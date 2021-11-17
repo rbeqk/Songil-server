@@ -1,5 +1,6 @@
 module.exports = function(app){
   const userController = require("./userController");
 
-  app.get('/', userController.test);
+  app.post('/auth', userController.getVerificationCode);
+  app.get('/auth', userController.verifyVerficationCode);
 }
