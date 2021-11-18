@@ -12,6 +12,8 @@ module.exports = {
   NEED_PHONE_OR_NICKNAME: {"isSuccess": false, "code": 2210, "message": "핸드폰 번호/닉네임 중 하나를 입력해주세요"},
   NEED_JUST_ONE_CONDITION: {"isSuccess": false, "code": 2211, "message": "핸드폰 번호/닉네임 중 하나만 입력해주세요"},
 
+  INVALID_AGEEMENT_IDX: {"isSuccess": false, "code": 2300, "message": "존재하지 않는 agreementIdx입니다"},
+
   //Response
   INVALD_VERIFICATIONCODE: {"isSuccess": false, "code": 3100, "message": "올바르지 않은 인증번호입니다"},
   NOT_REQUIRED_VERIFICATIONCODE_NUMBER: {"isSuccess": false, "code": 3101, "message": "인증번호를 요청한 번호가 아닙니다"},
@@ -22,6 +24,6 @@ module.exports = {
 
   EMPTY_AGREEMENTS: {"isSuccess": false, "code": 3300, "message": "이용약관이 없습니다"},
 
-  DB_ERROR: {"isSuccess": false, "code": 4001, "message": "DB 에러"},
+  DB_ERROR: {"isSuccess": false, "code": 4000, "message": "DB 에러"},
   SERVER_ERROR: {"isSuccess": false, "code": 4001, "message": "Server 에러"},
 }
