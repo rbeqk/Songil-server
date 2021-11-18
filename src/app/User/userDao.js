@@ -16,7 +16,18 @@ async function isExistNickname(connection, params){
   return rows[0]['isExist'];
 }
 
+//사용자 계정 생성
+async function createUser(connection, params){
+  const query = `
+  INSERT INTO User(phone, nickname)
+  VALUES (?, ?);
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows;
+}
+
 module.exports = {
   isExistPhone,
   isExistNickname,
+  createUser,
 }

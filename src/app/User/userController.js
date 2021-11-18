@@ -138,3 +138,24 @@ exports.checkDuplicated = async (req, res) => {
 
   return res.send(checkDuplicated);
 }
+
+/*
+  API No. 1.3
+  API Name: 회원가입 API
+  [POST] /signup
+  body: phone, nickname
+*/
+exports.signUp = async (req, res) => {
+  const {phone, nickname} = req.body;
+
+  if (!(phone && nickname)) return res.send(errResponse(baseResponse.IS_EMPTY));
+
+  const regPhone = /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/;
+  if (!regPhone.test(phone)) return res.send(errResponse(baseResponse.INVALID_PHONE_PATTERN));
+
+  let params = [phone, nickname];
+
+  const createUser = await userService.createUser(params);
+
+  return res.send(createUser);
+}
