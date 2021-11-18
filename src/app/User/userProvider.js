@@ -60,3 +60,21 @@ exports.isExistPhone = async (params) => {
     return false;
   }
 }
+
+exports.getUserIdx = async (params) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+      const userIdx = await userDao.getUserIdx(connection, params);
+      connection.release();
+      return userIdx;
+    }catch(err){
+      connection.release();
+      logger.error(`getUserIdx DB Query Error: ${err}`);
+      return false;
+    }
+  }catch(err){
+    logger.error(`getUserIdx DB Connection Error: ${err}`);
+    return false;
+  }
+}

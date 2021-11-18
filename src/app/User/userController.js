@@ -9,6 +9,7 @@ const CryptoJS = require('crypto-js');
 const SHA256 = require('crypto-js/sha256');
 const Base64 = require('crypto-js/enc-base64')
 const axios = require('axios');
+const jwt = require('jsonwebtoken');
 
 require('dotenv').config();
 
@@ -247,4 +248,46 @@ exports.getVerificationCodeWhenLogin = async (req, res) => {
   });
 
   return sendVerificationCode;
+}
+
+/*
+  API No. 1.6
+  API Name: 로그인 API
+  [POST] /login
+  body: phone, verificationCode
+*/
+exports.login = async (req, res) => {
+  const {phone, verificationCode} = req.body;
+  if (!(phone && verificationCode)) return res.send(errResponse(baseResponse.IS_EMPTY));
+
+  const regPhone = /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/;
+  if (!regPhone.test(phone)) return res.send(errResponse(baseResponse.INVALID_PHONE_PATTERN));
+
+  let params = [phone];
+  
+  //회원가입 한 번호인지 확인
+  const isExistPhone = await userProvider.isExistPhone(params);
+  if (!isExistPhone) return res.send(errResponse(baseResponse.NOT_SIGN_UP_PHONE));
+
+  //세션에 존재하지 않을 때(만료 or 발급 안함)
+  if (!(req.session.phone && req.session.verificationCode)) return res.send(errResponse(baseResponse.EXPIRES_VERIFICATIONCODE));
+
+  //인증번호를 요청한 번호가 아닐 때
+  if (req.session.phone != phone) return res.send(errResponse(baseResponse.NOT_REQUIRED_VERIFICATIONCODE_NUMBER));
+  else if (req.session.phone == phone && req.session.verificationCode != verificationCode) return res.send(errResponse(baseResponse.INVALD_VERIFICATIONCODE));
+
+  //로그인 한 유저의 idx 가져오기
+  const userIdx = await userProvider.getUserIdx(params);
+  if (!userIdx) return res.send(errResponse(baseResponse.DB_ERROR));
+
+  //jwt 생성
+  let token = await jwt.sign(
+    {userIdx: userIdx},
+    process.env.jwtSecret,
+    {expiresIn: '7d'}
+  );
+
+  const result = {'jwt': token};
+
+  return res.send(response(baseResponse.SUCCESS, result));
 }

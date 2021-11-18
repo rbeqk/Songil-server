@@ -18,7 +18,7 @@ module.exports = {
   //Response
   INVALD_VERIFICATIONCODE: {"isSuccess": false, "code": 3100, "message": "올바르지 않은 인증번호입니다"},
   NOT_REQUIRED_VERIFICATIONCODE_NUMBER: {"isSuccess": false, "code": 3101, "message": "인증번호를 요청한 번호가 아닙니다"},
-  EXPIRES_VERIFICATIONCODE: {"isSuccess": false, "code": 3102, "message": "만료된 인증번호입니다"},
+  EXPIRES_VERIFICATIONCODE: {"isSuccess": false, "code": 3102, "message": "인증번호를 먼저 발급해주세요"},
 
   DUPLICATED_PHONE: {"isSuccess": false, "code": 3200, "message": "이미 가입한 핸드폰 번호입니다"},
   DUPLICATED_NICKNAME: {"isSuccess": false, "code": 3201, "message": "중복된 닉네임입니다"},

@@ -26,8 +26,19 @@ async function createUser(connection, params){
   return rows;
 }
 
+//사용자idx 가져오기
+async function getUserIdx(connection, params){
+  const query = `
+  SELECT userIdx FROM User
+  WHERE phone = ? && isDeleted = 'N'
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows[0]['userIdx'];
+}
+
 module.exports = {
   isExistPhone,
   isExistNickname,
   createUser,
+  getUserIdx,
 }
