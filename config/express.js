@@ -21,6 +21,7 @@ module.exports = function (){
   }));
 
   require('../src/app/User/userRoute')(app);
+  require('../src/app/Agreement/agreementRoute')(app);
 
   return app;
 }

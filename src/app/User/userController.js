@@ -118,3 +118,23 @@ exports.verifyVerficationCode = async (req, res) => {
   else if (req.session.phone == phone && req.session.verificationCode != verificationCode) return res.send(errResponse(baseResponse.INVALD_VERIFICATIONCODE));
   else return res.send(response(baseResponse.SUCCESS));
 }
+
+
+/*
+  API No. 1.4
+  API Name: 핸드폰 번호 및 닉네임 중복 체크 API
+  [GET] /auth/duplicated-check
+  queryString: phone, nickname
+*/
+exports.checkDuplicated = async (req, res) => {
+  const {phone, nickname} = req.query;
+  if (!phone && !nickname) return res.send(errResponse(baseResponse.NEED_PHONE_OR_NICKNAME));
+  else if (phone && nickname) return res.send(errResponse(baseResponse.NEED_JUST_ONE_CONDITION));
+
+  let params;
+  phone ? params = [phone, 0] : params = [nickname, 1];
+
+  const checkDuplicated = await userProvider.checkDuplicated(params);
+
+  return res.send(checkDuplicated);
+}

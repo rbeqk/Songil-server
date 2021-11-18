@@ -1,12 +1,14 @@
 const mysql = require('mysql2/promise');
 const {logger} = require('./winston');
 
+require('dotenv').config();
+
 const pool = mysql.createPool({
-    host: 'songil-db.cvvepsxoj1ow.ap-northeast-2.rds.amazonaws.com',
+    host: process.env.dbHost,
     user: 'admin',
     port: '3306',
-    password: 'hyunbin7231',
-    database: 'songil-dev'
+    password: process.env.dbPassword,
+    database: process.env.dbName
 });
 
 module.exports = {
