@@ -291,3 +291,13 @@ exports.login = async (req, res) => {
 
   return res.send(response(baseResponse.SUCCESS, result));
 }
+
+/*
+  API No. 1.7
+  API Name: 자동로그인 API
+  [POST] /login/auto
+  body: x-access-token
+*/
+exports.autoLogin = async (req, res) => {
+  return res.send(response(baseResponse.SUCCESS));
+}
