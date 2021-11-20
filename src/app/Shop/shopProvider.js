@@ -21,7 +21,6 @@ exports.getProductDetail = async (params) => {
 
       //상세 정보
       const basicInfo = await shopDao.getProductBasicInfo(connection, params);  //기본 정보
-      const mainImage = await shopDao.getProductMainImage(connection, params);  //메인 이미지
       const detailImage = await shopDao.getProductDetailImage(connection, params);  //상세 이미지
       const cautions = await shopDao.getProductCautions(connection, params);  //유의사항
       const material = await shopDao.getProductMaterial(connection, params);  //소재
@@ -38,7 +37,6 @@ exports.getProductDetail = async (params) => {
         shippingFeeList = shippingFee.map(item => item.shippingFee);
       }
 
-      const mainImageList = mainImage.map(item => item.imageUrl);
       const detailImageList = detailImage.map(item => item.detailImageUrl);
       const cautionsList = cautions.map(item => item.cautions);
       const materialList = material.map(item => item.material);
@@ -48,7 +46,7 @@ exports.getProductDetail = async (params) => {
         'productIdx': basicInfo.productIdx,
         'isNew': basicInfo.isNew,
         'name': basicInfo.name,
-        'mainImageUrls': mainImageList,
+        'mainImageUrl': basicInfo.mainImageUrl,
         'price': basicInfo.price,
         'shippingFee': shippingFeeList,
         'material': materialList,

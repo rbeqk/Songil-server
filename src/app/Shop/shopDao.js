@@ -13,13 +13,14 @@ async function getProductBasicInfo(connection, params){
   SELECT P.productIdx,
         P.name,
         P.price,
+        P.mainImageUrl,
         P.content,
         P.size,
         P.isSoldOut,
         P.artistIdx,
         U.nickname as artistName,
         A.introduction as artistIntroduction,
-        IFNULL(U.imageUrl, '-') as artistImageUrl,
+        U.imageUrl as artistImageUrl,
         IF(TIMESTAMPDIFF(DAY, P.createdAt, NOW()) > 3, 'N', 'Y') as isNew
   FROM Product P
           JOIN Artist A ON A.artistIdx = P.artistIdx && A.isDeleted = 'N'
@@ -28,17 +29,6 @@ async function getProductBasicInfo(connection, params){
   `;
   const [rows] = await connection.query(query, params);
   return rows[0];
-}
-
-//상품 메인 이미지
-async function getProductMainImage(connection, params){
-  const query = `
-  SELECT PI.imageUrl FROM Product P
-  JOIN ProductImage PI ON PI.productIdx = P.productIdx && PI.isDeleted = 'N'
-  WHERE P.productIdx = ? && P.isDeleted = 'N';
-  `;
-  const [rows] = await connection.query(query, params);
-  return rows;
 }
 
 //상품 상세 이미지
@@ -110,7 +100,6 @@ async function getShippingFeeList(connection, params){
 module.exports = {
   isExistProductIdx,
   getProductBasicInfo,
-  getProductMainImage,
   getProductDetailImage,
   getProductCautions,
   getProductMaterial,
