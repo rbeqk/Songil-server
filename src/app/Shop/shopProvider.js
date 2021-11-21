@@ -4,12 +4,6 @@ const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 
-
-/*
-  API No. 3.11
-  API Name: 상품 상세 조회 API
-  [GET] /shop/products/:productIdx
-*/
 exports.getProductDetail = async (params) => {
   try{
     const connection = await pool.getConnection(async conn => conn);

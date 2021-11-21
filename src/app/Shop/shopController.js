@@ -7,6 +7,11 @@ const jwt = require("jsonwebtoken");
 
 require('dotenv').config();
 
+/*
+  API No. 3.11
+  API Name: 상품 상세 조회 API
+  [GET] /shop/products/:productIdx
+*/
 exports.getProductDetail = async (req, res) => {
   const token = req.headers['x-access-token'];
   let params = [token];
@@ -28,4 +33,23 @@ exports.getProductDetail = async (req, res) => {
   const productDetail = await shopProvider.getProductDetail(params);
 
   return res.send(productDetail);
+}
+
+/*
+  API No. 3.14
+  API Name: 1:1 문의하기 작성 (사용자) API
+  [POST] /shop/products/:productIdx/ask
+*/
+exports.createProductAsk = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {content} = req.body;
+  const {productIdx} = req.params;
+
+  if (!content) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (content.length > 300) return res.send(errResponse(baseResponse.EXCEED_ASK_CONTENT));
+
+  let params = [userIdx, productIdx, content];
+  const createProductAsk = await shopService.createProductAsk(params);
+
+  return res.send(createProductAsk);
 }
