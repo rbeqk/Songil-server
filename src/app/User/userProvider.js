@@ -79,7 +79,7 @@ exports.getUserIdx = async (params) => {
   }
 }
 
-exports.getSessionData = async (params) => {
+exports.getSessionData = async (params, type) => {
   const phone = params[0];
   const verificationCode = params[1];
   try{
@@ -104,7 +104,11 @@ exports.getSessionData = async (params) => {
       //해당 번호에 대한 인증번호 없을 때
       if (!result.length) return errResponse(baseResponse.GET_VERIFICATIONCODE_FIRST);
 
-      if (result[0] === verificationCode) return response(baseResponse.SUCCESS);  //가장 최근에 받은 인증번호 = 유효
+      //가장 최근에 받은 인증번호 = 유효
+      if (result[0] === verificationCode){
+        if (type) return true;
+        else return response(baseResponse.SUCCESS);
+      }
       else return errResponse(baseResponse.INVALD_VERIFICATIONCODE);  //만료 or 유효하지 않은 번호
 
     }catch(err){

@@ -272,12 +272,11 @@ exports.login = async (req, res) => {
   const isExistPhone = await userProvider.isExistPhone(params);
   if (!isExistPhone) return res.send(errResponse(baseResponse.NOT_SIGN_UP_PHONE));
 
-  //세션에 존재하지 않을 때(만료 or 발급 안함)
-  if (!(req.session.phone && req.session.verificationCode)) return res.send(errResponse(baseResponse.EXPIRES_VERIFICATIONCODE));
+  //유효한 인증번호인지 확인
+  params = [phone, verificationCode];
+  const isValidVerificationCode = await userProvider.getSessionData(params, 'login');
 
-  //인증번호를 요청한 번호가 아닐 때
-  if (req.session.phone != phone) return res.send(errResponse(baseResponse.NOT_REQUIRED_VERIFICATIONCODE_NUMBER));
-  else if (req.session.phone == phone && req.session.verificationCode != verificationCode) return res.send(errResponse(baseResponse.INVALD_VERIFICATIONCODE));
+  if (isValidVerificationCode !== true) return res.send(isValidVerificationCode);
 
   //로그인 한 유저의 idx 가져오기
   const userIdx = await userProvider.getUserIdx(params);
