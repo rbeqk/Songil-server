@@ -26,6 +26,11 @@ exports.getVerificationCode = async (req, res) => {
   const regPhone = /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/;
   if (!regPhone.test(phone)) return res.send(errResponse(baseResponse.INVALID_PHONE_PATTERN));
 
+  //이미 가입한 번호인지 확인
+  let params = [phone];
+  const isExistPhone = await userProvider.isExistPhone(params);
+  if (isExistPhone) return res.send(errResponse(baseResponse.DUPLICATED_PHONE));
+
   const hostPhone = process.env.hostPhone;
   const naverServiceId = process.env.naverServiceId;
   const naverSecretKey = process.env.naverSecretKey;
