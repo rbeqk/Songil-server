@@ -111,13 +111,11 @@ exports.verifyVerficationCode = async (req, res) => {
   const regPhone = /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/;
   if (!regPhone.test(phone)) return res.send(errResponse(baseResponse.INVALID_PHONE_PATTERN));
 
-  //세션에 존재하지 않을 때(만료)
-  if (!(req.session.phone && req.session.verificationCode)) return res.send(errResponse(baseResponse.EXPIRES_VERIFICATIONCODE));
+  //세션 정보 가져오기
+  let params = [phone, verificationCode];
+  const sessionInfo = await userProvider.getSessionData(params);
 
-  //인증번호를 요청한 번호가 아닐 때
-  if (req.session.phone != phone) return res.send(errResponse(baseResponse.NOT_REQUIRED_VERIFICATIONCODE_NUMBER));
-  else if (req.session.phone == phone && req.session.verificationCode != verificationCode) return res.send(errResponse(baseResponse.INVALD_VERIFICATIONCODE));
-  else return res.send(response(baseResponse.SUCCESS));
+  return res.send(sessionInfo);
 }
 
 

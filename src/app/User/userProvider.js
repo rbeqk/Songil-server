@@ -78,3 +78,42 @@ exports.getUserIdx = async (params) => {
     return false;
   }
 }
+
+exports.getSessionData = async (params) => {
+  const phone = params[0];
+  const verificationCode = params[1];
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+      const sessionData = await userDao.getSessionData(connection);
+      connection.release();
+      
+      //세션에 저장된 정보가 아예 없을 때
+      if (!sessionData.length) return errResponse(baseResponse.GET_VERIFICATIONCODE_FIRST);
+
+      let result = [];  //해당 번호에 대한 인증코드 목록
+      sessionData.forEach(item => {
+        let data = JSON.parse(item.data);
+        if (data.hasOwnProperty('phone')){
+          if (data.phone === phone){
+            result.push(data.verificationCode);
+          }
+        }
+      });
+
+      //해당 번호에 대한 인증번호 없을 때
+      if (!result.length) return errResponse(baseResponse.GET_VERIFICATIONCODE_FIRST);
+
+      if (result[0] === verificationCode) return response(baseResponse.SUCCESS);  //가장 최근에 받은 인증번호 = 유효
+      else return errResponse(baseResponse.INVALD_VERIFICATIONCODE);  //만료 or 유효하지 않은 번호
+
+    }catch(err){
+      connection.release();
+      logger.error(`getSessionData DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`getSessionData DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}

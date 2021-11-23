@@ -36,9 +36,19 @@ async function getUserIdx(connection, params){
   return rows[0]['userIdx'];
 }
 
+async function getSessionData(connection){
+  const query = `
+  SELECT data FROM sessions
+  ORDER BY expires DESC
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   isExistPhone,
   isExistNickname,
   createUser,
   getUserIdx,
+  getSessionData,
 }
