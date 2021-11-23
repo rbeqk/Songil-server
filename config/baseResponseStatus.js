@@ -12,10 +12,12 @@ module.exports = {
 
   NEED_PHONE_OR_NICKNAME: {"isSuccess": false, "code": 2210, "message": "핸드폰 번호/닉네임 중 하나를 입력해주세요"},
   NEED_JUST_ONE_CONDITION: {"isSuccess": false, "code": 2211, "message": "핸드폰 번호/닉네임 중 하나만 입력해주세요"},
+  NEED_PAGE: {"isSuccess": false, "code": 2212, "message": "page를 입력해주세요"},
 
   INVALID_AGEEMENT_IDX: {"isSuccess": false, "code": 2300, "message": "존재하지 않는 agreementIdx입니다"},
   INVALID_PRODUCT_IDX: {"isSuccess": false, "code": 2301, "message": "존재하지 않는 productIdx입니다"},
   INVALID_CONSUMER_IDX: {"isSuccess": false, "code": 2302, "message": "존재하지 않는 소비자입니다"},
+  INVALID_PAGE: {"isSuccess": false, "code": 2302, "message": "존재하지 않는 page입니다"},
 
   EXCEED_ASK_CONTENT: {"isSuccess": false, "code": 2350, "message": "content는 300자 이하로 입력해주세요"},
 
