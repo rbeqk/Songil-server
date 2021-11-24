@@ -53,6 +53,7 @@ exports.getProductDetail = async (params) => {
         'artistName': basicInfo.artistName,
         'artistIntroduction': basicInfo.artistIntroduction,
         'artistImageUrl': basicInfo.artistImageUrl,
+        'totalReviewCnt': basicInfo.totalReviewCnt
       };
 
       return response(baseResponse.SUCCESS, result);

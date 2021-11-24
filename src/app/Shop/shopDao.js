@@ -21,13 +21,14 @@ async function getProductBasicInfo(connection, params){
         U.nickname as artistName,
         A.introduction as artistIntroduction,
         U.imageUrl as artistImageUrl,
-        IF(TIMESTAMPDIFF(DAY, P.createdAt, NOW()) > 3, 'N', 'Y') as isNew
+        IF(TIMESTAMPDIFF(DAY, P.createdAt, NOW()) > 3, 'N', 'Y') as isNew,
+        (SELECT COUNT(productReviewIdx) as totalReviewCnt FROM ProductReview PR WHERE PR.productIdx = ? && PR.isDeleted = 'N') as totalReviewCnt
   FROM Product P
           JOIN Artist A ON A.artistIdx = P.artistIdx && A.isDeleted = 'N'
           JOIN User U ON A.userIdx = U.userIdx && U.isDeleted = 'N'
   WHERE P.productIdx = ? && P.isDeleted = 'N';
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query, [params[0], params[0]]);
   return rows[0];
 }
 
