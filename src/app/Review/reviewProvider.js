@@ -47,26 +47,42 @@ exports.getReview = async (params) => {
       //존재하는 productIdx인지
       const isExistProductIdx = await shopDao.isExistProductIdx(connection, productIdx);
       if (!isExistProductIdx) return errResponse(baseResponse.INVALID_PRODUCT_IDX);
+      
+      let reviewCnt;
 
-      //존재하는 page인지
+      //포토리뷰만
+      if (onlyPhoto === 'Y'){
+        reviewCnt = await reviewDao.getOnlyPhotoReviewCnt(connection, productIdx);
+      }
+      //리뷰 전체
+      else if (onlyPhoto === 'N'){
+        reviewCnt = await reviewDao.getReviewCnt(connection, productIdx);
+      }
+
       const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
-      const reviewCnt = await reviewDao.getReviewCnt(connection, productIdx); //존재하는 리뷰 개수
-      const totalPages = (reviewCnt % pageItemCnt == 0) ? reviewCnt / pageItemCnt : parseInt(reviewCnt / pageItemCnt) + 1;
-
-      if (page <= 0 || page > totalPages) return errResponse(baseResponse.INVALID_PAGE);
+      const totalPages = (reviewCnt % pageItemCnt == 0) ? reviewCnt / pageItemCnt : parseInt(reviewCnt / pageItemCnt) + 1;  //총 페이지 수
+      if (page <= 0 || page > totalPages) return errResponse(baseResponse.INVALID_PAGE);  //존재하는 page인지
 
       let result = {};
       result.totalReviewCnt = reviewCnt;
       result.reviews = [];
 
-      //리뷰 정보 전체 가져오기
-      const reviewInfo = await reviewDao.getReviewInfo(connection, productIdx);
+      let reviewInfo;
+      const startItemIdx = (page - 1) * pageItemCnt;
+
+      //포토리뷰만
+      if (onlyPhoto === 'Y'){
+        reviewInfo = await reviewDao.getReviewInfoOnlyPhoto(connection, [productIdx, startItemIdx, pageItemCnt]);
+      }
+      //리뷰 전체
+      else if (onlyPhoto === 'N'){
+        reviewInfo = await reviewDao.getReviewInfo(connection, [productIdx, startItemIdx, pageItemCnt]);
+      }
 
       let productReviewIdx;
       let reviewPhoto;
       for (let item of reviewInfo){
         productReviewIdx = item.productReviewIdx;
-        //리뷰 별 사진 가져오기
         reviewPhoto = await reviewDao.getReviewPhoto(connection, productReviewIdx);
 
         //이미지 배열로 변환
@@ -76,7 +92,7 @@ exports.getReview = async (params) => {
         }
 
         result.reviews.push({
-          'reviewIdx': item.reviewIdx,
+          'productReviewIdx': item.productReviewIdx,
           'userIdx': item.userIdx,
           'nickname': item.nickname,
           'createdAt': item.createdAt,
@@ -86,10 +102,7 @@ exports.getReview = async (params) => {
         })
       }
 
-      //포토리뷰만 볼 때
-      if (onlyPhoto === 'Y'){
-        result.reviews = result.reviews.filter(item => item.imageUrl)
-      }
+      connection.release();
 
       return response(baseResponse.SUCCESS, result);
       
