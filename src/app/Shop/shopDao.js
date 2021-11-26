@@ -78,6 +78,30 @@ async function getNewCraft(connection){
   return rows;
 }
 
+//사용자 별 최근 검색어 가져오기(15개)
+async function getRecentlySearch(connection, params){
+  const query = `
+  SELECT US.userSearchIdx, S.word FROM UserSearch US
+  JOIN Search S ON S.searchIdx = US.searchIdx
+  WHERE US.userIdx = ? && US.isDeleted = 'N'
+  ORDER BY US.userSearchIdx DESC
+  LIMIT 15
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows;
+}
+
+//인기 검색어 가져오기(10개)
+async function getPopularSearch(connection, params){
+  const query = `
+  SELECT searchIdx, word FROM Search
+  ORDER BY count DESC
+  LIMIT 10
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows;
+}
+
 module.exports = {
   getTodayCraftTotalCnt,
   getTodayCraft,
@@ -85,4 +109,6 @@ module.exports = {
   getBanner,
   getTodayArtist,
   getNewCraft,
+  getRecentlySearch,
+  getPopularSearch,
 }
