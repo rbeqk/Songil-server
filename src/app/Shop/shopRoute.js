@@ -4,4 +4,5 @@ module.exports = function (app){
   
   app.get('/shop/today-craft/page', shopController.getTodayCraftTotalPage);
   app.get('/shop/today-craft', shopController.getTodayCraft);
+  app.get('/shop', shopController.getShopEtc);
 }

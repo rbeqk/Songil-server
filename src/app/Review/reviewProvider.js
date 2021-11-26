@@ -55,7 +55,7 @@ exports.getReview = async (params) => {
     try{
       
       //존재하는 productIdx인지
-      const isExistProductIdx = await shopDao.isExistProductIdx(connection, productIdx);
+      const isExistProductIdx = await productDao.isExistProductIdx(connection, productIdx);
       if (!isExistProductIdx) return errResponse(baseResponse.INVALID_PRODUCT_IDX);
       
       let reviewCnt;

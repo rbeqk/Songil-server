@@ -72,3 +72,54 @@ exports.getTodayCraft = async (params) => {
     return errResponse(baseResponse.DB_ERROR);
   }
 }
+
+exports.getShopEtc = async (req, res) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+
+      const totalBannerCnt = await shopDao.getTotalBannerCnt(connection);
+      const banner = await shopDao.getBanner(connection);
+      const todayArtist = await shopDao.getTodayArtist(connection);
+      const newCraft = await shopDao.getNewCraft(connection);
+
+      let result = {};
+      result.totalBannerCnt = totalBannerCnt;
+
+      result.banner = [];
+      banner.forEach(item => {
+        result.banner.push({
+          'bannerIdx': item.shopBannerIdx,
+          'imageUrl': item.imageUrl
+        })
+      })
+
+      result.todayArtist = {
+        'artistIdx': todayArtist.artistIdx,
+        'artistName': todayArtist.artistName,
+        'imageUrl': todayArtist.imageUrl,
+        'major': todayArtist.major
+      }
+
+      result.newCraft = [];
+
+      newCraft.forEach(item => {
+        result.newCraft.push({
+          'productIdx': item.productIdx,
+          'imageUrl': item.mainImageUrl
+        })
+      });
+
+      connection.release();
+      return response(baseResponse.SUCCESS, result);
+      
+    }catch(err){
+      connection.release();
+      logger.error(`getShopEtc DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`getShopEtc DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}

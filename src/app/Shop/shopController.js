@@ -31,3 +31,14 @@ exports.getTodayCraft = async (req, res) => {
 
   return res.send(getTodayCraft);
 }
+
+/*
+  API No. 3.1
+  API Name: shop 쪽 banner/artist/new 조회 API
+  [GET] /shop
+*/
+exports.getShopEtc = async (req, res) => {
+  const getShopEtc = await shopProvider.getShopEtc();
+
+  return res.send(getShopEtc);
+}
