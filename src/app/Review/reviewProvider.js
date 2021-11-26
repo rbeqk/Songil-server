@@ -30,6 +30,7 @@ exports.getReviewTotalPage = async (params) => {
 
       const result = {'totalPages': totalPages};
 
+      connection.release();
       return response(baseResponse.SUCCESS, result);
       
     }catch(err){
@@ -111,9 +112,9 @@ exports.getReview = async (params) => {
           'isReported': item.isReported
         })
       }
-
+      result.reviews = result.reviews.reverse();
+      
       connection.release();
-
       return response(baseResponse.SUCCESS, result);
       
     }catch(err){

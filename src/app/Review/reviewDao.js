@@ -30,7 +30,7 @@ async function getReviewInfoOnlyPhoto(connection, params){
   FROM ProductReview PR
           JOIN User U ON U.userIdx = PR.userIdx
   WHERE PR.productIdx = ? && PR.isDeleted = 'N' && PR.isPhotoReview = 'Y'
-  ORDER BY PR.productReviewIdx DESC
+  ORDER BY PR.productReviewIdx
   LIMIT ?, ?
   `;
   const [rows] = await connection.query(query, params);
@@ -49,7 +49,7 @@ async function getReviewInfo(connection, params){
   FROM ProductReview PR
           JOIN User U ON U.userIdx = PR.userIdx
   WHERE PR.productIdx = ? && PR.isDeleted = 'N'
-  ORDER BY PR.productReviewIdx DESC
+  ORDER BY PR.productReviewIdx
   LIMIT ?, ?
   `;
   const [rows] = await connection.query(query, params);
