@@ -1,5 +1,5 @@
 const likeDao = require('./likeDao');
-const shopDao = require('../Shop/shopDao');
+const productDao = require('../Product/productDao');
 const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
@@ -13,7 +13,7 @@ exports.changeLikeStatus = async (params) => {
     try{
       
       //존재하는 productIdx인지
-      const isExistProductIdx = await shopDao.isExistProductIdx(connection, productIdx);
+      const isExistProductIdx = await productDao.isExistProductIdx(connection, productIdx);
       if (!isExistProductIdx) return errResponse(baseResponse.INVALID_PRODUCT_IDX);
 
       //현재 좋아요 status 확인

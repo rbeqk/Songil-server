@@ -1,4 +1,4 @@
-const shopDao = require('./shopDao');
+const productDao = require('./productDao');
 const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
@@ -14,16 +14,16 @@ exports.createProductAsk = async (params) => {
     try{
 
       //존재하는 소비자인지 확인
-      const isConsumerIdx = await shopDao.isExistConsumerIdx(connection, userIdx);
+      const isConsumerIdx = await productDao.isExistConsumerIdx(connection, userIdx);
       if (!isConsumerIdx) return errResponse(baseResponse.INVALID_CONSUMER_IDX);
 
       //존재하는 상품인지 확인
-      const isExistProductIdx = await shopDao.isExistProductIdx(connection, productIdx);
+      const isExistProductIdx = await productDao.isExistProductIdx(connection, productIdx);
       if (!isExistProductIdx) return errResponse(baseResponse.INVALID_PRODUCT_IDX);
 
       //1:1 문의 작성
       await connection.beginTransaction();
-      await shopDao.createProductAsk(connection, params);
+      await productDao.createProductAsk(connection, params);
       await connection.commit();
       connection.release();
 

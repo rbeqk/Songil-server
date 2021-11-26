@@ -1,4 +1,4 @@
-const shopDao = require('./shopDao');
+const productDao = require('./productDao');
 const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
@@ -10,24 +10,24 @@ exports.getProductDetail = async (params) => {
     try{
 
       //존재하는 productIdx인지
-      const isExistProductIdx = await shopDao.isExistProductIdx(connection, params);
+      const isExistProductIdx = await productDao.isExistProductIdx(connection, params);
       if (!isExistProductIdx) return errResponse(baseResponse.INVALID_PRODUCT_IDX);
 
       //상세 정보
-      const basicInfo = await shopDao.getProductBasicInfo(connection, params);  //기본 정보
-      const detailImage = await shopDao.getProductDetailImage(connection, params);  //상세 이미지
-      const cautions = await shopDao.getProductCautions(connection, params);  //유의사항
-      const material = await shopDao.getProductMaterial(connection, params);  //소재
-      const usage = await shopDao.getProductUsage(connection, params);  //용도
+      const basicInfo = await productDao.getProductBasicInfo(connection, params);  //기본 정보
+      const detailImage = await productDao.getProductDetailImage(connection, params);  //상세 이미지
+      const cautions = await productDao.getProductCautions(connection, params);  //유의사항
+      const material = await productDao.getProductMaterial(connection, params);  //소재
+      const usage = await productDao.getProductUsage(connection, params);  //용도
 
-      const isFreeShippingFee = await shopDao.isFreeShippingFee(connection, params);  //조건 없이 전체 무료배송인지
+      const isFreeShippingFee = await productDao.isFreeShippingFee(connection, params);  //조건 없이 전체 무료배송인지
       let shippingFeeList = [];
       
       if (isFreeShippingFee === 'Y'){
         shippingFeeList.push('무료배송');
       }
       else{
-        const shippingFee = await shopDao.getShippingFeeList(connection, params);
+        const shippingFee = await productDao.getShippingFeeList(connection, params);
         shippingFeeList = shippingFee.map(item => item.shippingFee);
       }
 

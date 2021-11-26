@@ -36,7 +36,7 @@ module.exports = function (){
 
   require('../src/app/User/userRoute')(app);
   require('../src/app/Agreement/agreementRoute')(app);
-  require('../src/app/Shop/shopRoute')(app);
+  require('../src/app/Product/productRoute')(app);
   require('../src/app/Review/reviewRoute')(app);
   require('../src/app/Like/likeRoute')(app);
 
