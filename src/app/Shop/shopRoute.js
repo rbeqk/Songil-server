@@ -3,4 +3,5 @@ module.exports = function (app){
   const shopController = require('./shopController');
   
   app.get('/shop/today-craft/page', shopController.getTodayCraftTotalPage);
+  app.get('/shop/today-craft', shopController.getTodayCraft);
 }

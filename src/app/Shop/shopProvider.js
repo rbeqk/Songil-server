@@ -30,3 +30,45 @@ exports.getTodayCraftTotalPage = async () => {
     return errResponse(baseResponse.DB_ERROR);
   }
 }
+
+exports.getTodayCraft = async (params) => {
+  const page = params[0];
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+
+      const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
+      const todayCraftCnt = await shopDao.getTodayCraftTotalCnt(connection);
+      const totalPages = (todayCraftCnt % pageItemCnt == 0) ? todayCraftCnt / pageItemCnt : parseInt(todayCraftCnt / pageItemCnt) + 1;  //총 페이지 수
+      if (page <= 0 || page > totalPages) return errResponse(baseResponse.INVALID_PAGE);  //존재하는 page인지
+
+      const startItemIdx = (page - 1) * pageItemCnt;
+
+      const todayCraft = await shopDao.getTodayCraft(connection, [startItemIdx, pageItemCnt]);
+
+      let result = [];
+      todayCraft.forEach(item => {
+        result.push({
+          'productIdx': item.productIdx,
+          'imageUrl': item.imageUrl,
+          'name': item.name,
+          'artistIdx': item.artistIdx,
+          'artistName': item.artistName,
+          'price': item.price,
+          'isNew': item.isNew
+        })
+      })
+
+      connection.release();
+      return response(baseResponse.SUCCESS, result);
+      
+    }catch(err){
+      connection.release();
+      logger.error(`getTodayCraft DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`getTodayCraft DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}

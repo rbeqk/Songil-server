@@ -15,3 +15,19 @@ exports.getTodayCraftTotalPage = async (req, res) => {
 
   return res.send(getTodayCraftTotalPage);
 }
+
+/*
+  API No. 3.2
+  API Name: shop 쪽 today craft 조회 API
+  [GET] /shop/today-craft
+  query: page
+*/
+exports.getTodayCraft = async (req, res) => {
+  const {page} = req.query;
+  if (!page) return res.send(errResponse(baseResponse.IS_EMPTY));
+  let params = [page];
+
+  const getTodayCraft = await shopProvider.getTodayCraft(params);
+
+  return res.send(getTodayCraft);
+}
