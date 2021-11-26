@@ -6,17 +6,27 @@ const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 
 exports.getReviewTotalPage = async (params) => {
+  const productIdx = params[0];
+  const onlyPhoto = params[1];
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
       
       //존재하는 productIdx인지
-      const isExistProductIdx = await shopDao.isExistProductIdx(connection, params);
+      const isExistProductIdx = await shopDao.isExistProductIdx(connection, productIdx);
       if (!isExistProductIdx) return errResponse(baseResponse.INVALID_PRODUCT_IDX);
 
+      let reviewCnt;
+      
+      if (onlyPhoto === 'Y'){
+        reviewCnt = await reviewDao.getOnlyPhotoReviewCnt(connection, params);
+      }
+      else if (onlyPhoto === 'N'){
+        reviewCnt = await reviewDao.getReviewCnt(connection, params);
+      }
+
       const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
-      const reviewCnt = await reviewDao.getReviewCnt(connection, params); //존재하는 리뷰 개수
-      const totalPages = (reviewCnt % pageItemCnt == 0) ? reviewCnt / pageItemCnt : parseInt(reviewCnt / pageItemCnt) + 1;
+      const totalPages = (reviewCnt % pageItemCnt == 0) ? reviewCnt / pageItemCnt : parseInt(reviewCnt / pageItemCnt) + 1;  //총 페이지 수
 
       const result = {'totalPages': totalPages};
 

@@ -13,9 +13,12 @@ require('dotenv').config();
   [GET] /shop/products/:productIdx/reviews/page
 */
 exports.getReviewTotalPage = async (req, res) => {
+  const {onlyPhoto} = req.query;
   const {productIdx} = req.params;
 
-  let params = [productIdx];
+  if (!onlyPhoto) return res.send(errResponse(baseResponse.IS_EMPTY));
+
+  let params = [productIdx, onlyPhoto];
   const getReviewTotalPage = await reviewProvider.getReviewTotalPage(params);
 
   return res.send(getReviewTotalPage);
