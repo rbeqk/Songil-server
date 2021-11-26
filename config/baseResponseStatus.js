@@ -1,7 +1,7 @@
 module.exports = {
   SUCCESS: { "isSuccess": true, "code": 200, "message": "성공" },
   // Common
-  TOKEN_EMPTY: { "isSuccess": false, "code": 2000, "message": "JWT 토큰이 입력되지 않았습니다." },
+  TOKEN_EMPTY: { "isSuccess": false, "code": 2000, "message": "JWT 토큰이 입력되지 않았습니다" },
   TOKEN_VERIFICATION_FAILURE: { "isSuccess": false, "code": 3000, "message": "JWT 토큰 검증 실패" },
 
   //Request
@@ -18,6 +18,7 @@ module.exports = {
   INVALID_PRODUCT_IDX: {"isSuccess": false, "code": 2301, "message": "존재하지 않는 productIdx입니다"},
   INVALID_CONSUMER_IDX: {"isSuccess": false, "code": 2302, "message": "존재하지 않는 소비자입니다"},
   INVALID_PAGE: {"isSuccess": false, "code": 2302, "message": "존재하지 않는 page입니다"},
+  INVALID_USER_SEARCH_IDX: {"isSuccess": false, "code": 2303, "message": "존재하지 않는 userSearchIdx입니다"},
 
   EXCEED_ASK_CONTENT: {"isSuccess": false, "code": 2350, "message": "content는 300자 이하로 입력해주세요"},
 

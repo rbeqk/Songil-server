@@ -102,6 +102,28 @@ async function getPopularSearch(connection, params){
   return rows;
 }
 
+//유효한 userSearchIdx인지
+async function isExistUserSearchIdx(connection, params){
+  const query = `
+  SELECT EXISTS(SELECT userSearchIdx
+    FROM UserSearch
+    WHERE userIdx = ? && userSearchIdx = ? && isDeleted = 'N') as isExist
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows[0]['isExist'];
+}
+
+//사용자 최근검색어 삭제
+async function deleteUserRecentlySearch(connection, params){
+  const query = `
+  UPDATE UserSearch
+  SET isDeleted = 'Y'
+  WHERE userSearchIdx = ?
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows;
+}
+
 module.exports = {
   getTodayCraftTotalCnt,
   getTodayCraft,
@@ -111,4 +133,6 @@ module.exports = {
   getNewCraft,
   getRecentlySearch,
   getPopularSearch,
+  isExistUserSearchIdx,
+  deleteUserRecentlySearch,
 }

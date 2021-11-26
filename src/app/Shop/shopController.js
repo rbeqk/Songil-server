@@ -72,3 +72,18 @@ exports.getSearchKeywords = async (req, res) => {
 
   return res.send(getSearchKeywords);
 }
+
+/*
+  API No. 3.16
+  API Name: 사용자 최근 검색어 삭제 API
+  [DELETE] /search/:userSearchIdx
+*/
+exports.deleteUserRecentlySearch = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {userSearchIdx} = req.params;
+
+  let params = [userIdx, userSearchIdx];
+  const deleteUserRecentlySearch = await shopService.deleteUserRecentlySearch(params);
+
+  return res.send(deleteUserRecentlySearch);
+}
