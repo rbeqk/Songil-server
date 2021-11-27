@@ -34,3 +34,33 @@ exports.deleteUserRecentlySearch = async (params) => {
     return errResponse(baseResponse.DB_ERROR);
   }
 }
+
+exports.deleteAllUserRecentlySearch = async (params) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+      
+      //user의 지울 검색어가 있는지
+      const isExistUserSearchs = await shopDao.isExistUserSearchs(connection, params);
+      if (!isExistUserSearchs) return errResponse(baseResponse.EMPTY_USER_SEARCH);
+      
+      await connection.beginTransaction();
+
+      //최근검색어 전체 삭제
+      await shopDao.deleteAllUserRecentlySearch(connection, params);
+      await connection.commit();
+      
+      connection.release();
+      return response(baseResponse.SUCCESS);
+      
+    }catch(err){
+      await connection.rollback();
+      connection.release();
+      logger.error(`deleteAllUserRecentlySearch DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`deleteAllUserRecentlySearch DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}

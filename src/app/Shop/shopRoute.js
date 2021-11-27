@@ -8,4 +8,5 @@ module.exports = function (app){
 
   app.get('/search/keywords', shopController.getSearchKeywords);
   app.delete('/search/:searchIdx', jwtMiddleware, shopController.deleteUserRecentlySearch);
+  app.delete('/search', jwtMiddleware, shopController.deleteAllUserRecentlySearch);
 }

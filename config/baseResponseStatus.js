@@ -30,6 +30,7 @@ module.exports = {
   DUPLICATED_NICKNAME: {"isSuccess": false, "code": 3201, "message": "중복된 닉네임입니다"},
 
   EMPTY_AGREEMENTS: {"isSuccess": false, "code": 3300, "message": "이용약관이 없습니다"},
+  EMPTY_USER_SEARCH: {"isSuccess": false, "code": 3300, "message": "사용자의 최근 검색어가 없습니다"},
 
   DB_ERROR: {"isSuccess": false, "code": 4000, "message": "DB 에러"},
   SERVER_ERROR: {"isSuccess": false, "code": 4001, "message": "Server 에러"},
