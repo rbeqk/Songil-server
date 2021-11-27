@@ -38,16 +38,6 @@ exports.getReview = async (req, res) => {
   const {productIdx} = req.params;
   let params = [token];
 
-  //jwt가 있을 경우 유효한지 확인
-  let userIdx;
-  if (token){
-    try{
-      userIdx = jwt.verify(token, process.env.jwtSecret);
-    }catch(err){
-      return res.send(errResponse(baseResponse.TOKEN_VERIFICATION_FAILURE));
-    }
-  }
-
   params = [productIdx, page, onlyPhoto];
 
   const getReview = await reviewProvider.getReview(params);
