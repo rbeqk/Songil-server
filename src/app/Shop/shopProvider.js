@@ -139,7 +139,7 @@ exports.getSearchKeywords = async (params) => {
 
         recentlySearch.forEach(item => {
           result.recentlySearch.push({
-            'userSearchIdx': item.userSearchIdx,
+            'searchIdx': item.searchIdx,
             'word': item.word
           });
         })

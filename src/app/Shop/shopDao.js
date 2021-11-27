@@ -81,8 +81,9 @@ async function getNewCraft(connection){
 //사용자 별 최근 검색어 가져오기(15개)
 async function getRecentlySearch(connection, params){
   const query = `
-  SELECT US.userSearchIdx, S.word FROM UserSearch US
-  JOIN Search S ON S.searchIdx = US.searchIdx
+  SELECT S.searchIdx, S.word
+  FROM UserSearch US
+          JOIN Search S ON S.searchIdx = US.searchIdx
   WHERE US.userIdx = ? && US.isDeleted = 'N'
   ORDER BY US.userSearchIdx DESC
   LIMIT 15
