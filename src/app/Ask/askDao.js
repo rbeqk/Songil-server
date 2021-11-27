@@ -1,3 +1,13 @@
+//1:1문의 작성
+async function createProductAsk(connection, params){
+  const query = `
+  INSERT INTO ProductAsk (userIdx, productIdx, content)
+  VALUES (?, ?, ?)
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows;
+}
+
 //사용자별 1:1 문의 개수 가져오기
 async function getAskCnt(connection, params){
   const query = `
@@ -9,5 +19,6 @@ async function getAskCnt(connection, params){
 }
 
 module.exports = {
+  createProductAsk,
   getAskCnt,
 }

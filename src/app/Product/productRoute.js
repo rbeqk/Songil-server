@@ -3,6 +3,4 @@ module.exports = function(app){
   const productController = require('./productController');
 
   app.get('/shop/products/:productIdx', productController.getProductDetail);
-  
-  app.post('/shop/products/:productIdx/ask', jwtMiddleware, productController.createProductAsk);
 }

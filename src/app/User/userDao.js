@@ -45,10 +45,20 @@ async function getSessionData(connection){
   return rows;
 }
 
+//존재하는 소비자인지
+async function isExistConsumerIdx(connection, params){
+  const query = `
+  SELECT EXISTS(SELECT userIdx FROM User WHERE userIdx = ? && isArtist = 'N' && isDeleted = 'N') as isExist
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows[0]['isExist'];
+}
+
 module.exports = {
   isExistPhone,
   isExistNickname,
   createUser,
   getUserIdx,
   getSessionData,
+  isExistConsumerIdx,
 }
