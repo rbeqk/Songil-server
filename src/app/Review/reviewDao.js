@@ -66,10 +66,45 @@ async function getReviewPhoto(connection, params){
   return rows;
 }
 
+//존재하는 상품 리뷰 idx인지
+async function isExistProductReviewIdx(connection, params){
+  const query = `
+  SELECT EXISTS(SELECT productReviewIdx
+    FROM ProductReview
+    WHERE isDeleted = 'N') as isExist;
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows[0]['isExist'];
+}
+
+//사용자가 기존에 신고한 상품 리뷰 idx인지
+async function isExistUserReportedReviewIdx(connection, params){
+  const query = `
+  SELECT EXISTS(SELECT *
+    FROM ReportedProductReview
+    WHERE userIdx = ? && productReviewIdx = ?) as isExist;
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows[0]['isExist'];
+}
+
+//리뷰 신고
+async function reportReview(connection, params){
+  const query = `
+  INSERT INTO ReportedProductReview(userIdx, productReviewIdx, reportedProductReasonIdx, etcContent)
+  VALUES (?, ?, ?, ?)
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows;
+}
+
 module.exports = {
   getOnlyPhotoReviewCnt,
   getReviewCnt,
   getReviewInfoOnlyPhoto,
   getReviewInfo,
   getReviewPhoto,
+  isExistProductReviewIdx,
+  isExistUserReportedReviewIdx,
+  reportReview,
 }

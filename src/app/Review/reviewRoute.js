@@ -4,4 +4,6 @@ module.exports = function (app){
   
   app.get('/shop/products/:productIdx/reviews/page', reviewController.getReviewTotalPage);
   app.get('/shop/products/:productIdx/reviews', reviewController.getReview);
+
+  app.post('/reported-reviews/:productReviewIdx', jwtMiddleware, reviewController.reportReview);
 }
