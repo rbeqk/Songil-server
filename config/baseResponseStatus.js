@@ -14,7 +14,6 @@ module.exports = {
   NEED_JUST_ONE_CONDITION: {"isSuccess": false, "code": 2211, "message": "핸드폰 번호/닉네임 중 하나만 입력해주세요"},
   NEED_PAGE: {"isSuccess": false, "code": 2212, "message": "page를 입력해주세요"},
 
-  INVALID_AGEEMENT_IDX: {"isSuccess": false, "code": 2300, "message": "존재하지 않는 agreementIdx입니다"},
   INVALID_PRODUCT_IDX: {"isSuccess": false, "code": 2301, "message": "존재하지 않는 productIdx입니다"},
   INVALID_CONSUMER_IDX: {"isSuccess": false, "code": 2302, "message": "존재하지 않는 소비자입니다"},
   INVALID_PAGE: {"isSuccess": false, "code": 2302, "message": "존재하지 않는 page입니다"},
@@ -29,7 +28,6 @@ module.exports = {
   DUPLICATED_PHONE: {"isSuccess": false, "code": 3200, "message": "이미 가입한 핸드폰 번호입니다"},
   DUPLICATED_NICKNAME: {"isSuccess": false, "code": 3201, "message": "중복된 닉네임입니다"},
 
-  EMPTY_AGREEMENTS: {"isSuccess": false, "code": 3300, "message": "이용약관이 없습니다"},
   EMPTY_USER_SEARCH: {"isSuccess": false, "code": 3300, "message": "사용자의 최근 검색어가 없습니다"},
 
   DB_ERROR: {"isSuccess": false, "code": 4000, "message": "DB 에러"},
