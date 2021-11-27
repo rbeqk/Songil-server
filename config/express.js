@@ -39,6 +39,7 @@ module.exports = function (){
   require('../src/app/Review/reviewRoute')(app);
   require('../src/app/Like/likeRoute')(app);
   require('../src/app/Shop/shopRoute')(app);
+  require('../src/app/Ask/askRoute')(app);
 
   return app;
 }
