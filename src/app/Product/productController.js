@@ -16,16 +16,6 @@ exports.getProductDetail = async (req, res) => {
   const token = req.headers['x-access-token'];
   let params = [token];
 
-  //jwt가 있을 경우 유효한지 확인
-  let userIdx;
-  if (token){
-    try{
-      userIdx = jwt.verify(token, process.env.jwtSecret);
-    }catch(err){
-      return res.send(errResponse(baseResponse.TOKEN_VERIFICATION_FAILURE));
-    }
-  }
-
   const {productIdx} = req.params;
   params = [productIdx];
   
