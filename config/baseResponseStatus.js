@@ -18,7 +18,7 @@ module.exports = {
   INVALID_PRODUCT_IDX: {"isSuccess": false, "code": 2301, "message": "존재하지 않는 productIdx입니다"},
   INVALID_CONSUMER_IDX: {"isSuccess": false, "code": 2302, "message": "존재하지 않는 소비자입니다"},
   INVALID_PAGE: {"isSuccess": false, "code": 2302, "message": "존재하지 않는 page입니다"},
-  INVALID_USER_SEARCH_IDX: {"isSuccess": false, "code": 2303, "message": "존재하지 않는 userSearchIdx입니다"},
+  INVALID_USER_SEARCH_IDX: {"isSuccess": false, "code": 2303, "message": "유저의 검색항목이 아닙니다"},
 
   EXCEED_ASK_CONTENT: {"isSuccess": false, "code": 2350, "message": "content는 300자 이하로 입력해주세요"},
 

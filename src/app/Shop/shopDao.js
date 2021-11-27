@@ -103,12 +103,12 @@ async function getPopularSearch(connection, params){
   return rows;
 }
 
-//유효한 userSearchIdx인지
+//유효한 user의 search 항목인지
 async function isExistUserSearchIdx(connection, params){
   const query = `
   SELECT EXISTS(SELECT userSearchIdx
     FROM UserSearch
-    WHERE userIdx = ? && userSearchIdx = ? && isDeleted = 'N') as isExist
+    WHERE userIdx = ? && searchIdx = ? && isDeleted = 'N') as isExist
   `;
   const [rows] = await connection.query(query, params);
   return rows[0]['isExist'];
@@ -119,7 +119,7 @@ async function deleteUserRecentlySearch(connection, params){
   const query = `
   UPDATE UserSearch
   SET isDeleted = 'Y'
-  WHERE userSearchIdx = ?
+  WHERE userIdx = ? && searchIdx = ?
   `;
   const [rows] = await connection.query(query, params);
   return rows;

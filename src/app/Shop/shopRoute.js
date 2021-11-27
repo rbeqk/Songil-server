@@ -7,5 +7,5 @@ module.exports = function (app){
   app.get('/shop', shopController.getShopEtc);
 
   app.get('/search/keywords', shopController.getSearchKeywords);
-  app.delete('/search/:userSearchIdx', jwtMiddleware, shopController.deleteUserRecentlySearch);
+  app.delete('/search/:searchIdx', jwtMiddleware, shopController.deleteUserRecentlySearch);
 }
