@@ -130,12 +130,12 @@ exports.getSearchKeywords = async (params) => {
     try{
 
       let result = {};
-      result.recentlySearch = [];
+      result.recentlySearch = null;
 
       //사용자 있을 경우 => 최근검색어 추가
       if (params[0]){
         const recentlySearch = await shopDao.getRecentlySearch(connection, params);
-        if (!recentlySearch.length) result.recentlySearch = null;
+        if (recentlySearch.length) result.recentlySearch = [];
 
         recentlySearch.forEach(item => {
           result.recentlySearch.push({
@@ -145,10 +145,10 @@ exports.getSearchKeywords = async (params) => {
         })
       }
 
-      result.popularSearch = [];
+      result.popularSearch = null;
       //인기검색어
       const popularSearch = await shopDao.getPopularSearch(connection);
-      if (!popularSearch.length) result.popularSearch = null;
+      if (popularSearch.length) result.popularSearch = [];
 
       popularSearch.forEach(item => {
         result.popularSearch.push({
