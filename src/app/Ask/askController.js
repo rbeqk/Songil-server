@@ -36,3 +36,19 @@ exports.getAskTotalPage = async (req, res) => {
 
   return res.send(getAskTotalPage);
 }
+
+/*
+  API No. 8.1
+  API Name: 1:1 문의 내역 페이지 조회 API
+  [GET] /mypage/ask
+  query: page
+*/
+exports.getAsk = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {page} = req.query;
+
+  let params = [userIdx, page];
+  const getAsk = await askProvider.getAsk(params);
+
+  return res.send(getAsk);
+}
