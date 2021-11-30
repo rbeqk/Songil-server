@@ -22,6 +22,7 @@ module.exports = {
   INVALD_PRODUT_REVIEW_IDX: {"isSuccess": false, "code": 2305, "message": "존재하지 않는 productReviewIdx입니다"},
   INVALID_REPORTED_REASON_IDX: {"isSuccess": false, "code": 2306, "message": "존재하지 않는 reportedReasonIdx입니다"},
   INVALID_ARTICLE_IDX: {"isSuccess": false, "code": 2307, "message": "존재하지 않는 articleIdx입니다"},
+  INVALID_ARTIST_IDX: {"isSuccess": false, "code": 2308, "message": "존재하지 않는 artistIdx입니다"},
 
   EXCEED_ASK_CONTENT: {"isSuccess": false, "code": 2350, "message": "content는 300자 이하로 입력해주세요"},
   EXCEED_REPORTED_REASON: {"isSuccess": false, "code": 2351, "message": "신고 사유는 150자 이하로 입력해주세요"},
