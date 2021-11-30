@@ -6,8 +6,8 @@ module.exports = function(app){
   app.post('/shop/products/:productIdx/ask', jwtMiddleware, askController.createProductAsk);
 
   //1:1 문의 내역 페이지 조회 API
-  app.get('/mypage/ask/page', jwtMiddleware, askController.getAskTotalPage);
+  app.get('/my-page/ask/page', jwtMiddleware, askController.getAskTotalPage);
 
   //1:1 문의 내역 조회 API
-  app.get('/mypage/ask', jwtMiddleware, askController.getAsk);
+  app.get('/my-page/ask', jwtMiddleware, askController.getAsk);
 }
