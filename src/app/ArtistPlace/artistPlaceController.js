@@ -20,3 +20,16 @@ exports.getArtistInfo = async (req, res) => {
 
   return res.send(getArtistInfo);
 }
+
+/*
+  API No. 9.2
+  API Name: 작가 별 craft 페이지 개수 조회 API
+  [GET] /artist/:artistIdx/crafts/page
+*/
+exports.getArtistCraftTotalPage = async (req, res) => {
+  const {artistIdx} = req.params;
+  let params = [artistIdx];
+  const getArtistCraftTotalPage = await artistPlaceProvider.getArtistCraftTotalPage(params);
+
+  return res.send(getArtistCraftTotalPage);
+}

@@ -41,9 +41,20 @@ async function getArtistExhibition(connection, params){
   return rows;
 }
 
+//작가 별 총 craft 개수 
+async function getArtistCraftCnt(connection, params){
+  const query = `
+  SELECT COUNT(productIdx) as totalCnt FROM Product
+  WHERE isDeleted = 'N' && artistIdx = ?;
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows[0]['totalCnt'];
+}
+
 module.exports = {
   isExistArtistIdx,
   getArtistInfo,
   getArtistProfile,
   getArtistExhibition,
+  getArtistCraftCnt,
 }
