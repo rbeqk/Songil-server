@@ -40,6 +40,7 @@ module.exports = function (){
   require('../src/app/Like/likeRoute')(app);
   require('../src/app/Shop/shopRoute')(app);
   require('../src/app/Ask/askRoute')(app);
+  require('../src/app/Article/articleRoute')(app);
 
   return app;
 }
