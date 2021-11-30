@@ -78,13 +78,11 @@ exports.getShopEtc = async (req, res) => {
     const connection = await pool.getConnection(async conn => conn);
     try{
 
-      const totalBannerCnt = await shopDao.getTotalBannerCnt(connection);
       const banner = await shopDao.getBanner(connection);
       const todayArtist = await shopDao.getTodayArtist(connection);
       const newCraft = await shopDao.getNewCraft(connection);
 
       let result = {};
-      result.totalBannerCnt = totalBannerCnt;
 
       result.banner = [];
       banner.forEach(item => {
