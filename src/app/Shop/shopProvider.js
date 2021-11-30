@@ -50,7 +50,7 @@ exports.getTodayCraft = async (params) => {
       todayCraft.forEach(item => {
         result.push({
           'productIdx': item.productIdx,
-          'imageUrl': item.imageUrl,
+          'mainImageUrl': item.mainImageUrl,
           'name': item.name,
           'artistIdx': item.artistIdx,
           'artistName': item.artistName,

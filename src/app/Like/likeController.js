@@ -5,7 +5,7 @@ const {errResponse} = require("../../../config/response");
 
 /*
   API No. 3.15
-  API Name: 이용약관 전체 조회 API
+  API Name: 상품 좋아요 변경 API
   [PATCH] /shop/products/:productIdx/like
 */
 exports.changeLikeStatus = async (req, res) => {

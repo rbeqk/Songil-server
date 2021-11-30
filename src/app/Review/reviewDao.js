@@ -2,7 +2,7 @@
 async function getOnlyPhotoReviewCnt(connection, params){
   const query = `
   SELECT COUNT(productReviewIdx) as totalReviewCnt FROM ProductReview
-  WHERE isDeleted = 'N' && isPhotoReview = 'Y'
+  WHERE productIdx = ? && isDeleted = 'N' && isPhotoReview = 'Y'
   `;
   const [rows] = await connection.query(query, params);
   return rows[0]['totalReviewCnt'];

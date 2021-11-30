@@ -32,14 +32,11 @@ exports.getReviewTotalPage = async (req, res) => {
 */
 exports.getReview = async (req, res) => {
   const {page, onlyPhoto} = req.query;
+  const {productIdx} = req.params;
+
   if (!(page && onlyPhoto)) return res.send(errResponse(baseResponse.IS_EMPTY));
 
-  const token = req.headers['x-access-token'];
-  const {productIdx} = req.params;
-  let params = [token];
-
-  params = [productIdx, page, onlyPhoto];
-
+  let params = [productIdx, page, onlyPhoto];
   const getReview = await reviewProvider.getReview(params);
 
   return res.send(getReview);

@@ -13,11 +13,8 @@ require('dotenv').config();
   [GET] /shop/products/:productIdx
 */
 exports.getProductDetail = async (req, res) => {
-  const token = req.headers['x-access-token'];
-  let params = [token];
-
   const {productIdx} = req.params;
-  params = [productIdx];
+  let params = [productIdx];
   
   //상품 detail
   const productDetail = await productProvider.getProductDetail(params);

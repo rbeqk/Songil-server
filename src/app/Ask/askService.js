@@ -15,10 +15,6 @@ exports.createProductAsk = async (params) => {
     const connection = await pool.getConnection(async conn => conn);
     try{
 
-      //존재하는 소비자인지 확인
-      const isConsumerIdx = await userDao.isExistConsumerIdx(connection, userIdx);
-      if (!isConsumerIdx) return errResponse(baseResponse.INVALID_CONSUMER_IDX);
-
       //존재하는 상품인지 확인
       const isExistProductIdx = await productDao.isExistProductIdx(connection, productIdx);
       if (!isExistProductIdx) return errResponse(baseResponse.INVALID_PRODUCT_IDX);

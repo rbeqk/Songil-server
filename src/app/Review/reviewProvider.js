@@ -107,7 +107,6 @@ exports.getReview = async (params) => {
           'userIdx': item.userIdx,
           'nickname': item.nickname,
           'createdAt': item.createdAt,
-          'totalImageUrlCnt': reviewPhotoList.length,
           'imageUrl': !reviewPhotoList.length ? null : reviewPhotoList,
           'content': item.content,
           'isReported': item.isReported

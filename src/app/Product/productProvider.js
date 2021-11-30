@@ -27,6 +27,8 @@ exports.getProductDetail = async (params) => {
         shippingFeeList.push('무료배송');
       }
       else{
+        
+        //다른 경우의 수 있을 때 변경 예정
         const shippingFee = await productDao.getShippingFeeList(connection, params);
         shippingFeeList = shippingFee.map(item => item.shippingFee);
       }
