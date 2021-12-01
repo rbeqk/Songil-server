@@ -98,6 +98,17 @@ async function getShippingFeeList(connection, params){
   return rows;
 }
 
+//사용자가 좋아요한 상품인지
+async function getUserLikeProduct(connection, params){
+  const query = `
+  SELECT EXISTS(SELECT *
+    FROM ProductLike
+    WHERE productIdx = ? && userIdx = ?) as isExist;
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows[0]['isExist'];
+}
+
 module.exports = {
   isExistProductIdx,
   getProductBasicInfo,
@@ -107,4 +118,5 @@ module.exports = {
   getProductUsage,
   isFreeShippingFee,
   getShippingFeeList,
+  getUserLikeProduct,
 }

@@ -33,3 +33,34 @@ exports.getArtistCraftTotalPage = async (req, res) => {
 
   return res.send(getArtistCraftTotalPage);
 }
+
+/*
+  API No. 9.3
+  API Name: 작가 별 craft 조회 API
+  [GET] /artist/:artistIdx/crafts
+  query: page, filter
+*/
+exports.getArtistCraft = async (req, res) => {
+  const {artistIdx} = req.params;
+  const {page, filter} = req.query;
+
+  if (!(page && filter)) return res.send(errResponse(baseResponse.IS_EMPTY));
+
+  const token = req.headers['x-access-token'];
+
+  //jwt가 있을 경우 유효한지 확인
+  let userIdx;
+  if (token){
+    try{
+      userIdx = jwt.verify(token, process.env.jwtSecret).userIdx;
+    }catch(err){
+      return res.send(errResponse(baseResponse.TOKEN_VERIFICATION_FAILURE));
+    }
+  }
+
+  let params = [artistIdx, page, filter, userIdx];
+
+  const getArtistCraft = await artistPlaceProvider.getArtistCraft(params);
+
+  return res.send(getArtistCraft);
+}

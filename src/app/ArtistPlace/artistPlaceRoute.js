@@ -7,4 +7,7 @@ module.exports = function (app){
 
   //작가 별 craft 페이지 개수 조회 API
   app.get('/artist/:artistIdx/crafts/page', artistPlaceController.getArtistCraftTotalPage);
+
+  //작가 별 craft 조회 API
+  app.get('/artist/:artistIdx/crafts', artistPlaceController.getArtistCraft);
 }
