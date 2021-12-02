@@ -76,6 +76,16 @@ async function getTotalArticleLikeCnt(connection, params){
   return rows[0]['totalLikeCnt'];
 }
 
+//사용자의 좋아요 아티클 개수
+async function getLikedArticleTotalPage(connection, params){
+  const query = `
+  SELECT COUNT(*) as totalCnt FROM ArticleLike
+  WHERE userIdx = ?;
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows[0]['totalCnt'];
+}
+
 module.exports = {
   productIsLike,
   changeProductToDisLike,
@@ -85,4 +95,5 @@ module.exports = {
   changeArticleToDisLike,
   changeArticleToLike,
   getTotalArticleLikeCnt,
+  getLikedArticleTotalPage,
 }

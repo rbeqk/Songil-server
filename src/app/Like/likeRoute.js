@@ -7,4 +7,7 @@ module.exports = function(app){
 
   //아티클 좋아요 변경 API
   app.patch('/articles/:articleIdx/like', jwtMiddleware, likeController.changeArticleLikeStatus);
+
+  //좋아요한 아티클 페이지 개수 조회 API
+  app.get('/my-page/articles/liked/page', jwtMiddleware, likeController.getLikedArticleTotalPage);
 }
