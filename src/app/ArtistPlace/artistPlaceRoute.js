@@ -10,4 +10,7 @@ module.exports = function (app){
 
   //작가 별 craft 조회 API
   app.get('/artist/:artistIdx/crafts', artistPlaceController.getArtistCraft);
+
+  //작가 별 article 페이지 개수 조회 API
+  app.get('/artist/:artistIdx/articles/page', artistPlaceController.getArtistArticleTotalPage);
 }

@@ -64,3 +64,19 @@ exports.getArtistCraft = async (req, res) => {
 
   return res.send(getArtistCraft);
 }
+
+/*
+  API No. 9.4
+  API Name: 작가 별 article 페이지 개수 조회 API
+  [GET] /artist/:artistIdx/articles/page
+  
+  작가의 상품이 들어있거나 태그가 작가명일 때
+*/
+exports.getArtistArticleTotalPage = async (req, res) => {
+  const {artistIdx} = req.params;
+  let parmas = [artistIdx];
+
+  const getArtistArticleTotalPage = await artistPlaceProvider.getArtistCraftTotalPage(parmas);
+
+  return res.send(getArtistArticleTotalPage);
+}

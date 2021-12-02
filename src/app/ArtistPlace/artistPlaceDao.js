@@ -84,6 +84,41 @@ async function getArtistCraft(connection, params){
   return rows;
 }
 
+//작가 이름
+async function getArtistName(connection, params){
+  const query = `
+  SELECT U.nickname FROM Artist A
+  JOIN User U on A.userIdx = U.userIdx && U.isDeleted = 'N'
+  WHERE A.isDeleted = 'N' && A.artistIdx = ?;
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows[0]['nickname'];
+}
+
+//태그에 작가이름이 들어가있는 아티클 목록
+async function getArticleWithArtistTag(connection, params){
+  const query = `
+  SELECT articleIdx
+  FROM ArticleTag
+  WHERE tag LIKE CONCAT('%', ?, '%');
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows;
+}
+
+//작가 상품이 들어가있는 아티클 목록
+async function getArticleWithArtistProduct(connection, params){
+  const query = `
+  SELECT AP.articleIdx
+  FROM ArticleProduct AP
+  JOIN Product P on AP.productIdx = P.productIdx && P.isDeleted = 'N'
+  JOIN Artist A on P.artistIdx = A.artistIdx && A.isDeleted = 'N'
+  WHERE AP.isDeleted = 'N' && A.artistIdx = ?;
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows;
+}
+
 module.exports = {
   isExistArtistIdx,
   getArtistInfo,
@@ -91,4 +126,7 @@ module.exports = {
   getArtistExhibition,
   getArtistCraftCnt,
   getArtistCraft,
+  getArtistName,
+  getArticleWithArtistTag,
+  getArticleWithArtistProduct,
 }

@@ -150,3 +150,53 @@ exports.getArtistCraft = async (params) => {
     return errResponse(baseResponse.DB_ERROR);
   }
 }
+
+exports.getArtistCraftTotalPage = async (params) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+
+      //존재하는 작가 idx인지
+      const isExistArtistIdx = await artistPlaceDao.isExistArtistIdx(connection, params);
+      if (!isExistArtistIdx) return errResponse(baseResponse.INVALID_ARTIST_IDX);
+
+      //작가 이름
+      const artistName = await artistPlaceDao.getArtistName(connection, params);
+
+      //태그에 작가이름이 들어가있는 아티클 목록
+      const articleWithArtistTag = await artistPlaceDao.getArticleWithArtistTag(connection, [artistName]);
+
+      //작가 상품이 들어가있는 아티클 목록
+      const articleWithArtistProduct = await artistPlaceDao.getArticleWithArtistProduct(connection, params);
+
+      let articleList = [];
+      articleWithArtistTag.forEach(item => {
+        articleList.push(item.articleIdx);
+      });
+
+      articleWithArtistProduct.forEach(item => {
+        articleList.push(item.articleIdx);
+      });
+
+      articleList = [...new Set(articleList)];  //작가 관련 아티클 목록
+
+      const articleCnt = articleList.length;  //총 아티클 개수
+
+      const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
+      const totalPages = (articleCnt % pageItemCnt == 0) ? articleCnt / pageItemCnt : parseInt(articleCnt / pageItemCnt) + 1;  //총 페이지 수
+
+      const result = {'totalPages': totalPages};
+
+      connection.release();
+      return response(baseResponse.SUCCESS, result);
+
+    }catch(err){
+      connection.release();
+      logger.error(`getArtistCraftTotalPage DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`getArtistCraftTotalPage DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}
