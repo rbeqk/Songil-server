@@ -5,7 +5,7 @@ const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 
-exports.changeLikeStatus = async (params) => {
+exports.changeCraftLikeStatus = async (params) => {
   const userIdx = params[0];
   const productIdx = params[1];
   try{
@@ -16,21 +16,21 @@ exports.changeLikeStatus = async (params) => {
       const isExistProductIdx = await productDao.isExistProductIdx(connection, productIdx);
       if (!isExistProductIdx) return errResponse(baseResponse.INVALID_PRODUCT_IDX);
 
-      //현재 좋아요 status 확인
-      const isLike = await likeDao.isLike(connection, params);
+      //현재 상품 좋아요 status 확인
+      const isProductLike = await likeDao.productIsLike(connection, params);
 
-      //좋아요 status 변경
-      if (isLike)
-        await likeDao.changeToDisLike(connection, params);  //좋아요 눌렀을 경우 => delete record
+      //상품 좋아요 status 변경
+      if (isProductLike)
+        await likeDao.changeProductToDisLike(connection, params);  //좋아요 눌렀을 경우 => delete record
       else
-        await likeDao.changeToLike(connection, params);  //좋아요 아닐 경우 => create record
+        await likeDao.changeProductToLike(connection, params);  //좋아요 아닐 경우 => create record
 
-      const totalLikeCnt = await likeDao.getTotalLikeCnt(connection, productIdx);
+      const totalProductLikeCnt = await likeDao.getTotalProductLikeCnt(connection, productIdx);
 
       //product의 최종 좋아요 상태 가져오기(현재와 반대)
       let result = {};
-      result.isLike = isLike ? 'N' : 'Y';
-      result.totalLikeCnt = totalLikeCnt;
+      result.isLike = isProductLike ? 'N' : 'Y';
+      result.totalLikeCnt = totalProductLikeCnt;
 
       connection.release();
 

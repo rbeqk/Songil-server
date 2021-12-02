@@ -1,5 +1,5 @@
-//현재 사용자의 좋아요 상태 가져오기
-async function isLike(connection, params){
+//현재 사용자의 상품 좋아요 상태 가져오기
+async function productIsLike(connection, params){
   const query = `
   SELECT EXISTS(SELECT *
   FROM ProductLike
@@ -9,8 +9,8 @@ async function isLike(connection, params){
   return rows[0]['isLike'];
 }
 
-//사용자의 좋아요 삭제
-async function changeToDisLike(connection, params){
+//사용자의 상품 좋아요 삭제
+async function changeProductToDisLike(connection, params){
   const query = `
   DELETE FROM ProductLike
   WHERE userIdx = ? && productIdx = ?;
@@ -19,8 +19,8 @@ async function changeToDisLike(connection, params){
   return rows;
 }
 
-//사용자의 좋아요 추가
-async function changeToLike(connection, params){
+//사용자의 상품 좋아요 추가
+async function changeProductToLike(connection, params){
   const query = `
   INSERT INTO ProductLike(userIdx, productIdx) VALUES (?, ?);
   `;
@@ -29,7 +29,7 @@ async function changeToLike(connection, params){
 }
 
 //상품의 총 좋아요 개수
-async function getTotalLikeCnt(connection, params){
+async function getTotalProductLikeCnt(connection, params){
   const query = `
   SELECT COUNT(*) as totalLikeCnt FROM ProductLike WHERE productIdx = ?;
   `;
@@ -38,8 +38,8 @@ async function getTotalLikeCnt(connection, params){
 }
 
 module.exports = {
-  isLike,
-  changeToDisLike,
-  changeToLike,
-  getTotalLikeCnt,
+  productIsLike,
+  changeProductToDisLike,
+  changeProductToLike,
+  getTotalProductLikeCnt,
 }

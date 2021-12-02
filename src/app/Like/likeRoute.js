@@ -3,5 +3,5 @@ module.exports = function(app){
   const likeController = require('./likeController');
 
   //상품 좋아요 변경 API
-  app.post('/shop/products/:productIdx/like', jwtMiddleware, likeController.changeLikeStatus);
+  app.patch('/shop/products/:productIdx/like', jwtMiddleware, likeController.changeCraftLikeStatus);
 }

@@ -8,13 +8,13 @@ const {errResponse} = require("../../../config/response");
   API Name: 상품 좋아요 변경 API
   [PATCH] /shop/products/:productIdx/like
 */
-exports.changeLikeStatus = async (req, res) => {
+exports.changeCraftLikeStatus = async (req, res) => {
   const {userIdx} = req.verifiedToken;
   const {productIdx} = req.params;
 
   let params = [userIdx, productIdx];
 
-  const changeLikeStauts = await likeService.changeLikeStatus(params);
+  const changeLikeStauts = await likeService.changeCraftLikeStatus(params);
 
   return res.send(changeLikeStauts);
 }
