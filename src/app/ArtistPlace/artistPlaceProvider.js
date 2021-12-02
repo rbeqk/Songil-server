@@ -136,6 +136,29 @@ exports.getArtistCraft = async (params) => {
       result.product.reverse();
 
       //총 작가의 아티클 개수 가져오기
+      //작가 이름
+      const artistName = await artistPlaceDao.getArtistName(connection, params);
+
+      //태그에 작가이름이 들어가있는 아티클 목록
+      const articleWithArtistTag = await artistPlaceDao.getArticleWithArtistTag(connection, [artistName]);
+
+      //작가 상품이 들어가있는 아티클 목록
+      const articleWithArtistProduct = await artistPlaceDao.getArticleWithArtistProduct(connection, params);
+
+      let articleList = [];
+      articleWithArtistTag.forEach(item => {
+        articleList.push(item.articleIdx);
+      });
+
+      articleWithArtistProduct.forEach(item => {
+        articleList.push(item.articleIdx);
+      });
+
+      articleList = [...new Set(articleList)];  //작가 관련 아티클 목록
+
+      const articleCnt = articleList.length;  //총 아티클 개수
+
+      result.totalArticleCnt = articleCnt;
       
       connection.release();
       return response(baseResponse.SUCCESS, result);
