@@ -4,4 +4,7 @@ module.exports = function(app){
 
   //상품 좋아요 변경 API
   app.patch('/shop/products/:productIdx/like', jwtMiddleware, likeController.changeCraftLikeStatus);
+
+  //아티클 좋아요 변경 API
+  app.patch('/articles/:articleIdx/like', jwtMiddleware, likeController.changeArticleLikeStatus);
 }

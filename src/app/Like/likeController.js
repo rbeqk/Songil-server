@@ -14,7 +14,21 @@ exports.changeCraftLikeStatus = async (req, res) => {
 
   let params = [userIdx, productIdx];
 
-  const changeLikeStauts = await likeService.changeCraftLikeStatus(params);
+  const changeCraftLikeStatus = await likeService.changeCraftLikeStatus(params);
 
-  return res.send(changeLikeStauts);
+  return res.send(changeCraftLikeStatus);
+}
+
+/*
+  API No. 4.3
+  API Name: 상품 좋아요 변경 API
+  [PATCH] /articles/:articleIdx/like
+*/
+exports.changeArticleLikeStatus = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {articleIdx} = req.params;
+
+  const changeArticleLikeStuatus = await likeService.changeArticleLikeStuatus(userIdx, articleIdx);
+
+  return res.send(changeArticleLikeStuatus);
 }
