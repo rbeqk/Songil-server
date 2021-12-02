@@ -77,7 +77,7 @@ async function getTotalArticleLikeCnt(connection, params){
 }
 
 //사용자의 좋아요 아티클 개수
-async function getLikedArticleTotalPage(connection, params){
+async function getLikedArticleTotalCnt(connection, params){
   const query = `
   SELECT COUNT(*) as totalCnt FROM ArticleLike
   WHERE userIdx = ?;
@@ -85,6 +85,40 @@ async function getLikedArticleTotalPage(connection, params){
   const [rows] = await connection.query(query, params);
   return rows[0]['totalCnt'];
 }
+//사용자의 좋아요 아티클 목록
+async function getLikedArticleIdx(connection, params){
+  const query = `
+  SELECT articleIdx FROM ArticleLike
+  WHERE userIdx = ?;
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows;
+}
+
+//사용자의 좋아요 아티클 목록 정보
+async function getLikedArticleInfo(connection, params){
+  const query = `
+  SELECT A.articleIdx,
+        A.mainImageUrl,
+        A.title,
+        A.editorIdx,
+        E.nickname                                  as editorName,
+        DATE_FORMAT(A.createdAt, '%Y.%m.%d') as createdAt,
+        IFNULL(AL.totalLikeCnt, 0)                  as totalLikeCnt,
+        (SELECT createdAt FROM ArticleLike WHERE userIdx = ? && articleIdx = A.articleIdx) likeCreatedAt
+  FROM Article A
+          JOIN Editor E on A.editorIdx = E.editorIdx && E.isDeleted = 'N'
+          LEFT JOIN (SELECT articleIdx, COUNT(*) as totalLikeCnt
+                      FROM ArticleLike
+                      GROUP BY articleIdx) as AL ON AL.articleIdx = A.articleIdx
+  WHERE A.isDeleted = 'N' && A.articleIdx IN (?)
+  ORDER BY likeCreatedAt
+  LIMIT ?, ?
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows;
+}
+
 
 module.exports = {
   productIsLike,
@@ -95,5 +129,7 @@ module.exports = {
   changeArticleToDisLike,
   changeArticleToLike,
   getTotalArticleLikeCnt,
-  getLikedArticleTotalPage,
+  getLikedArticleTotalCnt,
+  getLikedArticleIdx,
+  getLikedArticleInfo,
 }

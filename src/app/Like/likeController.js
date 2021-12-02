@@ -46,3 +46,20 @@ exports.getLikedArticleTotalPage = async (req, res) => {
 
   return res.send(getLikedArticleTotalPage);
 }
+
+/*
+  API No. 8.9
+  API Name: 좋아요한 아티클 조회 API
+  [GET] /my-page/articles/liked
+  query: page
+*/
+exports.getLikedArticle = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {page} = req.query;
+
+  if (!page) return res.send(errResponse(baseResponse.IS_EMPTY));
+
+  const getLikedArticle = await likeProvider.getLikedArticle(userIdx, page);
+
+  return res.send(getLikedArticle);
+}

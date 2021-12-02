@@ -10,4 +10,7 @@ module.exports = function(app){
 
   //좋아요한 아티클 페이지 개수 조회 API
   app.get('/my-page/articles/liked/page', jwtMiddleware, likeController.getLikedArticleTotalPage);
+
+  //좋아요한 아티클 조회 API
+  app.get('/my-page/articles/liked', jwtMiddleware, likeController.getLikedArticle);
 }
