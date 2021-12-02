@@ -85,7 +85,7 @@ async function getRecentlySearch(connection, params){
   FROM UserSearch US
           JOIN Search S ON S.searchIdx = US.searchIdx
   WHERE US.userIdx = ? && US.isDeleted = 'N'
-  ORDER BY US.userSearchIdx DESC
+  ORDER BY US.updatedAt DESC
   LIMIT 15
   `;
   const [rows] = await connection.query(query, params);
