@@ -69,7 +69,7 @@ exports.getArtistCraft = async (req, res) => {
   API No. 9.4
   API Name: 작가 별 article 페이지 개수 조회 API
   [GET] /artist/:artistIdx/articles/page
-  
+
   작가의 상품이 들어있거나 태그가 작가명일 때
 */
 exports.getArtistArticleTotalPage = async (req, res) => {
@@ -79,4 +79,31 @@ exports.getArtistArticleTotalPage = async (req, res) => {
   const getArtistArticleTotalPage = await artistPlaceProvider.getArtistCraftTotalPage(parmas);
 
   return res.send(getArtistArticleTotalPage);
+}
+
+/*
+  API No. 9.5
+  API Name: 작가 별 article 조회 API
+  [GET] /artist/:artistIdx/articles
+  query: page, filter
+*/
+exports.getArtistArticle = async (req, res) => {
+  const {page, filter} = req.query;
+  if (!(page && filter)) return res.send(errResponse(baseResponse.IS_EMPTY));
+
+  const token = req.headers['x-access-token'];
+  //jwt가 있을 경우 유효한지 확인
+  let userIdx;
+  if (token){
+    try{
+      userIdx = jwt.verify(token, process.env.jwtSecret).userIdx;
+    }catch(err){
+      return res.send(errResponse(baseResponse.TOKEN_VERIFICATION_FAILURE));
+    }
+  }
+
+  let params = [page, filter, userIdx];
+  const getArtistArticle = await artistPlaceProvider.getArtistArticle(params);
+
+  return res.send(getArtistArticle);
 }

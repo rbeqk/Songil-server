@@ -1,5 +1,6 @@
 const artistPlaceDao = require('./artistPlaceDao');
 const productDao = require('../Product/productDao');
+const articleDao = require('../Article/articleDao');
 const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
@@ -220,6 +221,72 @@ exports.getArtistCraftTotalPage = async (params) => {
     }
   }catch(err){
     logger.error(`getArtistCraftTotalPage DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}
+
+exports.getArtistArticle = async (params) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+
+      //존재하는 작가 idx인지
+      const isExistArtistIdx = await artistPlaceDao.isExistArtistIdx(connection, params);
+      if (!isExistArtistIdx) return errResponse(baseResponse.INVALID_ARTIST_IDX);
+
+       //작가 이름
+      const artistName = await artistPlaceDao.getArtistName(connection, params);
+
+      //태그에 작가이름이 들어가있는 아티클 목록
+      const articleWithArtistTag = await artistPlaceDao.getArticleWithArtistTag(connection, [artistName]);
+
+      //작가 상품이 들어가있는 아티클 목록
+      const articleWithArtistProduct = await artistPlaceDao.getArticleWithArtistProduct(connection, params);
+
+      let articleList = [];
+      articleWithArtistTag.forEach(item => {
+        articleList.push(item.articleIdx);
+      });
+
+      articleWithArtistProduct.forEach(item => {
+        articleList.push(item.articleIdx);
+      });
+
+      articleList = [...new Set(articleList)];  //작가 관련 아티클 목록
+
+      let result = {};
+      result.totalArticleCnt = articleList.length;
+
+      result.article = null;
+
+      if (articleList.length){
+        result.article = [];
+        for (let articleIdx of articleList){
+          const articleInfo = await articleDao.getArticleDetail(connection, articleIdx);
+          result.article.push({
+            'articleIdx': articleInfo.articleIdx,
+            'title': articleInfo.title,
+            'mainImageUrl': articleInfo.mainImageUrl,
+            'editorIdx': articleInfo.editorIdx,
+            'editorName': articleInfo.editorName,
+            'createdAt': articleInfo.createdAt,
+            //총 좋아요 개수, 페이지 처리, 필터 처리
+          })
+        }
+      }
+
+      //총 상품 개수 추가
+
+      connection.release();
+      return response(baseResponse.SUCCESS, result);
+
+    }catch(err){
+      connection.release();
+      logger.error(`getArtistArticle DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`getArtistArticle DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }
