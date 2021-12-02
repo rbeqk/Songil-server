@@ -34,14 +34,18 @@ async function isExistArticleIdx(connection, params){
 async function getArticleDetail(connection, params){
   const query = `
   SELECT A.articleIdx,
-    A.articleCategoryIdx,
-    A.mainImageUrl,
-    A.title,
-    A.editorIdx,
-    E.nickname as editorName,
-    DATE_FORMAT(A.createdAt, '%Y.%m.%d. %k:%i') as createdAt
+        A.articleCategoryIdx,
+        A.mainImageUrl,
+        A.title,
+        A.editorIdx,
+        E.nickname,
+        DATE_FORMAT(A.createdAt, '%Y.%m.%d. %k:%i') as createdAt,
+        IFNULL((SELECT COUNT(*) as totalLike
+                FROM ArticleLike
+                GROUP BY articleIdx
+                HAVING articleIdx = ?), 0)          as totalLikeCnt
   FROM Article A
-      JOIN Editor E on A.editorIdx = E.editorIdx && E.isDeleted = 'N'
+          JOIN Editor E on A.editorIdx = E.editorIdx && E.isDeleted = 'N'
   WHERE A.isDeleted = 'N' && A.articleIdx = ?;
   `;
   const [rows] = await connection.query(query, params);
@@ -87,9 +91,8 @@ async function getArticleReatedProduct(connection, params){
 //아티클 관련 태그 가져오기
 async function getArticleTag(connection, params){
   const query = `
-  SELECT AT.name FROM ArticleTag AT
-  JOIN Article A on AT.articleIdx = A.articleIdx && A.isDeleted = 'N'
-  WHERE AT.articleIdx = ? && AT.isDeleted = 'N'
+  SELECT tag FROM ArticleTag
+  WHERE articleIdx = ?;
   `;
   const [rows] = await connection.query(query, params);
   return rows;

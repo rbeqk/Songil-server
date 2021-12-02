@@ -49,7 +49,7 @@ exports.getArticleDetail = async (params) => {
       if (!isExistArticleIdx) return errResponse(baseResponse.INVALID_ARTICLE_IDX);
       
       //아티클 기본 정보 가져오기
-      const articleDetailInfo = await articleDao.getArticleDetail(connection, [articleIdx]);
+      const articleDetailInfo = await articleDao.getArticleDetail(connection, [articleIdx, articleIdx]);
 
       let result = {};
 
@@ -121,7 +121,7 @@ exports.getArticleDetail = async (params) => {
       if (articleTag.length){
         result.tag = [];
         articleTag.forEach(item => {
-          result.tag.push(item.name);
+          result.tag.push(item.tag);
         })
       }
       
@@ -147,6 +147,8 @@ exports.getArticleDetail = async (params) => {
       else{
         result.isLike = 'N';
       }
+
+      result.totalLikeCnt = articleDetailInfo.totalLikeCnt;
 
       connection.release();
       return response(baseResponse.SUCCESS, result);
