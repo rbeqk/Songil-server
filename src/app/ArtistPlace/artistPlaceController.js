@@ -91,6 +91,8 @@ exports.getArtistArticle = async (req, res) => {
   const {page, filter} = req.query;
   if (!(page && filter)) return res.send(errResponse(baseResponse.IS_EMPTY));
 
+  const {artistIdx} = req.params;
+
   const token = req.headers['x-access-token'];
   //jwt가 있을 경우 유효한지 확인
   let userIdx;
@@ -102,8 +104,7 @@ exports.getArtistArticle = async (req, res) => {
     }
   }
 
-  let params = [page, filter, userIdx];
-  const getArtistArticle = await artistPlaceProvider.getArtistArticle(params);
+  const getArtistArticle = await artistPlaceProvider.getArtistArticle(artistIdx, page, filter, userIdx);
 
   return res.send(getArtistArticle);
 }

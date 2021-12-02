@@ -119,6 +119,31 @@ async function getArticleWithArtistProduct(connection, params){
   return rows;
 }
 
+//작가 별 아티클 조회
+async function getArtistArticle(connection, params){
+  const query = `
+  SELECT A.articleIdx,
+        A.articleCategoryIdx,
+        A.mainImageUrl,
+        A.title,
+        A.editorIdx,
+        E.nickname as editorName,
+        DATE_FORMAT(A.createdAt, '%Y.%m.%d. %k:%i') as createdAt,
+        IFNULL(AL.totalLikeCnt, 0) as totalLikeCnt
+  FROM Article A
+          JOIN Editor E on A.editorIdx = E.editorIdx && E.isDeleted = 'N'
+          LEFT JOIN (SELECT articleIdx, COUNT(*) as totalLikeCnt
+                      FROM ArticleLike
+                      GROUP BY articleIdx) as AL ON AL.articleIdx = A.articleIdx
+  WHERE A.isDeleted = 'N' && A.articleIdx IN (?)
+  ORDER BY (CASE WHEN ? = 'new' THEN A.createdAt END) ASC,
+          (CASE WHEN ? = 'popular' THEN totalLikeCnt END) ASC
+  LIMIT ?, ?
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows;
+}
+
 module.exports = {
   isExistArtistIdx,
   getArtistInfo,
@@ -129,4 +154,5 @@ module.exports = {
   getArtistName,
   getArticleWithArtistTag,
   getArticleWithArtistProduct,
+  getArtistArticle,
 }
