@@ -66,7 +66,7 @@ exports.getArticleDetail = async (params) => {
 
       const text = 1;
       const image = 2;
-      const product = 3;
+      const craft = 3;
 
       //아티클 내용 가져오기
       const articleContent = await articleDao.getArticleContent(connection, [articleIdx]);
@@ -76,7 +76,7 @@ exports.getArticleDetail = async (params) => {
           'type': text,
           'textData': item.content,
           'imageData': null,
-          'productData': null
+          'craftData': null
         })
       });
 
@@ -88,20 +88,20 @@ exports.getArticleDetail = async (params) => {
           'type': image,
           'textData': null,
           'imageData': item.imageUrl,
-          'productData': null
+          'craftData': null
         })
       });
 
-      //아티클 관련상품 가져오기
-      const articleRelatedProduct = await articleDao.getArticleReatedProduct(connection, [articleIdx]);
-      articleRelatedProduct.forEach(item => {
+      //아티클 관련 상품 가져오기
+      const articleRelatedCraft = await articleDao.getArticleReatedCraft(connection, [articleIdx]);
+      articleRelatedCraft.forEach(item => {
         result.content.push({
           'index': item.contentIdx,
-          'type': product,
+          'type': craft,
           'textData': null,
           'imageData': null,
-          'productData': {
-            'productIdx': item.productIdx,
+          'craftData': {
+            'craftIdx': item.craftIdx,
             'name': item.name,
             'mainImageUrl': item.mainImageUrl,
             'artistName': item.artistName,

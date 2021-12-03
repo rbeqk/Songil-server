@@ -38,7 +38,7 @@ async function getArticleDetail(connection, params){
         A.mainImageUrl,
         A.title,
         A.editorIdx,
-        E.nickname,
+        E.nickname as editorName,
         DATE_FORMAT(A.createdAt, '%Y.%m.%d. %k:%i') as createdAt,
         IFNULL((SELECT COUNT(*) as totalLike
                 FROM ArticleLike
@@ -75,14 +75,14 @@ async function getArticelDetailImage(connection, params){
 }
 
 //아티클 관련상품 가져오기
-async function getArticleReatedProduct(connection, params){
+async function getArticleReatedCraft(connection, params){
   const query = `
-  SELECT AP.productIdx, P.mainImageUrl, P.name, P.artistIdx, U.nickname as artistName, AP.contentIdx, P.price
-  FROM ArticleProduct AP
-          JOIN Product P on AP.productIdx = P.productIdx && P.isDeleted = 'N'
-          JOIN Artist A on P.artistIdx = A.artistIdx && A.isDeleted = 'N'
+  SELECT AC.craftIdx, C.mainImageUrl, C.name, C.artistIdx, U.nickname as artistName, AC.contentIdx, C.price
+  FROM ArticleCraft AC
+          JOIN Craft C on AC.craftIdx = C.craftIdx && C.isDeleted = 'N'
+          JOIN Artist A on C.artistIdx = A.artistIdx && A.isDeleted = 'N'
           JOIN User U on A.userIdx = U.userIdx && U.isDeleted = 'N'
-  WHERE AP.isDeleted = 'N' && AP.articleIdx = ?;
+  WHERE AC.isDeleted = 'N' && AC.articleIdx = ?;
   `;
   const [rows] = await connection.query(query, params);
   return rows;
@@ -133,7 +133,7 @@ module.exports = {
   getArticleDetail,
   getArticleContent,
   getArticelDetailImage,
-  getArticleReatedProduct,
+  getArticleReatedCraft,
   getArticleTag,
   getArticleRelatedArticle,
   getArticleIsLike,
