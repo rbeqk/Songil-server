@@ -24,15 +24,50 @@ async function getAskCnt(connection, params){
   const query = `
   SELECT COUNT(PA.productAskIdx) as totalCnt
   FROM ProductAsk PA
-            JOIN Product P ON P.productIdx = PA.productIdx && P.isDeleted = 'N'
+            JOIN Product P ON P.productIdx = PA.productIdx
   WHERE PA.isDeleted = 'N' && P.artistIdx = ?;
   `;
   const [rows] = await connection.query(query, params);
   return rows[0]['totalCnt'];
 }
 
+//작가 1:1문의 목록 가져오기(삭제된 상품에 대해서도 보이게)
+async function getAskList(connection, params){
+  const query = `
+  SELECT PA.productAskIdx as askIdx
+  FROM ProductAsk PA
+            JOIN Product P ON P.productIdx = PA.productIdx
+  WHERE PA.isDeleted = 'N' && P.artistIdx = ?;
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows;
+}
+
+//문의 목록 상세 정보 가져오기
+async function getAskInfo(connection, params){
+  const query = `
+  SELECT PA.productAskIdx as askIdx,
+        PA.productIdx,
+        P.name           as productName,
+        P.mainImageUrl,
+        U.nickname,
+        PA.productAskStatusIdx as status,
+        DATE_FORMAT(PA.createdAt, '%Y.%m.%d. %k:%i') as                                     createdAt
+  FROM ProductAsk PA
+          JOIN Product P ON P.productIdx = PA.productIdx
+          JOIN User U ON U.userIdx = PA.userIdx && U.isDeleted = 'N'
+  WHERE PA.productAskIdx IN (?) && PA.isDeleted = 'N'
+  ORDER BY PA.createdAt
+  LIMIT ?, ?;
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows;
+}
+
 module.exports = {
   isArtist,
   getArtistIdx,
   getAskCnt,
+  getAskList,
+  getAskInfo,
 }
