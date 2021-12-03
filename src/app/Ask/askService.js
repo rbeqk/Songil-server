@@ -6,22 +6,22 @@ const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 
-exports.createProductAsk = async (params) => {
-  //params = [userIdx, productIdx, content]
+exports.createCraftAsk = async (params) => {
+  //params = [userIdx, craftIdx, content]
 
   const userIdx = params[0];
-  const productIdx = params[1];
+  const craftIdx = params[1];
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
 
       //존재하는 상품인지 확인
-      const isExistProductIdx = await productDao.isExistProductIdx(connection, productIdx);
-      if (!isExistProductIdx) return errResponse(baseResponse.INVALID_PRODUCT_IDX);
+      const isExistCraftIdx = await productDao.isExistCraftIdx(connection, [craftIdx]);
+      if (!isExistCraftIdx) return errResponse(baseResponse.INVALID_CRAFT_IDX);
 
       //1:1 문의 작성
       await connection.beginTransaction();
-      await askDao.createProductAsk(connection, params);
+      await askDao.createCraftAsk(connection, params);
       await connection.commit();
       connection.release();
 
@@ -30,11 +30,11 @@ exports.createProductAsk = async (params) => {
     }catch(err){
       await connection.rollback();
       connection.release();
-      logger.error(`createProductAsk DB Query Error: ${err}`);
+      logger.error(`createCraftAsk DB Query Error: ${err}`);
       return errResponse(baseResponse.DB_ERROR);
     }
   }catch(err){
-    logger.error(`createProductAsk DB Connection Error: ${err}`);
+    logger.error(`createCraftAsk DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }

@@ -49,15 +49,15 @@ exports.getAsk = async (params) => {
 
       ask.forEach(item => {
         result.push({
-          'productAskIdx': item.productAskIdx,
+          'askIdx': item.askIdx,
           'ask': {
-            'productIdx': item.productIdx,
-            'productName': item.name,
+            'craftIdx': item.craftIdx,
+            'name': item.name,
             'content': item.content,
             'createdAt': item.askCreatedAt,
             'status': item.status
           },
-          'answer':(!item.productAskAnswerIdx) ? null : {
+          'answer':(!item.craftAskAnswerIdx) ? null : {
             'artistIdx': item.artistIdx,
             'artistName': item.artistName,
             'content': item.answerContent,
