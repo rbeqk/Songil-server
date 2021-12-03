@@ -9,47 +9,48 @@ require('dotenv').config();
 
 /*
   API No. 3.13
-  API Name: 상품 리뷰 페이지 개수 조회 API
-  [GET] /shop/products/:productIdx/reviews/page
+  API Name: 상품 댓글 페이지 개수 조회 API
+  [GET] /shop/crafts/:craftIdx/comments/page
+  query: onlyPhoto
 */
-exports.getReviewTotalPage = async (req, res) => {
+exports.getCommentTotalPage = async (req, res) => {
   const {onlyPhoto} = req.query;
-  const {productIdx} = req.params;
+  const {craftIdx} = req.params;
 
   if (!onlyPhoto) return res.send(errResponse(baseResponse.IS_EMPTY));
 
-  let params = [productIdx, onlyPhoto];
-  const getReviewTotalPage = await reviewProvider.getReviewTotalPage(params);
+  let params = [craftIdx, onlyPhoto];
+  const getCommentTotalPage = await reviewProvider.getCommentTotalPage(params);
 
-  return res.send(getReviewTotalPage);
+  return res.send(getCommentTotalPage);
 }
 
 /*
   API No. 3.12
-  API Name: 상품 리뷰 조회 API
-  [GET] /shop/products/:productIdx/reviews
-  query: page
+  API Name: 상품 댓글 조회 API
+  [GET] /shop/crafts/:craftIdx/comments
+  query: page, onlyPhoto
 */
-exports.getReview = async (req, res) => {
+exports.getComment = async (req, res) => {
   const {page, onlyPhoto} = req.query;
-  const {productIdx} = req.params;
+  const {craftIdx} = req.params;
 
   if (!(page && onlyPhoto)) return res.send(errResponse(baseResponse.IS_EMPTY));
 
-  let params = [productIdx, page, onlyPhoto];
-  const getReview = await reviewProvider.getReview(params);
+  let params = [craftIdx, page, onlyPhoto];
+  const getComment = await reviewProvider.getComment(params);
 
-  return res.send(getReview);
+  return res.send(getComment);
 }
 
 /*
   API No. 3.18
-  API Name: 리뷰 신고 API
-  [POST] /reported-reviews/:productReviewIdx
+  API Name: 상품 댓글 신고 API
+  [POST] /comments/:commentIdx/reported
 */
-exports.reportReview = async (req, res) => {
+exports.reportComment = async (req, res) => {
   const {userIdx} = req.verifiedToken;
-  const {productReviewIdx} = req.params;
+  const {commentIdx} = req.params;
   const {reportedReasonIdx, etcReason} = req.body;
 
   const totalReportedReasonLength = 7;  //총 신고 사유 개수
@@ -57,7 +58,7 @@ exports.reportReview = async (req, res) => {
   const etcReasonLength = 150;  //직접입력 글자수 제한
 
   if (!reportedReasonIdx) return res.send(errResponse(baseResponse.IS_EMPTY));
-  if (!((1 < reportedReasonIdx) && (reportedReasonIdx <= totalReportedReasonLength))) return res.send(errResponse(baseResponse.INVALID_REPORTED_REASON_IDX));
+  if (reportedReasonIdx < 1 || reportedReasonIdx > totalReportedReasonLength) return res.send(errResponse(baseResponse.INVALID_REPORTED_REASON_IDX));
 
   //직접입력 시 사유가 없을 때
   if (reportedReasonIdx == etcReasonIdx && !etcReason) return res.send(errResponse(baseResponse.IS_EMPTY));
@@ -68,8 +69,8 @@ exports.reportReview = async (req, res) => {
   //직접입력 시 글자수 초과
   if (etcReason && etcReason.length > etcReasonLength) return res.send(errResponse(baseResponse.EXCEED_REPORTED_REASON));
 
-  let params = [userIdx, productReviewIdx, reportedReasonIdx, etcReason];
-  const reportReview = await reviewService.reportReview(params);
+  let params = [userIdx, commentIdx, reportedReasonIdx, etcReason];
+  const reportComment = await reviewService.reportComment(params);
 
-  return res.send(reportReview);
+  return res.send(reportComment);
 }

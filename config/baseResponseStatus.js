@@ -15,11 +15,11 @@ module.exports = {
   NEED_PAGE: {"isSuccess": false, "code": 2212, "message": "page를 입력해주세요"},
   SELECT_ANOTHER_ETC_REASON_IDX: {"isSuccess": false, "code": 2213, "message": "신고 사유 입력 시 직접 작성으로 체크해주세요"},
 
-  INVALID_PRODUCT_IDX: {"isSuccess": false, "code": 2301, "message": "존재하지 않는 productIdx입니다"},
+  INVALID_CRAFT_IDX: {"isSuccess": false, "code": 2301, "message": "존재하지 않는 craftIdx입니다"},
   INVALID_CONSUMER_IDX: {"isSuccess": false, "code": 2302, "message": "존재하지 않는 소비자입니다"},
   INVALID_PAGE: {"isSuccess": false, "code": 2303, "message": "존재하지 않는 page입니다"},
   INVALID_USER_SEARCH_IDX: {"isSuccess": false, "code": 2304, "message": "유저의 검색항목이 아닙니다"},
-  INVALD_PRODUT_REVIEW_IDX: {"isSuccess": false, "code": 2305, "message": "존재하지 않는 productReviewIdx입니다"},
+  INVALD_CRAFT_COMMENT_IDX: {"isSuccess": false, "code": 2305, "message": "존재하지 않는 commentIdx입니다"},
   INVALID_REPORTED_REASON_IDX: {"isSuccess": false, "code": 2306, "message": "존재하지 않는 reportedReasonIdx입니다"},
   INVALID_ARTICLE_IDX: {"isSuccess": false, "code": 2307, "message": "존재하지 않는 articleIdx입니다"},
   INVALID_ARTIST_IDX: {"isSuccess": false, "code": 2308, "message": "존재하지 않는 artistIdx입니다"},
@@ -35,7 +35,7 @@ module.exports = {
 
   DUPLICATED_PHONE: {"isSuccess": false, "code": 3200, "message": "이미 가입한 핸드폰 번호입니다"},
   DUPLICATED_NICKNAME: {"isSuccess": false, "code": 3201, "message": "중복된 닉네임입니다"},
-  ALREADY_REPORTED_PRODUCT_REVIEW_IDX: {"isSuccess": false, "code": 3202, "message": "기존에 신고한 리뷰입니다"},
+  ALREADY_REPORTED_CRAFT_COMMENT_IDX: {"isSuccess": false, "code": 3202, "message": "기존에 신고한 댓글입니다"},
 
   EMPTY_USER_SEARCH: {"isSuccess": false, "code": 3300, "message": "사용자의 최근 검색어가 없습니다"},
 

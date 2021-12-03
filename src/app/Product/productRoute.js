@@ -3,5 +3,5 @@ module.exports = function(app){
   const productController = require('./productController');
 
   //상품 상세 조회 API
-  app.get('/shop/products/:productIdx', productController.getProductDetail);
+  app.get('/shop/crafts/:craftIdx', productController.getCraftDetail);
 }

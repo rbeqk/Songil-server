@@ -1,8 +1,8 @@
 //today-craft 총 개수(=상품 총 개수)
 async function getTodayCraftTotalCnt(connection){
   const query = `
-  SELECT COUNT(productIdx) as totalCnt
-  FROM Product
+  SELECT COUNT(craftIdx) as totalCnt
+  FROM Craft
   WHERE isDeleted = 'N';
   `;
   const [rows] = await connection.query(query);
@@ -12,33 +12,23 @@ async function getTodayCraftTotalCnt(connection){
 //today-craft 가져오기
 async function getTodayCraft(connection, params){
   const query = `
-  SELECT P.productIdx,
-        P.mainImageUrl,
-        P.name,
+  SELECT C.craftIdx,
+        C.mainImageUrl,
+        C.name,
         A.artistIdx,
         A.artistIdx,
         U.nickname                                               as artistName,
-        P.price,
-        IF(TIMESTAMPDIFF(DAY, P.createdAt, NOW()) > 3, 'N', 'Y') as isNew
-  FROM Product P
-          JOIN Artist A ON A.artistIdx = P.artistIdx && A.isDeleted = 'N'
+        C.price,
+        IF(TIMESTAMPDIFF(DAY, C.createdAt, NOW()) > 3, 'N', 'Y') as isNew
+  FROM Craft C
+          JOIN Artist A ON A.artistIdx = C.artistIdx && A.isDeleted = 'N'
           JOIN User U ON A.userIdx = U.userIdx && U.isDeleted = 'N'
-  WHERE P.isDeleted = 'N'
-  ORDER BY RAND(0)
-  LIMIT ?, ?
+  WHERE C.isDeleted = 'N'
+  ORDER BY RAND()
+  LIMIT ?, ?;
   `;
   const [rows] = await connection.query(query, params);
   return rows;
-}
-
-//총 banner 개수 가져오기
-async function getTotalBannerCnt(connection){
-  const query = `
-  SELECT COUNT(imageUrl) as totalCnt FROM ShopBanner
-  WHERE isDeleted = 'N'
-  `;
-  const [rows] = await connection.query(query);
-  return rows[0]['totalCnt'];
 }
 
 //banner 가져오기
@@ -68,10 +58,10 @@ async function getTodayArtist(connection){
 //new craft 가져오기
 async function getNewCraft(connection){
   const query = `
-  SELECT productIdx, mainImageUrl
-  FROM Product
+  SELECT craftIdx, mainImageUrl
+  FROM Craft
   WHERE isDeleted = 'N'
-  ORDER BY productIdx DESC
+  ORDER BY craftIdx DESC
   LIMIT 9;
   `;
   const [rows] = await connection.query(query);
@@ -150,7 +140,6 @@ async function deleteAllUserRecentlySearch(connection, params){
 module.exports = {
   getTodayCraftTotalCnt,
   getTodayCraft,
-  getTotalBannerCnt,
   getBanner,
   getTodayArtist,
   getNewCraft,

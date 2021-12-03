@@ -10,14 +10,14 @@ require('dotenv').config();
 /*
   API No. 3.11
   API Name: 상품 상세 조회 API
-  [GET] /shop/products/:productIdx
+  [GET] /shop/crafts/:craftIdx
 */
-exports.getProductDetail = async (req, res) => {
-  const {productIdx} = req.params;
-  let params = [productIdx];
+exports.getCraftDetail = async (req, res) => {
+  const {craftIdx} = req.params;
+  let params = [craftIdx];
   
   //상품 detail
-  const productDetail = await productProvider.getProductDetail(params);
+  const productDetail = await productProvider.getCraftDetail(params);
 
   return res.send(productDetail);
 }

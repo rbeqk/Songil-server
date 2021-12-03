@@ -1,77 +1,83 @@
-//유효한 productIdx인지
-async function isExistProductIdx(connection, params){
+//유효한 craftIdx인지
+async function isExistCraftIdx(connection, params){
   const query = `
-  SELECT EXISTS(SELECT productIdx FROM Product WHERE isDeleted = 'N' && productIdx = ?) as isExist;
+  SELECT EXISTS(SELECT craftIdx FROM Craft WHERE isDeleted = 'N' && craftIdx = ?) as isExist;
   `;
   const [rows] = await connection.query(query, params);
   return rows[0]['isExist'];
 }
 
 //상품 기본 정보
-async function getProductBasicInfo(connection, params){
+async function getCraftBasicInfo(connection, params){
   const query = `
-  SELECT P.productIdx,
-        P.name,
-        P.price,
-        P.mainImageUrl,
-        P.content,
-        P.size,
-        P.isSoldOut,
-        P.artistIdx,
-        U.nickname as artistName,
-        A.introduction as artistIntroduction,
-        U.imageUrl as artistImageUrl,
-        IF(TIMESTAMPDIFF(DAY, P.createdAt, NOW()) > 3, 'N', 'Y') as isNew,
-        (SELECT COUNT(productReviewIdx) as totalReviewCnt FROM ProductReview PR WHERE PR.productIdx = ? && PR.isDeleted = 'N') as totalReviewCnt
-  FROM Product P
-          JOIN Artist A ON A.artistIdx = P.artistIdx && A.isDeleted = 'N'
+  SELECT C.craftIdx,
+        C.name,
+        C.price,
+        C.mainImageUrl,
+        C.content,
+        C.size,
+        C.isSoldOut,
+        C.artistIdx,
+        U.nickname                                               as artistName,
+        A.introduction                                           as artistIntroduction,
+        U.imageUrl                                               as artistImageUrl,
+        IF(TIMESTAMPDIFF(DAY, C.createdAt, NOW()) > 3, 'N', 'Y') as isNew,
+        (SELECT COUNT(craftCommentIdx) as totalReviewCnt
+          FROM CraftComment CC
+          WHERE CC.craftIdx = ? && CC.isDeleted = 'N')          as totalReviewCnt
+  FROM Craft C
+          JOIN Artist A ON A.artistIdx = C.artistIdx && A.isDeleted = 'N'
           JOIN User U ON A.userIdx = U.userIdx && U.isDeleted = 'N'
-  WHERE P.productIdx = ? && P.isDeleted = 'N';
+  WHERE C.craftIdx = ? && C.isDeleted = 'N';
   `;
   const [rows] = await connection.query(query, [params[0], params[0]]);
   return rows[0];
 }
 
 //상품 상세 이미지
-async function getProductDetailImage(connection, params){
+async function getCraftDetailImage(connection, params){
   const query = `
-  SELECT PDI.imageUrl as detailImageUrl FROM Product P
-  JOIN ProductDetailImage PDI ON PDI.productIdx = P.productIdx && PDI.isDeleted = 'N'
-  WHERE P.productIdx = ? && P.isDeleted = 'N';
+  SELECT CDI.imageUrl as detailImageUrl
+  FROM Craft C
+          JOIN CraftDetailImage CDI ON CDI.craftIdx = C.craftIdx && CDI.isDeleted = 'N'
+  WHERE C.craftIdx = ? && C.isDeleted = 'N';
   `;
   const [rows] = await connection.query(query, params);
   return rows;
 }
 
 //상품 유의사항
-async function getProductCautions(connection, params){
+async function getCraftCautions(connection, params){
   const query = `
-  SELECT PC.caution as cautions FROM Product P
-  JOIN ProductCaution PC on P.productIdx = PC.productIdx && PC.isDeleted = 'N'
-  WHERE P.productIdx = ? && P.isDeleted = 'N';
+  SELECT CC.caution as cautions
+  FROM Craft C
+          JOIN CraftCaution CC on C.craftIdx = CC.craftIdx && CC.isDeleted = 'N'
+  WHERE C.craftIdx = ? && C.isDeleted = 'N';
   `;
   const [rows] = await connection.query(query, params);
   return rows;
 }
 
 //상품 소재
-async function getProductMaterial(connection, params){
+async function getCraftMaterial(connection, params){
   const query = `
-  SELECT PM.material FROM Product P
-  JOIN ProductMaterial PM on P.productIdx = PM.productIdx && PM.isDeleted = 'N'
-  WHERE P.productIdx = ? && P.isDeleted = 'N';
+  SELECT CM.material
+  FROM Craft C
+          JOIN CraftMaterial CM on C.craftIdx = CM.craftIdx && CM.isDeleted = 'N'
+  WHERE C.craftIdx = ? && C.isDeleted = 'N';
   `;
   const [rows] = await connection.query(query, params);
   return rows;
 }
 
 //상품 용도
-async function getProductUsage(connection, params){
+async function getCraftUsage(connection, params){
   const query = `
-  SELECT PUI.name as 'usage' FROM Product P
-  JOIN ProductUsage PU on PU.productIdx = P.productIdx && PU.isDeleted = 'N'
-  JOIN ProductUsageItem PUI on PUI.productUsageItemIdx = PU.productUsageItemIdx && PUI.isDeleted = 'N'
-  WHERE P.productIdx = ? && P.isDeleted = 'N';
+  SELECT CUI.name as 'usage'
+  FROM Craft C
+          JOIN CraftUsage CU on CU.craftIdx = C.craftIdx && CU.isDeleted = 'N'
+          JOIN CraftUsageItem CUI on CUI.craftUsageItemIdx = CU.craftUsageItemIdx && CUI.isDeleted = 'N'
+  WHERE C.craftIdx = ? && C.isDeleted = 'N';
   `;
   const [rows] = await connection.query(query, params);
   return rows;
@@ -80,8 +86,9 @@ async function getProductUsage(connection, params){
 //조건 없이 전체 무료배송인지
 async function isFreeShippingFee(connection, params){
   const query = `
-  SELECT P.isFreeShipping FROM Product P
-  WHERE P.productIdx = ? && P.isDeleted = 'N';
+  SELECT C.isFreeShipping
+  FROM Craft C
+  WHERE C.craftIdx = ? && C.isDeleted = 'N';
   `;
   const [rows] = await connection.query(query, params);
   return rows[0]['isFreeShipping'];
@@ -90,33 +97,34 @@ async function isFreeShippingFee(connection, params){
 //배송비 조건 있을 경우 배송비
 async function getShippingFeeList(connection, params){
   const query = `
-  SELECT CONCAT(PSFC.conditions, ' ', IF(PSFC.shippingFee=0, '무료배송', CONCAT(PSFC.shippingFee, '원'))) as shippingFee FROM Product P
-  JOIN ProductShippingFeeCondition PSFC ON PSFC.productIdx = P.productIdx && PSFC.isDeleted = 'N'
-  WHERE P.productIdx = ? && P.isDeleted = 'N'
+  SELECT CONCAT(CSFC.conditions, ' ', IF(CSFC.shippingFee = 0, '무료배송', CONCAT(CSFC.shippingFee, '원'))) as shippingFee
+  FROM Craft C
+          JOIN CraftShippingFeeCondition CSFC ON CSFC.craftIdx = C.craftIdx && CSFC.isDeleted = 'N'
+  WHERE C.craftIdx = ? && C.isDeleted = 'N';
   `;
   const [rows] = await connection.query(query, params);
   return rows;
 }
 
 //사용자가 좋아요한 상품인지
-async function getUserLikeProduct(connection, params){
+async function getUserLikeCraft(connection, params){
   const query = `
   SELECT EXISTS(SELECT *
-    FROM ProductLike
-    WHERE productIdx = ? && userIdx = ?) as isExist;
+    FROM CraftLike
+    WHERE craftIdx = ? && userIdx = ?) as isExist;
   `;
   const [rows] = await connection.query(query, params);
   return rows[0]['isExist'];
 }
 
 module.exports = {
-  isExistProductIdx,
-  getProductBasicInfo,
-  getProductDetailImage,
-  getProductCautions,
-  getProductMaterial,
-  getProductUsage,
+  isExistCraftIdx,
+  getCraftBasicInfo,
+  getCraftDetailImage,
+  getCraftCautions,
+  getCraftMaterial,
+  getCraftUsage,
   isFreeShippingFee,
   getShippingFeeList,
-  getUserLikeProduct,
+  getUserLikeCraft,
 }

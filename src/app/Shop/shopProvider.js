@@ -49,7 +49,7 @@ exports.getTodayCraft = async (params) => {
       let result = [];
       todayCraft.forEach(item => {
         result.push({
-          'productIdx': item.productIdx,
+          'craftIdx': item.craftIdx,
           'mainImageUrl': item.mainImageUrl,
           'name': item.name,
           'artistIdx': item.artistIdx,
@@ -103,7 +103,7 @@ exports.getShopEtc = async (req, res) => {
 
       newCraft.forEach(item => {
         result.newCraft.push({
-          'productIdx': item.productIdx,
+          'craftIdx': item.craftIdx,
           'imageUrl': item.mainImageUrl
         })
       });

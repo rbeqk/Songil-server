@@ -4,21 +4,21 @@ const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 
-exports.getProductDetail = async (params) => {
+exports.getCraftDetail = async (params) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
 
-      //존재하는 productIdx인지
-      const isExistProductIdx = await productDao.isExistProductIdx(connection, params);
-      if (!isExistProductIdx) return errResponse(baseResponse.INVALID_PRODUCT_IDX);
+      //존재하는 craftIdx인지
+      const isExistCraftIdx = await productDao.isExistCraftIdx(connection, params);
+      if (!isExistCraftIdx) return errResponse(baseResponse.INVALID_CRAFT_IDX);
 
       //상세 정보
-      const basicInfo = await productDao.getProductBasicInfo(connection, params);  //기본 정보
-      const detailImage = await productDao.getProductDetailImage(connection, params);  //상세 이미지
-      const cautions = await productDao.getProductCautions(connection, params);  //유의사항
-      const material = await productDao.getProductMaterial(connection, params);  //소재
-      const usage = await productDao.getProductUsage(connection, params);  //용도
+      const basicInfo = await productDao.getCraftBasicInfo(connection, params);  //기본 정보
+      const detailImage = await productDao.getCraftDetailImage(connection, params);  //상세 이미지
+      const cautions = await productDao.getCraftCautions(connection, params);  //유의사항
+      const material = await productDao.getCraftMaterial(connection, params);  //소재
+      const usage = await productDao.getCraftUsage(connection, params);  //용도
 
       const isFreeShippingFee = await productDao.isFreeShippingFee(connection, params);  //조건 없이 전체 무료배송인지
       let shippingFeeList = [];
@@ -39,7 +39,7 @@ exports.getProductDetail = async (params) => {
       const usageList = usage.map(item => item.usage);
 
       let result = {
-        'productIdx': basicInfo.productIdx,
+        'craftIdx': basicInfo.craftIdx,
         'isNew': basicInfo.isNew,
         'name': basicInfo.name,
         'mainImageUrl': basicInfo.mainImageUrl,
@@ -62,11 +62,11 @@ exports.getProductDetail = async (params) => {
       
     }catch(err){
       connection.release();
-      logger.error(`getProductDetail DB Query Error: ${err}`);
+      logger.error(`getCraftDetail DB Query Error: ${err}`);
       return errResponse(baseResponse.DB_ERROR);
     }
   }catch(err){
-    logger.error(`getProductDetail DB Connection Error: ${err}`);
+    logger.error(`getCraftDetail DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }

@@ -1,110 +1,113 @@
-//총 포토 리뷰 개수
-async function getOnlyPhotoReviewCnt(connection, params){
+//총 포토 댓글 개수
+async function getOnlyPhotoCommentCnt(connection, params){
   const query = `
-  SELECT COUNT(productReviewIdx) as totalReviewCnt FROM ProductReview
-  WHERE productIdx = ? && isDeleted = 'N' && isPhotoReview = 'Y'
+  SELECT COUNT(craftCommentIdx) as totalReviewCnt
+  FROM CraftComment
+  WHERE craftIdx = ? && isDeleted = 'N' && isPhotoComment = 'Y';
   `;
   const [rows] = await connection.query(query, params);
   return rows[0]['totalReviewCnt'];
 }
 
-//총 리뷰 개수
-async function getReviewCnt(connection, params){
+//총 댓글 개수
+async function getCommentCnt(connection, params){
   const query = `
-  SELECT COUNT(productIdx) as totalReviewCnt FROM ProductReview
-  WHERE productIdx = ? && isDeleted = 'N'
+  SELECT COUNT(craftCommentIdx) as totalReviewCnt
+  FROM CraftComment
+  WHERE craftIdx = ? && isDeleted = 'N';
   `;
   const [rows] = await connection.query(query, params);
   return rows[0]['totalReviewCnt'];
 }
 
-//상품 포토 리뷰 전체 가져오기
-async function getReviewInfoOnlyPhoto(connection, params){
+//상품 포토 댓글 전체 가져오기
+async function getCommentInfoOnlyPhoto(connection, params){
   const query = `
-  SELECT PR.productReviewIdx,
+  SELECT CC.craftCommentIdx as commentIdx,
         U.userIdx,
         U.nickname,
-        DATE_FORMAT(PR.createdAt, '%Y.%m.%d') as createdAt,
-        PR.content,
-        PR.isReported
-  FROM ProductReview PR
-          JOIN User U ON U.userIdx = PR.userIdx
-  WHERE PR.productIdx = ? && PR.isDeleted = 'N' && PR.isPhotoReview = 'Y'
-  ORDER BY PR.productReviewIdx
-  LIMIT ?, ?
+        DATE_FORMAT(CC.createdAt, '%Y.%m.%d') as createdAt,
+        CC.content,
+        CC.isReported
+  FROM CraftComment CC
+          JOIN User U ON U.userIdx = CC.userIdx
+  WHERE CC.craftIdx = ? && CC.isDeleted = 'N' && CC.isPhotoComment = 'Y'
+  ORDER BY CC.craftCommentIdx
+  LIMIT ?, ?;
   `;
   const [rows] = await connection.query(query, params);
   return rows;
 }
 
-//상품 리뷰 전체 가져오기
-async function getReviewInfo(connection, params){
+//상품 댓글 전체 가져오기
+async function getCommentInfo(connection, params){
   const query = `
-  SELECT PR.productReviewIdx,
+  SELECT CC.craftCommentIdx as commentIdx,
         U.userIdx,
         U.nickname,
-        DATE_FORMAT(PR.createdAt, '%Y.%m.%d') as createdAt,
-        PR.content,
-        PR.isReported
-  FROM ProductReview PR
-          JOIN User U ON U.userIdx = PR.userIdx
-  WHERE PR.productIdx = ? && PR.isDeleted = 'N'
-  ORDER BY PR.productReviewIdx
-  LIMIT ?, ?
+        DATE_FORMAT(CC.createdAt, '%Y.%m.%d') as createdAt,
+        CC.content,
+        CC.isReported
+  FROM CraftComment CC
+          JOIN User U ON U.userIdx = CC.userIdx
+  WHERE CC.craftIdx = ? && CC.isDeleted = 'N'
+  ORDER BY CC.craftCommentIdx
+  LIMIT ?, ?;
   `;
   const [rows] = await connection.query(query, params);
   return rows;
 }
 
-//리뷰 별 사진 가져오기
-async function getReviewPhoto(connection, params){
+//댓글 별 사진 가져오기
+async function getCommentPhoto(connection, params){
   const query = `
-  SELECT imageUrl FROM ProductReviewImage
-  WHERE productReviewIdx = ? && isDeleted = 'N';
+  SELECT imageUrl
+  FROM CraftCommentImage
+  WHERE craftCommentIdx = ? && isDeleted = 'N';
   `;
   const [rows] = await connection.query(query, params);
   return rows;
 }
 
-//존재하는 상품 리뷰 idx인지
-async function isExistProductReviewIdx(connection, params){
+//존재하는 상품 댓글 idx인지
+async function isExistCraftCommentIdx(connection, params){
   const query = `
-  SELECT EXISTS(SELECT productReviewIdx
-    FROM ProductReview
+  SELECT EXISTS(SELECT craftCommentIdx
+    FROM CraftComment
     WHERE isDeleted = 'N') as isExist;
   `;
   const [rows] = await connection.query(query, params);
   return rows[0]['isExist'];
 }
 
-//사용자가 기존에 신고한 상품 리뷰 idx인지
-async function isExistUserReportedReviewIdx(connection, params){
+//사용자가 기존에 신고한 상품 댓글 idx인지
+async function isExistUserReportedCommentIdx(connection, params){
   const query = `
   SELECT EXISTS(SELECT *
-    FROM ReportedProductReview
-    WHERE userIdx = ? && productReviewIdx = ?) as isExist;
+    FROM ReportedCraftComment
+    WHERE userIdx = ? && craftCommentIdx = ?) as isExist;
   `;
   const [rows] = await connection.query(query, params);
   return rows[0]['isExist'];
 }
 
-//리뷰 신고
-async function reportReview(connection, params){
+//댓글 신고
+async function reportComment(connection, params){
   const query = `
-  INSERT INTO ReportedProductReview(userIdx, productReviewIdx, reportedProductReasonIdx, etcContent)
-  VALUES (?, ?, ?, ?)
+  INSERT INTO ReportedCraftComment(userIdx, craftCommentIdx, reportedCraftReasonIdx, etcContent)
+  VALUES (?, ?, ?, ?);
   `;
   const [rows] = await connection.query(query, params);
   return rows;
 }
 
 module.exports = {
-  getOnlyPhotoReviewCnt,
-  getReviewCnt,
-  getReviewInfoOnlyPhoto,
-  getReviewInfo,
-  getReviewPhoto,
-  isExistProductReviewIdx,
-  isExistUserReportedReviewIdx,
-  reportReview,
+  getOnlyPhotoCommentCnt,
+  getCommentCnt,
+  getCommentInfoOnlyPhoto,
+  getCommentInfo,
+  getCommentPhoto,
+  isExistCraftCommentIdx,
+  isExistUserReportedCommentIdx,
+  reportComment,
 }
