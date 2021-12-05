@@ -16,4 +16,7 @@ module.exports = function(app){
 
   //찜한 상품 페이지 개수 조회 API
   app.get('/my-page/crafts/liked/page', jwtMiddleware, likeController.getLikedCraftTotalPage);
+
+  //찜한 상품 조회 API
+  app.get('/my-page/crafts/liked', jwtMiddleware, likeController.getLikedCraft);
 }

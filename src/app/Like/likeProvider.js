@@ -97,3 +97,48 @@ exports.getLikedCraftTotalPage = async (userIdx) => {
     return errResponse(baseResponse.DB_ERROR);
   }
 }
+
+exports.getLikedCraft = async (userIdx, page) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+      const craftCnt = await likeDao.getLikedCraftTotalCnt(connection, [userIdx]);
+      const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
+      const totalPages = (craftCnt % pageItemCnt == 0) ? craftCnt / pageItemCnt : parseInt(craftCnt / pageItemCnt) + 1;  //총 페이지 수
+      if (page <= 0 || page > totalPages) return errResponse(baseResponse.INVALID_PAGE);  //존재하는 page인지
+
+      const startItemIdx = (page - 1) * pageItemCnt;
+      
+      const result = [];
+      const likedCraftInfo = await likeDao.getLikedCraftInfo(connection, [userIdx, userIdx, startItemIdx, pageItemCnt]);
+
+      likedCraftInfo.forEach(item => {
+        result.push({
+          'craftIdx': item.craftIdx,
+          'mainImageUrl': item.mainImageUrl,
+          'name': item.name,
+          'artistIdx': item.artistIdx,
+          'artistName': item.artistName,
+          'price': item.price,
+          'isNew': item.isNew,
+          'totalLikeCnt': item.totalLikeCnt,
+          'isLike': 'Y',
+          'totalCommentCnt': item.totalCommentCnt,
+        })
+      })
+
+      result.reverse();
+
+      connection.release();
+      return response(baseResponse.SUCCESS, result);
+      
+    }catch(err){
+      connection.release();
+      logger.error(`getLikedCraft DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`getLikedCraft DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}

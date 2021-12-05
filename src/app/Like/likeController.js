@@ -74,3 +74,20 @@ exports.getLikedCraftTotalPage = async (req, res) => {
 
   return res.send(getLikedCraftTotalPage);
 }
+
+/*
+  API No. 8.5
+  API Name: 찜한 상품 조회 API
+  [GET] /my-page/crafts/liked
+  query: page
+*/
+exports.getLikedCraft = async (req, res) => {
+  const {page} = req.query;
+  if (!page) return res.send(errResponse(baseResponse.IS_EMPTY));
+
+  const {userIdx} = req.verifiedToken;
+
+  const getLikedCraft = await likeProvider.getLikedCraft(userIdx, page);
+
+  return res.send(getLikedCraft);
+}

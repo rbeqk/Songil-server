@@ -130,6 +130,42 @@ async function getLikedCraftTotalCnt(connection, params){
   return rows[0]['totalCnt'];
 }
 
+//사용자의 찜한 상품 정보
+async function getLikedCraftInfo(connection, params){
+  const query = `
+  SELECT C.craftIdx,
+        C.name,
+        C.price,
+        C.mainImageUrl,
+        C.content,
+        C.size,
+        C.isSoldOut,
+        C.artistIdx,
+        U.nickname                                               as artistName,
+        IF(TIMESTAMPDIFF(DAY, C.createdAt, NOW()) > 3, 'N', 'Y') as isNew,
+        (SELECT COUNT(craftCommentIdx)
+          FROM CraftComment CC
+          WHERE CC.craftIdx = C.craftIdx && CC.isDeleted = 'N')   as totalCommentCnt,
+        (SELECT COUNT(*)
+          FROM CraftLike TCL
+          WHERE TCL.craftIdx = C.craftIdx)                        as totalLikeCnt,
+        (SELECT CL.createdAt
+          FROM CraftLike CL
+          WHERE CL.craftIdx = C.craftIdx && CL.userIdx = ?)       as likedCreatedAt
+  FROM Craft C
+          JOIN Artist A ON A.artistIdx = C.artistIdx && A.isDeleted = 'N'
+          JOIN User U ON A.userIdx = U.userIdx && U.isDeleted = 'N'
+  WHERE C.craftIdx IN (SELECT craftIdx
+                      FROM CraftLike
+                      WHERE userIdx = ?
+  ) && C.isDeleted = 'N'
+  ORDER BY likedCreatedAt
+  LIMIT ?, ?;
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows;
+}
+
 module.exports = {
   craftIsLike,
   changeCraftToDisLike,
@@ -143,4 +179,5 @@ module.exports = {
   getLikedArticleIdx,
   getLikedArticleInfo,
   getLikedCraftTotalCnt,
+  getLikedCraftInfo,
 }
