@@ -6,38 +6,40 @@ const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 
-exports.changeCraftLikeStatus = async (params) => {
-  const userIdx = params[0];
-  const productIdx = params[1];
+exports.changeCraftLikeStatus = async (userIdx, craftIdx) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
       
-      //존재하는 productIdx인지
-      const isExistProductIdx = await productDao.isExistProductIdx(connection, productIdx);
-      if (!isExistProductIdx) return errResponse(baseResponse.INVALID_PRODUCT_IDX);
+      //존재하는 craftIdx인지
+      const isExistCraftIdx = await productDao.isExistCraftIdx(connection, [craftIdx]);
+      if (!isExistCraftIdx) return errResponse(baseResponse.INVALID_CRAFT_IDX);
 
       //현재 상품 좋아요 status 확인
-      const isProductLike = await likeDao.productIsLike(connection, params);
+      const isCraftLike = await likeDao.craftIsLike(connection, [userIdx, craftIdx]);
+
+      await connection.beginTransaction();
 
       //상품 좋아요 status 변경
-      if (isProductLike)
-        await likeDao.changeProductToDisLike(connection, params);  //좋아요 눌렀을 경우 => delete record
+      if (isCraftLike)
+        await likeDao.changeCraftToDisLike(connection, [userIdx, craftIdx]);  //좋아요 눌렀을 경우 => delete record
       else
-        await likeDao.changeProductToLike(connection, params);  //좋아요 아닐 경우 => create record
+        await likeDao.changeCraftToLike(connection, [userIdx, craftIdx]);  //좋아요 아닐 경우 => create record
+      
+      const totalCraftLikeCnt = await likeDao.getTotalCraftLikeCnt(connection, [craftIdx]);
 
-      const totalProductLikeCnt = await likeDao.getTotalProductLikeCnt(connection, productIdx);
-
-      //product의 최종 좋아요 상태 가져오기(현재와 반대)
+      //craft의 최종 좋아요 상태 가져오기(현재와 반대)
       let result = {};
-      result.isLike = isProductLike ? 'N' : 'Y';
-      result.totalLikeCnt = totalProductLikeCnt;
+      result.isLike = isCraftLike ? 'N' : 'Y';
+      result.totalLikeCnt = totalCraftLikeCnt;
 
+      await connection.commit();
       connection.release();
 
       return response(baseResponse.SUCCESS, result);
       
     }catch(err){
+      await connection.rollback();
       connection.release();
       logger.error(`changeCraftLikeStatus DB Query Error: ${err}`);
       return errResponse(baseResponse.DB_ERROR);
