@@ -61,3 +61,16 @@ exports.getLikedArticle = async (req, res) => {
 
   return res.send(getLikedArticle);
 }
+
+/*
+  API No. 8.4
+  API Name: 찜한 상품 페이지 개수 조회 API
+  [GET] /my-page/crafts/liked
+*/
+exports.getLikedCraftTotalPage = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+
+  const getLikedCraftTotalPage = await likeProvider.getLikedCraftTotalPage(userIdx);
+
+  return res.send(getLikedCraftTotalPage);
+}

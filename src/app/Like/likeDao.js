@@ -120,6 +120,15 @@ async function getLikedArticleInfo(connection, params){
   return rows;
 }
 
+//사용자의 찜한 상품 개수
+async function getLikedCraftTotalCnt(connection, params){
+  const query = `
+  SELECT COUNT(*) as totalCnt FROM CraftLike
+  WHERE userIdx = ?;
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows[0]['totalCnt'];
+}
 
 module.exports = {
   craftIsLike,
@@ -133,4 +142,5 @@ module.exports = {
   getLikedArticleTotalCnt,
   getLikedArticleIdx,
   getLikedArticleInfo,
+  getLikedCraftTotalCnt,
 }

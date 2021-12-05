@@ -13,4 +13,7 @@ module.exports = function(app){
 
   //좋아요한 아티클 조회 API
   app.get('/my-page/articles/liked', jwtMiddleware, likeController.getLikedArticle);
+
+  //찜한 상품 페이지 개수 조회 API
+  app.get('/my-page/crafts/liked/page', jwtMiddleware, likeController.getLikedCraftTotalPage);
 }
