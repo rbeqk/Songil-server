@@ -55,7 +55,7 @@ exports.getCraftDetail = async (params) => {
         'artistName': basicInfo.artistName,
         'artistIntroduction': basicInfo.artistIntroduction,
         'artistImageUrl': basicInfo.artistImageUrl,
-        'totalReviewCnt': basicInfo.totalReviewCnt
+        'totalCommentCnt': basicInfo.totalCommentCnt
       };
 
       return response(baseResponse.SUCCESS, result);

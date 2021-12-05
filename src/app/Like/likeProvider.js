@@ -19,11 +19,11 @@ exports.getLikedArticleTotalPage = async (userIdx) => {
       
     }catch(err){
       connection.release();
-      logger.error(`getProductDetail DB Query Error: ${err}`);
+      logger.error(`getLikedArticleTotalPage DB Query Error: ${err}`);
       return errResponse(baseResponse.DB_ERROR);
     }
   }catch(err){
-    logger.error(`getProductDetail DB Connection Error: ${err}`);
+    logger.error(`getLikedArticleTotalPage DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }

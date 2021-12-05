@@ -44,7 +44,8 @@ async function getArtistExhibition(connection, params){
 //작가 별 총 craft 개수 
 async function getArtistCraftCnt(connection, params){
   const query = `
-  SELECT COUNT(productIdx) as totalCnt FROM Product
+  SELECT COUNT(craftIdx) as totalCnt
+  FROM Craft
   WHERE isDeleted = 'N' && artistIdx = ?;
   `;
   const [rows] = await connection.query(query, params);
@@ -54,30 +55,30 @@ async function getArtistCraftCnt(connection, params){
 //작가 별 craft 조회
 async function getArtistCraft(connection, params){
   const query = `
-  SELECT P.productIdx,
-        P.mainImageUrl,
-        P.name,
-        A.artistIdx,
-        U.nickname                                               as artistName,
-        P.price,
-        IF(TIMESTAMPDIFF(DAY, P.createdAt, NOW()) > 3, 'N', 'Y') as isNew,
-        IFNULL(R.totalReviewCnt, 0)                              as totalReviewCnt,
-        IFNULL(L.totalLikeCnt, 0)                                as totalLikeCnt
-  FROM Product P
-          JOIN Artist A ON A.artistIdx = P.artistIdx && A.isDeleted = 'N'
-          JOIN User U ON A.userIdx = U.userIdx && U.isDeleted = 'N'
-          LEFT JOIN (SELECT productIdx, COUNT(productReviewIdx) as totalReviewCnt
-                      FROM ProductReview
-                      WHERE isDeleted = 'N'
-                      GROUP BY productIdx) R ON P.productIdx = R.productIdx
-          LEFT JOIN (SELECT productIdx, COUNT(userIdx) as totalLikeCnt
-                      FROM ProductLike
-                      GROUP BY productIdx) L ON P.productIdx = L.productIdx
-  WHERE P.isDeleted = 'N' && P.artistIdx = ?
-  ORDER BY (CASE WHEN ? = 'new' THEN P.createdAt END) ASC,
-          (CASE WHEN ? = 'price' THEN P.price END) DESC,
-          (CASE WHEN ? = 'review' THEN totalReviewCnt END) ASC,
-          (CASE WHEN ? = 'popular' THEN totalLikeCnt END) ASC
+  SELECT C.craftIdx,
+    C.mainImageUrl,
+    C.name,
+    A.artistIdx,
+    U.nickname                                               as artistName,
+    C.price,
+    IF(TIMESTAMPDIFF(DAY, C.createdAt, NOW()) > 3, 'N', 'Y') as isNew,
+    IFNULL(CC.totalCommentCnt, 0)                             as totalCommentCnt,
+    IFNULL(L.totalLikeCnt, 0)                                as totalLikeCnt
+  FROM Craft C
+      JOIN Artist A ON A.artistIdx = C.artistIdx && A.isDeleted = 'N'
+      JOIN User U ON A.userIdx = U.userIdx && U.isDeleted = 'N'
+      LEFT JOIN (SELECT craftIdx, COUNT(craftCommentIdx) as totalCommentCnt
+                FROM CraftComment
+                WHERE isDeleted = 'N'
+                GROUP BY craftIdx) CC ON C.craftIdx = CC.craftIdx
+      LEFT JOIN (SELECT craftIdx, COUNT(userIdx) as totalLikeCnt
+                FROM CraftLike
+                GROUP BY craftIdx) L ON C.craftIdx = L.craftIdx
+  WHERE C.isDeleted = 'N' && C.artistIdx = ?
+  ORDER BY (CASE WHEN ? = 'new' THEN C.createdAt END) ASC,
+      (CASE WHEN ? = 'price' THEN C.price END) DESC,
+      (CASE WHEN ? = 'comment' THEN totalCommentCnt END) ASC,
+      (CASE WHEN ? = 'popular' THEN totalLikeCnt END) ASC
   LIMIT ?, ?;
   `;
   const [rows] = await connection.query(query, params);
@@ -107,13 +108,13 @@ async function getArticleWithArtistTag(connection, params){
 }
 
 //작가 상품이 들어가있는 아티클 목록
-async function getArticleWithArtistProduct(connection, params){
+async function getArticleWithArtistCraft(connection, params){
   const query = `
-  SELECT AP.articleIdx
-  FROM ArticleProduct AP
-  JOIN Product P on AP.productIdx = P.productIdx && P.isDeleted = 'N'
-  JOIN Artist A on P.artistIdx = A.artistIdx && A.isDeleted = 'N'
-  WHERE AP.isDeleted = 'N' && A.artistIdx = ?;
+  SELECT AC.articleIdx
+  FROM ArticleCraft AC
+          JOIN Craft C on AC.craftIdx = C.craftIdx && C.isDeleted = 'N'
+          JOIN Artist A on C.artistIdx = A.artistIdx && A.isDeleted = 'N'
+  WHERE AC.isDeleted = 'N' && A.artistIdx = ?;
   `;
   const [rows] = await connection.query(query, params);
   return rows;
@@ -153,6 +154,6 @@ module.exports = {
   getArtistCraft,
   getArtistName,
   getArticleWithArtistTag,
-  getArticleWithArtistProduct,
+  getArticleWithArtistCraft,
   getArtistArticle,
 }

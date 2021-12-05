@@ -1,23 +1,23 @@
 //총 포토 댓글 개수
 async function getOnlyPhotoCommentCnt(connection, params){
   const query = `
-  SELECT COUNT(craftCommentIdx) as totalReviewCnt
+  SELECT COUNT(craftCommentIdx) as totalCommentCnt
   FROM CraftComment
   WHERE craftIdx = ? && isDeleted = 'N' && isPhotoComment = 'Y';
   `;
   const [rows] = await connection.query(query, params);
-  return rows[0]['totalReviewCnt'];
+  return rows[0]['totalCommentCnt'];
 }
 
 //총 댓글 개수
 async function getCommentCnt(connection, params){
   const query = `
-  SELECT COUNT(craftCommentIdx) as totalReviewCnt
+  SELECT COUNT(craftCommentIdx) as totalCommentnt
   FROM CraftComment
   WHERE craftIdx = ? && isDeleted = 'N';
   `;
   const [rows] = await connection.query(query, params);
-  return rows[0]['totalReviewCnt'];
+  return rows[0]['totalCommentnt'];
 }
 
 //상품 포토 댓글 전체 가져오기

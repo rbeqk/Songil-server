@@ -58,9 +58,7 @@ exports.getArtistCraft = async (req, res) => {
     }
   }
 
-  let params = [artistIdx, page, filter, userIdx];
-
-  const getArtistCraft = await artistPlaceProvider.getArtistCraft(params);
+  const getArtistCraft = await artistPlaceProvider.getArtistCraft(artistIdx, page, filter, userIdx);
 
   return res.send(getArtistCraft);
 }
@@ -74,9 +72,8 @@ exports.getArtistCraft = async (req, res) => {
 */
 exports.getArtistArticleTotalPage = async (req, res) => {
   const {artistIdx} = req.params;
-  let parmas = [artistIdx];
 
-  const getArtistArticleTotalPage = await artistPlaceProvider.getArtistCraftTotalPage(parmas);
+  const getArtistArticleTotalPage = await artistPlaceProvider.getArtistCraftTotalPage(artistIdx);
 
   return res.send(getArtistArticleTotalPage);
 }

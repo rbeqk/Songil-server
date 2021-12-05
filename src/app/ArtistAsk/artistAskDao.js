@@ -22,10 +22,10 @@ async function getArtistIdx(connection, params){
 //작가의 총 1:1문의 개수
 async function getAskCnt(connection, params){
   const query = `
-  SELECT COUNT(PA.productAskIdx) as totalCnt
-  FROM ProductAsk PA
-            JOIN Product P ON P.productIdx = PA.productIdx
-  WHERE PA.isDeleted = 'N' && P.artistIdx = ?;
+  SELECT COUNT(CA.craftAskIdx) as totalCnt
+  FROM CraftAsk CA
+          JOIN Craft C ON C.craftIdx = CA.craftIdx
+  WHERE CA.isDeleted = 'N' && C.artistIdx = ?;
   `;
   const [rows] = await connection.query(query, params);
   return rows[0]['totalCnt'];
@@ -34,10 +34,10 @@ async function getAskCnt(connection, params){
 //작가 1:1문의 목록 가져오기(삭제된 상품에 대해서도 보이게)
 async function getAskList(connection, params){
   const query = `
-  SELECT PA.productAskIdx as askIdx
-  FROM ProductAsk PA
-            JOIN Product P ON P.productIdx = PA.productIdx
-  WHERE PA.isDeleted = 'N' && P.artistIdx = ?;
+  SELECT CA.craftAskIdx as askIdx
+  FROM CraftAsk CA
+          JOIN Craft C ON C.craftIdx = CA.craftIdx
+  WHERE CA.isDeleted = 'N' && C.artistIdx = ?;
   `;
   const [rows] = await connection.query(query, params);
   return rows;
@@ -46,18 +46,18 @@ async function getAskList(connection, params){
 //문의 목록 상세 정보 가져오기
 async function getAskInfo(connection, params){
   const query = `
-  SELECT PA.productAskIdx as askIdx,
-        PA.productIdx,
-        P.name           as productName,
-        P.mainImageUrl,
+  SELECT CA.craftAskIdx                               as askIdx,
+        CA.craftIdx,
+        C.name,
+        C.mainImageUrl,
         U.nickname,
-        PA.productAskStatusIdx as status,
-        DATE_FORMAT(PA.createdAt, '%Y.%m.%d. %k:%i') as                                     createdAt
-  FROM ProductAsk PA
-          JOIN Product P ON P.productIdx = PA.productIdx
-          JOIN User U ON U.userIdx = PA.userIdx && U.isDeleted = 'N'
-  WHERE PA.productAskIdx IN (?) && PA.isDeleted = 'N'
-  ORDER BY PA.createdAt
+        CA.craftAskStatusIdx                         as status,
+        DATE_FORMAT(CA.createdAt, '%Y.%m.%d. %k:%i') as createdAt
+  FROM CraftAsk CA
+          JOIN Craft C ON C.craftIdx = CA.craftIdx
+          JOIN User U ON U.userIdx = CA.userIdx && U.isDeleted = 'N'
+  WHERE CA.craftAskIdx IN (?) && CA.isDeleted = 'N'
+  ORDER BY CA.createdAt
   LIMIT ?, ?;
   `;
   const [rows] = await connection.query(query, params);

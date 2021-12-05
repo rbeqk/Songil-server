@@ -69,8 +69,8 @@ exports.getAsk = async (userIdx, page) => {
       askInfo.forEach(item => {
         result.push({
           'askIdx': item.askIdx,
-          'productIdx': item.productIdx,
-          'productName': item.productName,
+          'craftIdx': item.craftIdx,
+          'name': item.name,
           'nickname': item.nickname,
           'createdAt': item.createdAt,
           'status': item.status,
