@@ -4,26 +4,27 @@ const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 
-exports.reportComment = async (params) => {
-  //params = [userIdx, commentIdx, reportedReasonIdx, etcReason]
-  const userIdx = params[0];
-  const commentIdx = params[1];
+exports.reportComment = async (userIdx, craftCommentIdx, reportedReasonIdx, etcReason) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
       
       //존재하는 상품 댓글 idx인지
-      const isExistCraftCommentIdx = await reviewDao.isExistCraftCommentIdx(connection, [commentIdx]);
+      const isExistCraftCommentIdx = await reviewDao.isExistCraftCommentIdx(connection, [craftCommentIdx]);
       if (!isExistCraftCommentIdx) return errResponse(baseResponse.INVALD_CRAFT_COMMENT_IDX);
 
       //사용자가 기존에 신고한 상품 댓글 idx인지
-      const isExistUserReportedCommentIdx = await reviewDao.isExistUserReportedCommentIdx(connection, [userIdx, commentIdx]);
+      const isExistUserReportedCommentIdx = await reviewDao.isExistUserReportedCommentIdx(connection, [userIdx, craftCommentIdx]);
       if (isExistUserReportedCommentIdx) return errResponse(baseResponse.ALREADY_REPORTED_CRAFT_COMMENT_IDX);
+
+      //자기 댓글인지
+      const isUserCraftComment = await reviewDao.isUserCraftComment(connection, [userIdx, craftCommentIdx]);
+      if (isUserCraftComment) return errResponse(baseResponse.CAN_NOT_REPORT_SELF);
 
       await connection.beginTransaction();
 
       //댓글 신고
-      await reviewDao.reportComment(connection, params);
+      await reviewDao.reportComment(connection, [userIdx, craftCommentIdx, reportedReasonIdx, etcReason]);
       await connection.commit();
 
       connection.release();

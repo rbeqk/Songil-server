@@ -91,6 +91,17 @@ async function isExistUserReportedCommentIdx(connection, params){
   return rows[0]['isExist'];
 }
 
+//자기 댓글인지
+async function isUserCraftComment(connection, params){
+  const query = `
+  SELECT EXISTS(SELECT craftCommentIdx
+    FROM CraftComment
+    WHERE userIdx = ? && craftCommentIdx = ? && isDeleted = 'N') as isExist;
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows[0]['isExist'];
+}
+
 //댓글 신고
 async function reportComment(connection, params){
   const query = `
@@ -109,5 +120,6 @@ module.exports = {
   getCommentPhoto,
   isExistCraftCommentIdx,
   isExistUserReportedCommentIdx,
+  isUserCraftComment,
   reportComment,
 }

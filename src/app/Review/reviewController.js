@@ -50,7 +50,7 @@ exports.getComment = async (req, res) => {
 */
 exports.reportComment = async (req, res) => {
   const {userIdx} = req.verifiedToken;
-  const {commentIdx} = req.params;
+  const {commentIdx: craftCommentIdx} = req.params;
   const {reportedReasonIdx, etcReason} = req.body;
 
   const totalReportedReasonLength = 7;  //총 신고 사유 개수
@@ -69,8 +69,7 @@ exports.reportComment = async (req, res) => {
   //직접입력 시 글자수 초과
   if (etcReason && etcReason.length > etcReasonLength) return res.send(errResponse(baseResponse.EXCEED_REPORTED_REASON));
 
-  let params = [userIdx, commentIdx, reportedReasonIdx, etcReason];
-  const reportComment = await reviewService.reportComment(params);
+  const reportComment = await reviewService.reportComment(userIdx, craftCommentIdx, reportedReasonIdx, etcReason);
 
   return res.send(reportComment);
 }
