@@ -1,4 +1,4 @@
-const reviewDao = require('./reviewDao');
+const craftCommentDao = require('./craftCommentDao');
 const craftDao = require('../Craft/craftDao');
 const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
@@ -19,10 +19,10 @@ exports.getCommentTotalPage = async (params) => {
       let commentCnt;
       
       if (onlyPhoto === 'Y'){
-        commentCnt = await reviewDao.getOnlyPhotoCommentCnt(connection, params);
+        commentCnt = await craftCommentDao.getOnlyPhotoCommentCnt(connection, params);
       }
       else if (onlyPhoto === 'N'){
-        commentCnt = await reviewDao.getCommentCnt(connection, params);
+        commentCnt = await craftCommentDao.getCommentCnt(connection, params);
       }
 
       const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
@@ -58,11 +58,11 @@ exports.getComment = async (craftIdx, page, onlyPhoto) => {
 
       //포토댓글만
       if (onlyPhoto === 'Y'){
-        commentCnt = await reviewDao.getOnlyPhotoCommentCnt(connection, [craftIdx]);
+        commentCnt = await craftCommentDao.getOnlyPhotoCommentCnt(connection, [craftIdx]);
       }
       //리뷰 전체
       else if (onlyPhoto === 'N'){
-        commentCnt = await reviewDao.getCommentCnt(connection, [craftIdx]);
+        commentCnt = await craftCommentDao.getCommentCnt(connection, [craftIdx]);
       }
 
       const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
@@ -78,18 +78,18 @@ exports.getComment = async (craftIdx, page, onlyPhoto) => {
 
       //포토댓글만
       if (onlyPhoto === 'Y'){
-        commentInfo = await reviewDao.getCommentInfoOnlyPhoto(connection, [craftIdx, startItemIdx, pageItemCnt]);
+        commentInfo = await craftCommentDao.getCommentInfoOnlyPhoto(connection, [craftIdx, startItemIdx, pageItemCnt]);
       }
       //댓글 전체
       else if (onlyPhoto === 'N'){
-        commentInfo = await reviewDao.getCommentInfo(connection, [craftIdx, startItemIdx, pageItemCnt]);
+        commentInfo = await craftCommentDao.getCommentInfo(connection, [craftIdx, startItemIdx, pageItemCnt]);
       }
 
       let commentIdx;
       let commentPhoto;
       for (let item of commentInfo){
         commentIdx = item.commentIdx;
-        commentPhoto = await reviewDao.getCommentPhoto(connection, commentIdx);
+        commentPhoto = await craftCommentDao.getCommentPhoto(connection, commentIdx);
 
         //이미지 배열로 변환
         let commentPhotoList = [];

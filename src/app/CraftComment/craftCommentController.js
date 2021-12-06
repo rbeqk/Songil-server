@@ -1,5 +1,5 @@
-const reviewProvider = require("./reviewProvider");
-const reviewService = require("./reviewService");
+const craftCommentController = require("./craftCommentProvider");
+const craftCommentService = require("./craftCommentService");
 const baseResponse = require("../../../config/baseResponseStatus");
 const {response} = require("../../../config/response");
 const {errResponse} = require("../../../config/response");
@@ -20,7 +20,7 @@ exports.getCommentTotalPage = async (req, res) => {
   if (!onlyPhoto) return res.send(errResponse(baseResponse.IS_EMPTY));
 
   let params = [craftIdx, onlyPhoto];
-  const getCommentTotalPage = await reviewProvider.getCommentTotalPage(params);
+  const getCommentTotalPage = await craftCommentController.getCommentTotalPage(params);
 
   return res.send(getCommentTotalPage);
 }
@@ -37,7 +37,7 @@ exports.getComment = async (req, res) => {
 
   if (!(page && onlyPhoto)) return res.send(errResponse(baseResponse.IS_EMPTY));
 
-  const getComment = await reviewProvider.getComment(craftIdx, page, onlyPhoto);
+  const getComment = await craftCommentController.getComment(craftIdx, page, onlyPhoto);
 
   return res.send(getComment);
 }
@@ -68,7 +68,7 @@ exports.reportComment = async (req, res) => {
   //직접입력 시 글자수 초과
   if (etcReason && etcReason.length > etcReasonLength) return res.send(errResponse(baseResponse.EXCEED_REPORTED_REASON));
 
-  const reportComment = await reviewService.reportComment(userIdx, craftCommentIdx, reportedReasonIdx, etcReason);
+  const reportComment = await craftCommentService.reportComment(userIdx, craftCommentIdx, reportedReasonIdx, etcReason);
 
   return res.send(reportComment);
 }
