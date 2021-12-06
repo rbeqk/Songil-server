@@ -109,6 +109,40 @@ async function getAskDetail(connection, params){
   return rows[0];
 }
 
+//이미 답변한 문의인지
+async function isAlreadyCommentAskIdx(connection, params){
+  const query = `
+  SELECT EXISTS(SELECT *
+    FROM CraftAskAnswer
+    WHERE craftAskIdx = ? && isDeleted = 'N') as isExist;
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows[0]['isExist'];
+}
+
+//삭제된 상품에 대한 문의인지
+async function isDeletedCraftAskIdx(connection, params){
+  const query = `
+  SELECT IF(isDeleted ='Y', 1, 0) as status
+  FROM Craft
+  WHERE craftIdx = (SELECT craftIdx
+                    FROM CraftAsk
+                    WHERE craftAskIdx = ? && isDeleted = 'N');
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows[0]['status'];
+}
+
+//1:1문의 답변 작성
+async function createAskComment(connection, params){
+  const query = `
+  INSERT INTO CraftAskAnswer(craftAskIdx, comment)
+  VALUES (?, ?);
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows;
+}
+
 module.exports = {
   isArtist,
   getArtistIdx,
@@ -118,4 +152,7 @@ module.exports = {
   isArtistAsk,
   isExistCraftAskIdx,
   getAskDetail,
+  isAlreadyCommentAskIdx,
+  isDeletedCraftAskIdx,
+  createAskComment,
 }

@@ -10,4 +10,7 @@ module.exports = function(app){
 
   //1:1 문의 내역 상세 조회 API
   app.get('/artist-page/ask/:askIdx', jwtMiddleware, artistAskController.getAskDetail);
+
+  //1:1 문의 답변 등록 API
+  app.post('/artist-page/ask/:askIdx', jwtMiddleware, artistAskController.createAskComment);
 }
