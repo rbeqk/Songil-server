@@ -1,5 +1,5 @@
-const productProvider = require("./productProvider");
-const productService = require("./productService");
+const craftProvider = require("./craftProvider");
+const craftService = require("./craftService");
 const baseResponse = require("../../../config/baseResponseStatus");
 const {response} = require("../../../config/response");
 const {errResponse} = require("../../../config/response");
@@ -17,7 +17,7 @@ exports.getCraftDetail = async (req, res) => {
   let params = [craftIdx];
   
   //상품 detail
-  const productDetail = await productProvider.getCraftDetail(params);
+  const craftDetail = await craftProvider.getCraftDetail(params);
 
-  return res.send(productDetail);
+  return res.send(craftDetail);
 }

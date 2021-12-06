@@ -37,8 +37,7 @@ exports.getComment = async (req, res) => {
 
   if (!(page && onlyPhoto)) return res.send(errResponse(baseResponse.IS_EMPTY));
 
-  let params = [craftIdx, page, onlyPhoto];
-  const getComment = await reviewProvider.getComment(params);
+  const getComment = await reviewProvider.getComment(craftIdx, page, onlyPhoto);
 
   return res.send(getComment);
 }

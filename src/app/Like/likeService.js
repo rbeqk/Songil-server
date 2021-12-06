@@ -1,5 +1,5 @@
 const likeDao = require('./likeDao');
-const productDao = require('../Product/productDao');
+const craftDao = require('../Craft/craftDao');
 const articleDao = require('../Article/articleDao');
 const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
@@ -12,7 +12,7 @@ exports.changeCraftLikeStatus = async (userIdx, craftIdx) => {
     try{
       
       //존재하는 craftIdx인지
-      const isExistCraftIdx = await productDao.isExistCraftIdx(connection, [craftIdx]);
+      const isExistCraftIdx = await craftDao.isExistCraftIdx(connection, [craftIdx]);
       if (!isExistCraftIdx) return errResponse(baseResponse.INVALID_CRAFT_IDX);
 
       //현재 상품 좋아요 status 확인

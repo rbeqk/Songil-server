@@ -1,5 +1,5 @@
 const artistPlaceDao = require('./artistPlaceDao');
-const productDao = require('../Product/productDao');
+const craftDao = require('../Craft/craftDao');
 const articleDao = require('../Article/articleDao');
 const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
@@ -113,7 +113,7 @@ exports.getArtistCraft = async (artistIdx, page, filter, userIdx) => {
       if (artistCraft.length){
         result.craft = [];
         for (item of artistCraft){
-          const isLike = await productDao.getUserLikeCraft(connection, [item.craftIdx, userIdx]);
+          const isLike = await craftDao.getUserLikeCraft(connection, [item.craftIdx, userIdx]);
           result.craft.push({
             'craftIdx': item.craftIdx,
             'mainImageUrl': item.mainImageUrl,

@@ -1,4 +1,4 @@
-const productDao = require('./productDao');
+const craftDao = require('./craftDao');
 const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
@@ -10,17 +10,17 @@ exports.getCraftDetail = async (params) => {
     try{
 
       //존재하는 craftIdx인지
-      const isExistCraftIdx = await productDao.isExistCraftIdx(connection, params);
+      const isExistCraftIdx = await craftDao.isExistCraftIdx(connection, params);
       if (!isExistCraftIdx) return errResponse(baseResponse.INVALID_CRAFT_IDX);
 
       //상세 정보
-      const basicInfo = await productDao.getCraftBasicInfo(connection, params);  //기본 정보
-      const detailImage = await productDao.getCraftDetailImage(connection, params);  //상세 이미지
-      const cautions = await productDao.getCraftCautions(connection, params);  //유의사항
-      const material = await productDao.getCraftMaterial(connection, params);  //소재
-      const usage = await productDao.getCraftUsage(connection, params);  //용도
+      const basicInfo = await craftDao.getCraftBasicInfo(connection, params);  //기본 정보
+      const detailImage = await craftDao.getCraftDetailImage(connection, params);  //상세 이미지
+      const cautions = await craftDao.getCraftCautions(connection, params);  //유의사항
+      const material = await craftDao.getCraftMaterial(connection, params);  //소재
+      const usage = await craftDao.getCraftUsage(connection, params);  //용도
 
-      const isFreeShippingFee = await productDao.isFreeShippingFee(connection, params);  //조건 없이 전체 무료배송인지
+      const isFreeShippingFee = await craftDao.isFreeShippingFee(connection, params);  //조건 없이 전체 무료배송인지
       let shippingFeeList = [];
       
       if (isFreeShippingFee === 'Y'){
@@ -29,7 +29,7 @@ exports.getCraftDetail = async (params) => {
       else{
         
         //다른 경우의 수 있을 때 변경 예정
-        const shippingFee = await productDao.getShippingFeeList(connection, params);
+        const shippingFee = await craftDao.getShippingFeeList(connection, params);
         shippingFeeList = shippingFee.map(item => item.shippingFee);
       }
 

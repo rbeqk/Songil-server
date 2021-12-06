@@ -1,6 +1,6 @@
 const askDao = require('./askDao');
 const userDao = require('../User/userDao');
-const productDao = require('../Product/productDao');
+const craftDao = require('../Craft/craftDao');
 const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
@@ -16,7 +16,7 @@ exports.createCraftAsk = async (params) => {
     try{
 
       //존재하는 상품인지 확인
-      const isExistCraftIdx = await productDao.isExistCraftIdx(connection, [craftIdx]);
+      const isExistCraftIdx = await craftDao.isExistCraftIdx(connection, [craftIdx]);
       if (!isExistCraftIdx) return errResponse(baseResponse.INVALID_CRAFT_IDX);
 
       //1:1 문의 작성

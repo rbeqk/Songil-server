@@ -1,5 +1,5 @@
 const reviewDao = require('./reviewDao');
-const productDao = require('../Product/productDao');
+const craftDao = require('../Craft/craftDao');
 const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
@@ -13,7 +13,7 @@ exports.getCommentTotalPage = async (params) => {
     try{
       
       //존재하는 craftIdx인지
-      const isExistCraftIdx = await productDao.isExistCraftIdx(connection, [craftIdx]);
+      const isExistCraftIdx = await craftDao.isExistCraftIdx(connection, [craftIdx]);
       if (!isExistCraftIdx) return errResponse(baseResponse.INVALID_CRAFT_IDX);
 
       let commentCnt;
@@ -45,29 +45,24 @@ exports.getCommentTotalPage = async (params) => {
 }
 
 
-exports.getComment = async (params) => {
-  //params = [productIdx, page, onlyPhoto]
-  const productIdx = params[0];
-  const page = params[1];
-  const onlyPhoto = params[2];
-
+exports.getComment = async (craftIdx, page, onlyPhoto) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
       
       //존재하는 craftIdx인지
-      const isExistCraftIdx = await productDao.isExistCraftIdx(connection, productIdx);
+      const isExistCraftIdx = await craftDao.isExistCraftIdx(connection, [craftIdx]);
       if (!isExistCraftIdx) return errResponse(baseResponse.INVALID_CRAFT_IDX);
       
       let commentCnt;
 
       //포토댓글만
       if (onlyPhoto === 'Y'){
-        commentCnt = await reviewDao.getOnlyPhotoCommentCnt(connection, productIdx);
+        commentCnt = await reviewDao.getOnlyPhotoCommentCnt(connection, [craftIdx]);
       }
       //리뷰 전체
       else if (onlyPhoto === 'N'){
-        commentCnt = await reviewDao.getCommentCnt(connection, productIdx);
+        commentCnt = await reviewDao.getCommentCnt(connection, [craftIdx]);
       }
 
       const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
@@ -83,11 +78,11 @@ exports.getComment = async (params) => {
 
       //포토댓글만
       if (onlyPhoto === 'Y'){
-        commentInfo = await reviewDao.getCommentInfoOnlyPhoto(connection, [productIdx, startItemIdx, pageItemCnt]);
+        commentInfo = await reviewDao.getCommentInfoOnlyPhoto(connection, [craftIdx, startItemIdx, pageItemCnt]);
       }
       //댓글 전체
       else if (onlyPhoto === 'N'){
-        commentInfo = await reviewDao.getCommentInfo(connection, [productIdx, startItemIdx, pageItemCnt]);
+        commentInfo = await reviewDao.getCommentInfo(connection, [craftIdx, startItemIdx, pageItemCnt]);
       }
 
       let commentIdx;
