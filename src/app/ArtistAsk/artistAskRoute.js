@@ -7,4 +7,7 @@ module.exports = function(app){
 
   //1:1 문의 목록 조회 API
   app.get('/artist-page/ask', jwtMiddleware, artistAskController.getAsk);
+
+  //1:1 문의 내역 상세 조회 API
+  app.get('/artist-page/ask/:askIdx', jwtMiddleware, artistAskController.getAskDetail);
 }

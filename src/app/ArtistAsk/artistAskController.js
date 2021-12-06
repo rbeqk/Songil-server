@@ -32,3 +32,17 @@ exports.getAsk = async (req, res) => {
 
   return res.send(getAsk);
 }
+
+/*
+  API No. 10.4
+  API Name: 1:1 문의 내역 상세 조회 API
+  [GET] /artist-page/ask/:askIdx
+*/
+exports.getAskDetail = async (req, res) => {
+  const {askIdx: craftAskIdx} = req.params;
+  const {userIdx} = req.verifiedToken;
+
+  const getAskDetail = await artistAskProvider.getAskDetail(craftAskIdx, userIdx);
+
+  return res.send(getAskDetail);
+}

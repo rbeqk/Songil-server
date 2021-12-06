@@ -64,10 +64,58 @@ async function getAskInfo(connection, params){
   return rows;
 }
 
+//문의에 대한 작가 권한 확인
+async function isArtistAsk(connection, params){
+  const query = `
+  SELECT EXISTS(SELECT *
+    FROM Craft C
+    WHERE C.craftIdx = (SELECT CA.craftIdx
+                        FROM CraftAsk CA
+                        WHERE CA.isDeleted = 'N' && CA.craftAskIdx = ?) && C.artistIdx = ?) as isExist;
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows[0]['isExist'];
+}
+
+//존재하는 craftAskIdx인지
+async function isExistCraftAskIdx(connection, params){
+  const query = `
+  SELECT EXISTS(SELECT * FROM CraftAsk
+    WHERE isDeleted = 'N' && craftAskIdx = ?) as isExist;
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows[0]['isExist'];
+}
+
+
+//1:1 문의 상세 정보
+async function getAskDetail(connection, params){
+  const query = `
+  SELECT CA.craftAskIdx as askIdx,
+        CA.craftIdx,
+        C.name         as craftName,
+        CA.userIdx,
+        U.nickname,
+        CA.content     as askContent,
+        CAA.comment    as answerContent,
+        C.isDeleted as craftIsDeleted
+  FROM CraftAsk CA
+      JOIN User U ON U.userIdx = CA.userIdx && U.isDeleted = 'N'
+          JOIN Craft C ON C.craftIdx = CA.craftIdx
+          LEFT JOIN CraftAskAnswer CAA on CA.craftAskIdx = CAA.craftAskIdx
+  WHERE CA.isDeleted = 'N' && CA.craftAskIdx = ?;
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows[0];
+}
+
 module.exports = {
   isArtist,
   getArtistIdx,
   getAskCnt,
   getAskList,
   getAskInfo,
+  isArtistAsk,
+  isExistCraftAskIdx,
+  getAskDetail,
 }
