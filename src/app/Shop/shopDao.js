@@ -68,10 +68,21 @@ async function getNewCraft(connection){
   return rows;
 }
 
+//카테고리 별 상품 개수
+async function getProductByCategory(connection, params){
+  const query = `
+  SELECT COUNT(craftIdx) as totalCnt FROM Craft
+  WHERE craftCategoryIdx = ? && isDeleted = 'N';
+  `;
+  const [rows] = await connection.query(query, params);
+  return rows[0]['totalCnt'];
+}
+
 module.exports = {
   getTodayCraftTotalCnt,
   getTodayCraft,
   getBanner,
   getTodayArtist,
   getNewCraft,
+  getProductByCategory,
 }
