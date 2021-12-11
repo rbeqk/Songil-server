@@ -45,6 +45,7 @@ module.exports = function (){
   require('../src/app/ArtistAsk/artistAskRoute')(app);
   require('../src/app/Search/searchRoute')(app);
   require('../src/app/Story/storyRoute')(app);
+  require('../src/app/StoryComment/storyCommentRoute')(app);
 
   return app;
 }
