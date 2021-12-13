@@ -166,6 +166,49 @@ async function getLikedCraftInfo(connection, params){
   return rows;
 }
 
+//현재 QnA 좋아요 status 확인
+async function getQnALikeStatus(connection, userIdx, qnaIdx){
+  const query = `
+  SELECT EXISTS(SELECT *
+    FROM QnALike
+    WHERE userIdx = ${userIdx} && qnaIdx = ${qnaIdx}) as isLike;
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['isLike'];
+}
+
+//QnA 좋아요 삭제
+async function deleteQnALike(connection, userIdx, qnaIdx){
+  const query = `
+  DELETE
+  FROM QnALike
+  WHERE userIdx = ${userIdx} && qnaIdx = ${qnaIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
+//QnA 좋아요 등록
+async function createQnALike(connection, userIdx, qnaIdx){
+  const query = `
+  INSERT INTO QnALike(userIdx, qnaIdx)
+  VALUES (${userIdx}, ${qnaIdx});
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
+//QnA 총 좋아요 개수
+async function getTotalQnALikeCnt(connection, qnaIdx){
+  const query = `
+  SELECT COUNT(*) as totalLikeCnt
+  FROM QnALike
+  WHERE qnaIdx = ${qnaIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['totalLikeCnt'];
+}
+
 module.exports = {
   craftIsLike,
   changeCraftToDisLike,
@@ -180,4 +223,8 @@ module.exports = {
   getLikedArticleInfo,
   getLikedCraftTotalCnt,
   getLikedCraftInfo,
+  getQnALikeStatus,
+  deleteQnALike,
+  createQnALike,
+  getTotalQnALikeCnt,
 }

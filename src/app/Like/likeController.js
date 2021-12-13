@@ -91,3 +91,17 @@ exports.getLikedCraft = async (req, res) => {
 
   return res.send(getLikedCraft);
 }
+
+/*
+  API No. 5.20
+  API Name: QnA 좋아요 여부 변경 API
+  [PATCH] /with/qna/:qnaIdx/like
+*/
+exports.changeQnALikeStatus = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {qnaIdx} = req.params;
+
+  const changeQnALikeStatus = await likeService.changeQnALikeStatus(userIdx, qnaIdx);
+
+  return res.send(changeQnALikeStatus);
+}

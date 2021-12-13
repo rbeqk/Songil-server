@@ -1,6 +1,7 @@
 const likeDao = require('./likeDao');
 const craftDao = require('../Craft/craftDao');
 const articleDao = require('../Article/articleDao');
+const qnaDao = require('../QnA/qnaDao');
 const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
@@ -90,6 +91,57 @@ exports.changeArticleLikeStuatus = async (userIdx, articleIdx) => {
     }
   }catch(err){
     logger.error(`changeArticleLikeStuatus DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}
+
+exports.changeQnALikeStatus = async (userIdx, qnaIdx) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+
+      //존재하는 qnaIdx인지
+      const isExistQnaIdx = await qnaDao.isExistQnaIdx(connection, qnaIdx);
+      if (!isExistQnaIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_QNA_IDX);
+      }
+
+      //현재 QnA 좋아요 status 확인
+      const isQnALike = await likeDao.getQnALikeStatus(connection, userIdx, qnaIdx);
+
+      //QnA status 변경
+      if (isQnALike){
+        await likeDao.deleteQnALike(connection, userIdx, qnaIdx);  //좋아요 눌렀을 경우 => delete record
+      }
+      else{
+        await likeDao.createQnALike(connection, userIdx, qnaIdx);  //좋아요 아닐 경우 => create record
+      }
+
+      //QnA 총 좋아요 개수
+      const totalQnALikeCnt = await likeDao.getTotalQnALikeCnt(connection, qnaIdx);
+
+      //QnA의 최종 좋아요 상태 가져오기(현재와 반대)
+      const result = {
+        'isLike': isQnALike ? 'N' : 'Y',
+        'totalLikeCnt': totalQnALikeCnt
+      };
+
+      await connection.beginTransaction();
+
+      await connection.commit();
+      connection.release();
+
+      return response(baseResponse.SUCCESS, result);
+      
+    }catch(err){
+      await connection.rollback();
+      connection.release();
+      logger.error(`changeQnALikeStatus DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`changeQnALikeStatus DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }

@@ -19,4 +19,7 @@ module.exports = function(app){
 
   //찜한 상품 조회 API
   app.get('/my-page/crafts/liked', jwtMiddleware, likeController.getLikedCraft);
+
+  //QnA 좋아요 여부 변경 API
+  app.patch('/with/qna/:qnaIdx/like', jwtMiddleware, likeController.changeQnALikeStatus);
 }
