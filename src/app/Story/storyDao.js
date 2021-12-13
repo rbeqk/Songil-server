@@ -50,9 +50,54 @@ async function getUserStoryLike(connection, storyIdx, userIdx){
   return rows[0]['isExist'];
 }
 
+//현재 user의 story 좋아요 여부 가져오기
+async function getCurrentUserStoryLikeStatus(connection, userIdx, storyIdx){
+  const query = `
+  SELECT IF(EXISTS(SELECT *
+    FROM StoryLike
+    WHERE userIdx = ${userIdx} && storyIdx = ${storyIdx}) = 1, 'Y', 'N') as isLike;
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['isLike'];
+}
+
+//story 좋아요 삭제
+async function deleteUserStoryLike(connection, userIdx, storyIdx){
+  const query = `
+  DELETE FROM StoryLike
+  WHERE userIdx = ${userIdx} && storyIdx = ${storyIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
+//story 좋아요 입력
+async function createUserStoryLike(connection, userIdx, storyIdx){
+  const query = `
+  INSERT INTO StoryLike(userIdx, storyIdx)
+  VALUES (${userIdx}, ${storyIdx});
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
+//story의 총 좋아요 개수 가져오기
+async function getTotalStoryLikeCnt(connection, storyIdx){
+  const query = `
+  SELECT COUNT(*) as totalLikeCnt FROM StoryLike
+  WHERE storyIdx = ${storyIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['totalLikeCnt'];
+}
+
 module.exports = {
   isExistStoryIdx,
   getStoryDetail,
   getStoryImage,
-  getUserStoryLike
+  getUserStoryLike,
+  getCurrentUserStoryLikeStatus,
+  deleteUserStoryLike,
+  createUserStoryLike,
+  getTotalStoryLikeCnt,
 }
