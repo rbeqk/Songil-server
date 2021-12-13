@@ -105,3 +105,17 @@ exports.changeQnALikeStatus = async (req, res) => {
 
   return res.send(changeQnALikeStatus);
 }
+
+/*
+  API No. 5.19
+  API Name: 스토리 좋아요 여부 변경 API
+  [GET] /with/stories/:storyIdx/like
+*/
+exports.changeUserStoryLikeStatus = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {storyIdx} = req.params;
+
+  const changeUserStoryLikeStatus = await likeService.changeUserStoryLikeStatus(userIdx, storyIdx);
+
+  return res.send(changeUserStoryLikeStatus);
+}

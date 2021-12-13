@@ -30,17 +30,3 @@ exports.getStoryDetail = async (req, res) => {
 
   return res.send(getStoryDetail);
 }
-
-/*
-  API No. 5.19
-  API Name: 스토리 좋아요 여부 변경 API
-  [GET] /with/stories/:storyIdx/like
-*/
-exports.changeUserStoryLikeStatus = async (req, res) => {
-  const {userIdx} = req.verifiedToken;
-  const {storyIdx} = req.params;
-
-  const changeUserStoryLikeStatus = await storyService.changeUserStoryLikeStatus(userIdx, storyIdx);
-
-  return res.send(changeUserStoryLikeStatus);
-}

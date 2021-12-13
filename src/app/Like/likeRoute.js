@@ -22,4 +22,7 @@ module.exports = function(app){
 
   //QnA 좋아요 여부 변경 API
   app.patch('/with/qna/:qnaIdx/like', jwtMiddleware, likeController.changeQnALikeStatus);
+
+  //스토리 좋아요 여부 변경 API
+  app.patch('/with/stories/:storyIdx/like', jwtMiddleware, likeController.changeUserStoryLikeStatus);
 }

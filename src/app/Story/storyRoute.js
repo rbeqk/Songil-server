@@ -4,7 +4,4 @@ module.exports = function(app){
 
   //스토리 상세 조회 API
   app.get('/with/stories/:storyIdx', storyController.getStoryDetail);
-
-  //스토리 좋아요 여부 변경 API
-  app.get('/with/stories/:storyIdx/like', jwtMiddleware, storyController.changeUserStoryLikeStatus);
 }

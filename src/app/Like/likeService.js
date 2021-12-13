@@ -2,6 +2,7 @@ const likeDao = require('./likeDao');
 const craftDao = require('../Craft/craftDao');
 const articleDao = require('../Article/articleDao');
 const qnaDao = require('../QnA/qnaDao');
+const storyDao = require('../Story/storyDao');
 const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
@@ -142,6 +143,55 @@ exports.changeQnALikeStatus = async (userIdx, qnaIdx) => {
     }
   }catch(err){
     logger.error(`changeQnALikeStatus DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}
+
+exports.changeUserStoryLikeStatus = async (userIdx, storyIdx) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+      
+      //유효한 storyIdx인지
+      const isExistStoryIdx = await storyDao.isExistStoryIdx(connection, storyIdx);
+      if (!isExistStoryIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_STORY_IDX);
+      }
+
+      //현재 story 좋아요 status 확인
+      const isStoryLike = await likeDao.getStoryLikeStatus(connection, userIdx, storyIdx);
+
+      await connection.beginTransaction();
+
+      if (isStoryLike){
+        await likeDao.deleteUserStoryLike(connection, userIdx, storyIdx);  //좋아요 눌렀을 경우 => delete record
+      }
+      else{
+        await likeDao.createUserStoryLike(connection, userIdx, storyIdx);  //좋아요 아닐 경우 => create record
+      }
+
+      //story 총 좋아요 개수
+      const totalStoryLikeCnt = await likeDao.getTotalStoryLikeCnt(connection, storyIdx);
+
+      const result = {
+        'isLike': isStoryLike ? 'N' : 'Y',
+        'totalLikeCnt': totalStoryLikeCnt
+      };
+
+      await connection.commit();
+      connection.release();
+
+      return response(baseResponse.SUCCESS, result);
+      
+    }catch(err){
+      await connection.rollback();
+      connection.release();
+      logger.error(`changeUserStoryLikeStatus DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`changeUserStoryLikeStatus DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }
