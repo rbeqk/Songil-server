@@ -74,11 +74,10 @@ exports.getABTestDetail = async (abTestIdx, userIdx) => {
         if (finalInfo.length > 1){
 
           //서로 비겼을 경우
-          //어떤거 표시할 지 결정 후
           if (finalInfo[0]['totalCnt'] === finalInfo[1]['totalCnt']){
-            result.finalInfo.voteImage = 'EQUAL';
+            result.finalInfo.voteImage = await abTestDao.getEarlyArrivedImage(connection, abTestIdx);  //더 빨리 퍼센트에 도달된 이미지
             result.finalInfo.totalVoteCnt = finalInfo[0]['totalCnt'];  //총 투표 수
-            result.finalInfo.percent = parseInt(finalInfo[0]['totalCnt'] / currentVoteTotalCnt * 100);  //두 표의 총 퍼센트
+            result.finalInfo.percent = 50;
           }
           else{
             result.finalInfo.voteImage = finalInfo[0]['voteImage'];  //표를 많이 받은 표
@@ -94,7 +93,7 @@ exports.getABTestDetail = async (abTestIdx, userIdx) => {
         }
         //아무도 투표하지 않았을 경우
         else{
-          result.finalInfo.voteImage = 'EQUAL';
+          result.finalInfo.voteImage = 'A';
           result.finalInfo.totalVoteCnt = 0;
           result.finalInfo.percent = 50;
         }

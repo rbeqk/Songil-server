@@ -75,6 +75,18 @@ async function getFinalVoteInfo(connection, abTestIdx){
   return rows;
 }
 
+//더 빨리 퍼센트에 도달된 이미지(=마지막 표가 아닌 것)
+async function getEarlyArrivedImage(connection, abTestIdx){
+  const query = `
+  SELECT IF(vote = 'A', 'B', 'A') as earlyArrivedImage FROM ABTestVote
+  WHERE abTestIdx = ${abTestIdx}
+  ORDER BY createdAt DESC
+  LIMIT 1;
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['earlyArrivedImage'];
+}
+
 module.exports = {
   isExistABTestIdx,
   getABTestInfo,
@@ -82,4 +94,5 @@ module.exports = {
   getCurrentVoteTotalCnt,
   getCurrentUserVoteTotalCnt,
   getFinalVoteInfo,
+  getEarlyArrivedImage,
 }
