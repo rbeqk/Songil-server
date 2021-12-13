@@ -36,7 +36,18 @@ async function getQnADetail(connection, qnaIdx, userIdx){
   return rows[0];
 }
 
+//qna 작성
+async function createQnA(connection, userIdx, title, content){
+  const query = `
+  INSERT INTO QnA(userIdx, title, content)
+  VALUES (${userIdx}, '${title}', '${content}');
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   isExistQnaIdx,
   getQnADetail,
+  createQnA,
 }

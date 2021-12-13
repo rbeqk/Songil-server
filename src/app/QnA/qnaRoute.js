@@ -4,4 +4,7 @@ module.exports = function(app){
 
   //qna 상세 조회 API
   app.get('/with/qna/:qnaIdx', qnaController.getQnADetail);
+
+  //QnA 등록 API
+  app.post('/with/qna', jwtMiddleware, qnaController.createQnA);
 }

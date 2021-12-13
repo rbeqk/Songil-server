@@ -10,7 +10,7 @@ require('dotenv').config();
 /*
   API No. 5.7
   API Name: QnA 상세 조회 API
-  [PATCH] /with/qna/:qanIdx
+  [GET] /with/qna/:qanIdx
 */
 exports.getQnADetail = async (req, res) => {
   const {qnaIdx} = req.params;
@@ -29,4 +29,22 @@ exports.getQnADetail = async (req, res) => {
   const getQnADetail = await qnaProvider.getQnADetail(qnaIdx, userIdx);
 
   return res.send(getQnADetail);
+}
+
+/*
+  API No. 5.14
+  API Name: QnA 등록 API
+  [POST] /with/qna
+*/
+exports.createQnA = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {title, content} = req.body;
+
+  if (!(title && content)) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (title.length > 300) return res.send(errResponse(baseResponse.EXCEED_QNA_TITLE));
+  if (content.length > 3000) return res.send(errResponse(baseResponse.EXCEED_QNA_CONTENT));
+
+  const createQnA = await qnaService.createQnA(userIdx, title, content);
+
+  return res.send(createQnA);
 }
