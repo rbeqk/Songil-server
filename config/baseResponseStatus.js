@@ -27,6 +27,7 @@ module.exports = {
   INVALID_CATEGORY_IDX: {"isSuccess": false, "code": 2310, "message": "존재하지 않는 categoryIdx입니다"},
   INVALID_STORY_IDX: {"isSuccess": false, "code": 2311, "message": "존재하지 않는 storyIdx입니다"},
   INVALID_QNA_IDX: {"isSuccess": false, "code": 2312, "message": "존재하지 않는 qnaIdx입니다"},
+  INVALID_ABTEST_IDX: {"isSuccess": false, "code": 2313, "message": "존재하지 않는 abTestIdx입니다"},
 
   EXCEED_ASK_CONTENT: {"isSuccess": false, "code": 2350, "message": "content는 300자 이하로 입력해주세요"},
   EXCEED_REPORTED_REASON: {"isSuccess": false, "code": 2351, "message": "신고 사유는 150자 이하로 입력해주세요"},

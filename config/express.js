@@ -47,6 +47,7 @@ module.exports = function (){
   require('../src/app/Story/storyRoute')(app);
   require('../src/app/StoryComment/storyCommentRoute')(app);
   require('../src/app/QnA/qnaRoute')(app);
+  require('../src/app/ABTest/abtestRoute')(app);
 
   return app;
 }
