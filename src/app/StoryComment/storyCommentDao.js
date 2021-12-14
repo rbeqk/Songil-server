@@ -32,6 +32,17 @@ async function getStoryReCommentCnt(connection, storyIdx){
   return rows[0]['totalReCommentCnt'];
 }
 
+//존재하는 storyCommentIdx인지
+async function isExistStoryCommentParentIdx(connection, parentIdx){
+  const query = `
+  SELECT EXISTS(SELECT storyCommentIdx
+    FROM StoryComment
+    WHERE storyCommentIdx = ${parentIdx} && isDeleted = 'N' && parentIdx IS NULL) as isExist;
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['isExist'];
+}
+
 //story 댓글 작성
 async function createStoryComment(connection, storyIdx, userIdx, parentIdx, content){
   const query = `
@@ -46,4 +57,5 @@ module.exports = {
   getStoryParentCommentCnt,
   getStoryReCommentCnt,
   createStoryComment,
+  isExistStoryCommentParentIdx,
 }

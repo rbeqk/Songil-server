@@ -17,10 +17,10 @@ exports.createStoryComment = async (userIdx, storyIdx, parentIdx, comment) => {
         return errResponse(baseResponse.INVALID_STORY_IDX);
       }
 
-      //존재하는 parentIdx인지(= 존재하는 storyIdx인지)
+      //존재하는 parentIdx인지(= 존재하는 storyCommentIdx인지 && parentIdx IS NULL)
       if (parentIdx){
-        const isExistStoryParentIdx = await storyDao.isExistStoryIdx(connection, storyIdx);
-        if (!isExistStoryParentIdx){
+        const isExistStoryCommentParentIdx = await storyCommentDao.isExistStoryCommentParentIdx(connection, parentIdx);
+        if (!isExistStoryCommentParentIdx){
           connection.release();
           return errResponse(baseResponse.INVALID_PARENT_IDX);
         }

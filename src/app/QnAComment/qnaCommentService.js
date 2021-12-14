@@ -17,10 +17,10 @@ exports.createQnAComment = async (userIdx, qnaIdx, parentIdx, comment) => {
         return errResponse(baseResponse.INVALID_QNA_IDX);
       }
 
-      //존재하는 parentIdx인지(= 존재하는 qnaCommentIdx인지)
+      //존재하는 parentIdx인지(= 존재하는 qnaCommentIdx인지 && parentIdx IS NULL)
       if (parentIdx){
-        const isExistStoryParentIdx = await qnaCommentDao.isExistQnACommentIdx(connection, parentIdx);
-        if (!isExistStoryParentIdx){
+        const isExistQnACommentParentIdx = await qnaCommentDao.isExistQnACommentParentIdx(connection, parentIdx);
+        if (!isExistQnACommentParentIdx){
           connection.release();
           return errResponse(baseResponse.INVALID_PARENT_IDX);
         }

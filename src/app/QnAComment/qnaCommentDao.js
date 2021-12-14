@@ -1,9 +1,9 @@
-//존재하는 qnaCommentIdx인지
-async function isExistQnACommentIdx(connection, parentIdx){
+//존재하는 parentIdx인지
+async function isExistQnACommentParentIdx(connection, parentIdx){
   const query = `
   SELECT EXISTS(SELECT qnaCommentIdx
     FROM QnAComment
-    WHERE qnaCommentIdx = ${parentIdx} && isDeleted = 'N') as isExist;
+    WHERE qnaCommentIdx = ${parentIdx} && isDeleted = 'N' && parentIdx IS NULL) as isExist;
   `;
   const [rows] = await connection.query(query);
   return rows[0]['isExist'];
@@ -20,6 +20,6 @@ async function createQnAComment(connection, qnaIdx, userIdx, parentIdx, comment)
 }
 
 module.exports = {
-  isExistQnACommentIdx,
+  isExistQnACommentParentIdx,
   createQnAComment,
 }
