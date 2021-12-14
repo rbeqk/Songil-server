@@ -48,6 +48,7 @@ module.exports = function (){
   require('../src/app/StoryComment/storyCommentRoute')(app);
   require('../src/app/QnA/qnaRoute')(app);
   require('../src/app/ABTest/abtestRoute')(app);
+  require('../src/app/QnAComment/qnaCommentRoute')(app);
 
   return app;
 }
