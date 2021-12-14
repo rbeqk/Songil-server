@@ -32,7 +32,18 @@ async function getStoryReCommentCnt(connection, storyIdx){
   return rows[0]['totalReCommentCnt'];
 }
 
+//story 댓글 작성
+async function createStoryComment(connection, storyIdx, userIdx, parentIdx, content){
+  const query = `
+  INSERT INTO StoryComment(storyIdx, userIdx, parentIdx, comment)
+  VALUES (${storyIdx}, ${userIdx}, ${parentIdx}, '${content}');
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   getStoryParentCommentCnt,
   getStoryReCommentCnt,
+  createStoryComment,
 }

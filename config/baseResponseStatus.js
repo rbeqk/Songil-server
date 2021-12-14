@@ -28,12 +28,14 @@ module.exports = {
   INVALID_STORY_IDX: {"isSuccess": false, "code": 2311, "message": "존재하지 않는 storyIdx입니다"},
   INVALID_QNA_IDX: {"isSuccess": false, "code": 2312, "message": "존재하지 않는 qnaIdx입니다"},
   INVALID_ABTEST_IDX: {"isSuccess": false, "code": 2313, "message": "존재하지 않는 abTestIdx입니다"},
+  INVALID_PARENT_IDX: {"isSuccess": false, "code": 2314, "message": "존재하지 않는 parentIdx입니다"},
 
   EXCEED_ASK_CONTENT: {"isSuccess": false, "code": 2350, "message": "content는 300자 이하로 입력해주세요"},
   EXCEED_REPORTED_REASON: {"isSuccess": false, "code": 2351, "message": "신고 사유는 150자 이하로 입력해주세요"},
   EXCEED_CRAFT_ASK_COMMENT_REASON: {"isSuccess": false, "code": 2352, "message": "문의 답변은 300자 이하로 입력해주세요"},
   EXCEED_QNA_TITLE: {"isSuccess": false, "code": 2353, "message": "title은 300자 이하로 입력해주세요"},
   EXCEED_QNA_CONTENT: {"isSuccess": false, "code": 2354, "message": "content은 3000자 이하로 입력해주세요"},
+  EXCEED_STORY_COMMENT: {"isSuccess": false, "code": 2354, "message": "content은 500자 이하로 입력해주세요"},
 
   NO_PERMISSION: {"isSuccess": false, "code": 2400, "message": "권한이 없습니다"},
   CAN_NOT_REPORT_SELF: {"isSuccess": false, "code": 2401, "message": "자신의 댓글은 신고할 수 없습니다"},
