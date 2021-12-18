@@ -30,3 +30,26 @@ exports.getStoryDetail = async (req, res) => {
 
   return res.send(getStoryDetail);
 }
+
+/*
+  API No. 5.13
+  API Name: 스토리 등록 API
+  [POST] /with/stories
+  body: title, content, tag, image
+*/
+exports.createStory = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {title, content, tag} = req.body;
+
+  if (!(title && content)) return res.send(errResponse(baseResponse.IS_EMPTY));
+
+  if (title.length > 100) return res.send(errResponse(baseResponse.EXCEED_STORY_TITLE));
+  if (content.length > 2000) return res.send(errResponse(baseResponse.EXCEED_STORY_CONTENT));
+  if (tag.length > 3) return res.send(errResponse(baseResponse.EXCEED_STORY_TAG));
+
+  const imageArr = req.files.map(item => item.location);
+
+  const createStory = await storyService.createStory(userIdx, title, content, tag, imageArr);
+  
+  return res.send(createStory);
+}

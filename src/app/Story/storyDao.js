@@ -41,8 +41,41 @@ async function getStoryImage(connection, storyIdx){
   return rows;
 }
 
+//스토리 기본 정보 등록
+async function createStoryInfo(connection, userIdx, title, content){
+  const query = `
+  INSERT INTO Story(userIdx, title, content)
+  VALUES (${userIdx}, '${title}', '${content}');
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
+//스토리 태그 등록
+async function createStoryTag(connection, storyIdx, tag){
+  const query = `
+  INSERT INTO StoryTag(storyIdx, tag)
+  VALUES (${storyIdx}, '${tag}');
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
+//스토리 이미지 등록
+async function createStoryImage(connection, storyIdx, imageUrl){
+  const query = `
+  INSERT INTO StoryImage(storyIdx, imageUrl)
+  VALUES (${storyIdx}, '${imageUrl}');
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   isExistStoryIdx,
   getStoryDetail,
   getStoryImage,
+  createStoryInfo,
+  createStoryTag,
+  createStoryImage,
 }

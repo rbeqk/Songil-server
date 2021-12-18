@@ -38,6 +38,9 @@ module.exports = {
   EXCEED_STORY_COMMENT: {"isSuccess": false, "code": 2354, "message": "comment는 500자 이하로 입력해주세요"},
   EXCEED_QNA_COMMENT: {"isSuccess": false, "code": 2355, "message": "comment는 500자 이하로 입력해주세요"},
   EXCEED_ABTEST_COMMENT: {"isSuccess": false, "code": 2356, "message": "comment는 500자 이하로 입력해주세요"},
+  EXCEED_STORY_TITLE: {"isSuccess": false, "code": 2357, "message": "title은 100자 이하로 입력해주세요"},
+  EXCEED_STORY_CONTENT: {"isSuccess": false, "code": 2358, "message": "content는 2000자 이하로 입력해주세요"},
+  EXCEED_STORY_TAG: {"isSuccess": false, "code": 2359, "message": "tag는 3개 이하로 입력해주세요"},
 
   NO_PERMISSION: {"isSuccess": false, "code": 2400, "message": "권한이 없습니다"},
   CAN_NOT_REPORT_SELF: {"isSuccess": false, "code": 2401, "message": "자신의 댓글은 신고할 수 없습니다"},
