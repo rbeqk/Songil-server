@@ -13,18 +13,24 @@ exports.createStory = async (userIdx, title, content, tag, imageArr) => {
       const createStoryInfo = await storyDao.createStoryInfo(connection, userIdx, title, content);
       const storyIdx = createStoryInfo.insertId;
       
-      tag.forEach(async tag => {
-        await storyDao.createStoryTag(connection, storyIdx, tag);
-      });
+      if (tag){
+        tag.forEach(async tag => {
+          await storyDao.createStoryTag(connection, storyIdx, tag);
+        });
+      }
 
       imageArr.forEach(async imageUrl => {
         await storyDao.createStoryImage(connection, storyIdx, imageUrl);
       })
 
+      const result = {
+        'storyIdx': storyIdx
+      };
+
       await connection.commit();
       connection.release();
 
-      return response(baseResponse.SUCCESS);
+      return response(baseResponse.SUCCESS, result);
       
     }catch(err){
       await connection.rollback();

@@ -45,7 +45,7 @@ exports.createStory = async (req, res) => {
 
   if (title.length > 100) return res.send(errResponse(baseResponse.EXCEED_STORY_TITLE));
   if (content.length > 2000) return res.send(errResponse(baseResponse.EXCEED_STORY_CONTENT));
-  if (tag.length > 3) return res.send(errResponse(baseResponse.EXCEED_STORY_TAG));
+  if (tag && tag.length > 3) return res.send(errResponse(baseResponse.EXCEED_STORY_TAG));
 
   const imageArr = req.files.map(item => item.location);
 

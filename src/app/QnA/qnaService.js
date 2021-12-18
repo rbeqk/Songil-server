@@ -11,12 +11,18 @@ exports.createQnA = async (userIdx, title, content) => {
     try{
       
       await connection.beginTransaction();
-      await qnaDao.createQnA(connection, userIdx, title, content);
+      const createQnA = await qnaDao.createQnA(connection, userIdx, title, content);
+
+      const qnaIdx = createQnA.insertId;
+
+      const result = {
+        'qnaIdx': qnaIdx
+      };
 
       await connection.commit();
       connection.release();
 
-      return response(baseResponse.SUCCESS);
+      return response(baseResponse.SUCCESS, result);
       
     }catch(err){
       await connection.rollback();
