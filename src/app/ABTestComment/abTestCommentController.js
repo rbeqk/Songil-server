@@ -5,7 +5,7 @@ const {response} = require("../../../config/response");
 const {errResponse} = require("../../../config/response");
 
 /*
-  API No. 5.18
+  API No. 5.15
   API Name: AB Test 댓글 등록 API
   [POST] /with/ab-test/:abTestIdx/comments
 */

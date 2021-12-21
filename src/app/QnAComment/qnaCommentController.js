@@ -5,7 +5,7 @@ const {response} = require("../../../config/response");
 const {errResponse} = require("../../../config/response");
 
 /*
-  API No. 5.17
+  API No. 5.14
   API Name: QnA 댓글 등록 API
   [POST] /with/qna/:qnaIdx/comments
   body: parentIdx, comment

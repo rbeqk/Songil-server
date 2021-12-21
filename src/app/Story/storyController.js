@@ -32,7 +32,7 @@ exports.getStoryDetail = async (req, res) => {
 }
 
 /*
-  API No. 5.13
+  API No. 5.10
   API Name: 스토리 등록 API
   [POST] /with/stories
   body: title, content, tag, image

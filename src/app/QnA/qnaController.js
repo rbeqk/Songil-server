@@ -8,7 +8,7 @@ const jwt = require("jsonwebtoken");
 require('dotenv').config();
 
 /*
-  API No. 5.7
+  API No. 5.6
   API Name: QnA 상세 조회 API
   [GET] /with/qna/:qanIdx
 */
@@ -32,7 +32,7 @@ exports.getQnADetail = async (req, res) => {
 }
 
 /*
-  API No. 5.14
+  API No. 5.11
   API Name: QnA 등록 API
   [POST] /with/qna
 */

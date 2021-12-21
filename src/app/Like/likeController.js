@@ -93,7 +93,7 @@ exports.getLikedCraft = async (req, res) => {
 }
 
 /*
-  API No. 5.20
+  API No. 5.17
   API Name: QnA 좋아요 여부 변경 API
   [PATCH] /with/qna/:qnaIdx/like
 */
@@ -107,7 +107,7 @@ exports.changeQnALikeStatus = async (req, res) => {
 }
 
 /*
-  API No. 5.19
+  API No. 5.16
   API Name: 스토리 좋아요 여부 변경 API
   [GET] /with/stories/:storyIdx/like
 */

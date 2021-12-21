@@ -8,7 +8,7 @@ const jwt = require("jsonwebtoken");
 require('dotenv').config();
 
 /*
-  API No. 5.10
+  API No. 5.8
   API Name: ABTest 상세 조회 API
   [GET] /with/ab-test/:abTestIdx
 */

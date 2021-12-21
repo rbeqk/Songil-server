@@ -18,7 +18,7 @@ exports.getStoryCommentTotalPage = async (req, res) => {
 }
 
 /*
-  API No. 5.16
+  API No. 5.13
   API Name: 스토리 댓글 등록 API
   [POST] /with/stories/:storyIdx/comments
   body: parentIdx, comment
