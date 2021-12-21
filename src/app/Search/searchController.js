@@ -15,8 +15,6 @@ require('dotenv').config();
 exports.getSearchKeywords = async (req, res) => {
   const token = req.headers['x-access-token'];
 
-  let params = [token];
-
   //jwt가 있을 경우 유효한지 확인
   let userIdx;
   if (token){
@@ -27,9 +25,7 @@ exports.getSearchKeywords = async (req, res) => {
     }
   }
 
-  params = [userIdx];
-
-  const getSearchKeywords = await searchProvider.getSearchKeywords(params);
+  const getSearchKeywords = await searchProvider.getSearchKeywords(userIdx);
 
   return res.send(getSearchKeywords);
 }
@@ -43,8 +39,7 @@ exports.deleteUserRecentlySearch = async (req, res) => {
   const {userIdx} = req.verifiedToken;
   const {searchIdx} = req.params;
 
-  let params = [userIdx, searchIdx];
-  const deleteUserRecentlySearch = await searchService.deleteUserRecentlySearch(params);
+  const deleteUserRecentlySearch = await searchService.deleteUserRecentlySearch(userIdx, searchIdx);
 
   return res.send(deleteUserRecentlySearch);
 }
@@ -57,8 +52,7 @@ exports.deleteUserRecentlySearch = async (req, res) => {
 exports.deleteAllUserRecentlySearch = async (req, res) => {
   const {userIdx} = req.verifiedToken;
 
-  let params = [userIdx];
-  const deleteAllUserRecentlySearch = await searchService.deleteAllUserRecentlySearch(params);
+  const deleteAllUserRecentlySearch = await searchService.deleteAllUserRecentlySearch(userIdx);
 
   return res.send(deleteAllUserRecentlySearch);
 }

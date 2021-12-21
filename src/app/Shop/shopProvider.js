@@ -73,7 +73,7 @@ exports.getTodayCraft = async (params) => {
   }
 }
 
-exports.getShopEtc = async (req, res) => {
+exports.getShopEtc = async () => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
@@ -84,13 +84,7 @@ exports.getShopEtc = async (req, res) => {
 
       let result = {};
 
-      result.banner = [];
-      banner.forEach(item => {
-        result.banner.push({
-          'bannerIdx': item.shopBannerIdx,
-          'imageUrl': item.imageUrl
-        })
-      })
+      result.banner = banner.map(item => item.imageUrl);
 
       result.todayArtist = {
         'artistIdx': todayArtist.artistIdx,
@@ -126,7 +120,7 @@ exports.getProductByCategoryTotalPage = async (craftCategoryIdx) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
-      const productCnt = await shopDao.getProductByCategory(connection, [craftCategoryIdx]); //카테고리 별 상품 개수
+      const productCnt = await shopDao.getProductByCategory(connection, craftCategoryIdx); //카테고리 별 상품 개수
 
       const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
       const totalPages = (productCnt % pageItemCnt == 0) ? productCnt / pageItemCnt : parseInt(productCnt / pageItemCnt) + 1;  //총 페이지 수

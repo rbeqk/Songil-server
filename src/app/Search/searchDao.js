@@ -1,14 +1,14 @@
 //사용자 별 최근 검색어 가져오기(15개)
-async function getRecentlySearch(connection, params){
+async function getRecentlySearch(connection, userIdx){
   const query = `
   SELECT S.searchIdx, S.word
   FROM UserSearch US
           JOIN Search S ON S.searchIdx = US.searchIdx
-  WHERE US.userIdx = ? && US.isDeleted = 'N'
+  WHERE US.userIdx = ${userIdx} && US.isDeleted = 'N'
   ORDER BY US.updatedAt DESC
   LIMIT 15
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows;
 }
 
@@ -46,24 +46,24 @@ async function deleteUserRecentlySearch(connection, params){
 }
 
 //user의 지울 검색어가 있는지
-async function isExistUserSearchs(connection, params){
+async function isExistUserSearchs(connection, userIdx){
   const query = `
   SELECT EXISTS(SELECT userSearchIdx
     FROM UserSearch
-    WHERE userIdx = ? && isDeleted = 'N') as isExist
+    WHERE userIdx = ${userIdx} && isDeleted = 'N') as isExist
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows[0]['isExist'];
 }
 
 //user의 최근검색어 전체 삭제
-async function deleteAllUserRecentlySearch(connection, params){
+async function deleteAllUserRecentlySearch(connection, userIdx){
   const query = `
   UPDATE UserSearch
   SET isDeleted = 'Y'
-  WHERE isDeleted = 'N' && userIdx = ?;
+  WHERE isDeleted = 'N' && userIdx = ${userIdx};
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows;
 }
 

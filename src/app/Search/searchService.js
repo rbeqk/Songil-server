@@ -4,20 +4,19 @@ const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 
-exports.deleteUserRecentlySearch = async (params) => {
-  //params = [userIdx, searchIdx]
+exports.deleteUserRecentlySearch = async (userIdx, searchIdx) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
       
-      //유효한 user의 search 항목인지
-      const isExistUserSearchIdx = await searchDao.isExistUserSearchIdx(connection, params);
+      //유효한 user의 word인지
+      const isExistUserSearchIdx = await searchDao.isExistUserSearchIdx(connection, userIdx, searchIdx);
       if (!isExistUserSearchIdx) return errResponse(baseResponse.INVALID_USER_SEARCH_IDX);
       
       await connection.beginTransaction();
 
       //최근검색어 삭제
-      await searchDao.deleteUserRecentlySearch(connection, params);
+      await searchDao.deleteUserRecentlySearch(connection, userIdx, searchIdx);
       await connection.commit();
       
       connection.release();
@@ -35,19 +34,19 @@ exports.deleteUserRecentlySearch = async (params) => {
   }
 }
 
-exports.deleteAllUserRecentlySearch = async (params) => {
+exports.deleteAllUserRecentlySearch = async (userIdx) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
       
       //user의 지울 검색어가 있는지
-      const isExistUserSearchs = await searchDao.isExistUserSearchs(connection, params);
+      const isExistUserSearchs = await searchDao.isExistUserSearchs(connection, userIdx);
       if (!isExistUserSearchs) return errResponse(baseResponse.EMPTY_USER_SEARCH);
       
       await connection.beginTransaction();
 
       //최근검색어 전체 삭제
-      await searchDao.deleteAllUserRecentlySearch(connection, params);
+      await searchDao.deleteAllUserRecentlySearch(connection, userIdx);
       await connection.commit();
       
       connection.release();

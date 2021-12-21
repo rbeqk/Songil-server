@@ -34,19 +34,19 @@ async function getTodayCraft(connection, params){
 //banner 가져오기
 async function getBanner(connection){
   const query = `
-  SELECT shopBannerIdx, imageUrl FROM ShopBanner
-  WHERE isDeleted = 'N'
+  SELECT imageUrl FROM ShopBanner
+  WHERE isDeleted = 'N';
   `;
   const [rows] = await connection.query(query);
   return rows;
 }
 
-//today artist 가져오기
+//today artist 가져오기(가장 최근 등록 작가)
 async function getTodayArtist(connection){
   const query = `
   SELECT A.artistIdx, U.nickname as artistName, U.imageUrl, A.major
   FROM User U
-  JOIN Artist A on A.userIdx = U.userIdx
+  JOIN Artist A on A.userIdx = U.userIdx && A.isDeleted = 'N'
   WHERE U.isDeleted = 'N' && U.isArtist = 'Y'
   ORDER BY U.userIdx DESC
   LIMIT 1;
@@ -69,12 +69,12 @@ async function getNewCraft(connection){
 }
 
 //카테고리 별 상품 개수
-async function getProductByCategory(connection, params){
+async function getProductByCategory(connection, craftCategoryIdx){
   const query = `
   SELECT COUNT(craftIdx) as totalCnt FROM Craft
-  WHERE craftCategoryIdx = ? && isDeleted = 'N';
+  WHERE craftCategoryIdx = ${craftCategoryIdx} && isDeleted = 'N';
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows[0]['totalCnt'];
 }
 
