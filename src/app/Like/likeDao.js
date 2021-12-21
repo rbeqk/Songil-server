@@ -39,41 +39,41 @@ async function getTotalCraftLikeCnt(connection, params){
 }
 
 //현재 아티클 좋아요 status 확인
-async function articleLikeStatus(connection, params){
+async function articleLikeStatus(connection, userIdx, articleIdx){
   const query = `
   SELECT EXISTS(SELECT *
     FROM ArticleLike
-    WHERE userIdx = ? && articleIdx = ?) as isLike
+    WHERE userIdx = ${userIdx} && articleIdx = ${articleIdx}) as isLike
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows[0]['isLike'];
 }
 
 //사용자의 아티클 좋아요 삭제
-async function changeArticleToDisLike(connection, params){
+async function changeArticleToDisLike(connection, userIdx, articleIdx){
   const query = `
   DELETE FROM ArticleLike
-  WHERE userIdx = ? && articleIdx = ?;
+  WHERE userIdx = ${userIdx} && articleIdx = ${articleIdx};
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows;
 }
 
 //사용자의 아티클 좋아요 추가
-async function changeArticleToLike(connection, params){
+async function changeArticleToLike(connection, userIdx, articleIdx){
   const query = `
-  INSERT INTO ArticleLike(userIdx, articleIdx) VALUES (?, ?);
+  INSERT INTO ArticleLike(userIdx, articleIdx) VALUES (${userIdx}, ${articleIdx});
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows;
 }
 
 //아티클의 총 좋아요 개수
-async function getTotalArticleLikeCnt(connection, params){
+async function getTotalArticleLikeCnt(connection, articleIdx){
   const query = `
-  SELECT COUNT(*) as totalLikeCnt FROM ArticleLike WHERE articleIdx = ?;
+  SELECT COUNT(*) as totalLikeCnt FROM ArticleLike WHERE articleIdx = ${articleIdx};
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows[0]['totalLikeCnt'];
 }
 

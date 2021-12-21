@@ -13,10 +13,7 @@ require('dotenv').config();
   [GET] /articles
 */
 exports.getArticleList = async (req, res) => {
-  const maxLength = 15; //최대 가지고 올 아티클 개수
-
-  let params = [maxLength];
-  const getArticleList = await articleProvider.getArticleList(params);
+  const getArticleList = await articleProvider.getArticleList();
 
   return res.send(getArticleList);
 }
@@ -40,9 +37,7 @@ exports.getArticleDetail = async (req, res) => {
   }
 
   const {articleIdx} = req.params;
-
-  let params = [articleIdx, userIdx];
-  const getArticleDetail = await articleProvider.getArticleDetail(params);
+  const getArticleDetail = await articleProvider.getArticleDetail(articleIdx, userIdx);
 
   return res.send(getArticleDetail);
 }
