@@ -13,35 +13,45 @@ async function getRecentlySearch(connection, userIdx){
 }
 
 //인기 검색어 가져오기(10개)
-async function getPopularSearch(connection, params){
+async function getPopularSearch(connection){
   const query = `
   SELECT searchIdx, word FROM Search
   ORDER BY count DESC
   LIMIT 10
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows;
 }
 
+//word의 searchIdx가져오기
+async function getSearchIdx(connection, word){
+  const query = `
+  SELECT searchIdx FROM Search
+  WHERE word = '${word}';
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0];
+}
+
 //유효한 user의 search 항목인지
-async function isExistUserSearchIdx(connection, params){
+async function isExistUserSearchIdx(connection, userIdx, searchIdx){
   const query = `
   SELECT EXISTS(SELECT userSearchIdx
     FROM UserSearch
-    WHERE userIdx = ? && searchIdx = ? && isDeleted = 'N') as isExist
+    WHERE userIdx = ${userIdx} && searchIdx = ${searchIdx} && isDeleted = 'N') as isExist
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows[0]['isExist'];
 }
 
 //사용자 최근검색어 삭제
-async function deleteUserRecentlySearch(connection, params){
+async function deleteUserRecentlySearch(connection, userIdx, searchIdx){
   const query = `
   UPDATE UserSearch
   SET isDeleted = 'Y'
-  WHERE userIdx = ? && searchIdx = ?
+  WHERE userIdx = ${userIdx} && searchIdx = ${searchIdx};
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows;
 }
 
@@ -50,7 +60,7 @@ async function isExistUserSearchs(connection, userIdx){
   const query = `
   SELECT EXISTS(SELECT userSearchIdx
     FROM UserSearch
-    WHERE userIdx = ${userIdx} && isDeleted = 'N') as isExist
+    WHERE userIdx = ${userIdx} && isDeleted = 'N') as isExist;
   `;
   const [rows] = await connection.query(query);
   return rows[0]['isExist'];
@@ -70,6 +80,7 @@ async function deleteAllUserRecentlySearch(connection, userIdx){
 module.exports = {
   getRecentlySearch,
   getPopularSearch,
+  getSearchIdx,
   isExistUserSearchIdx,
   deleteUserRecentlySearch,
   isExistUserSearchs,

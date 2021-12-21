@@ -33,13 +33,16 @@ exports.getSearchKeywords = async (req, res) => {
 /*
   API No. 3.16
   API Name: 사용자 최근 검색어 삭제 API
-  [DELETE] /search/:searchIdx
+  [DELETE] /search
+  query: word
 */
 exports.deleteUserRecentlySearch = async (req, res) => {
   const {userIdx} = req.verifiedToken;
-  const {searchIdx} = req.params;
+  const {word} = req.query;
 
-  const deleteUserRecentlySearch = await searchService.deleteUserRecentlySearch(userIdx, searchIdx);
+  if (!word) return res.send(errResponse(baseResponse.IS_EMPTY));
+
+  const deleteUserRecentlySearch = await searchService.deleteUserRecentlySearch(userIdx, word);
 
   return res.send(deleteUserRecentlySearch);
 }
@@ -47,7 +50,7 @@ exports.deleteUserRecentlySearch = async (req, res) => {
 /*
   API No. 3.16
   API Name: 사용자 최근 검색어 전체 삭제 API
-  [DELETE] /search
+  [DELETE] /search/all
 */
 exports.deleteAllUserRecentlySearch = async (req, res) => {
   const {userIdx} = req.verifiedToken;

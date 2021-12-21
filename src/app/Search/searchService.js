@@ -4,10 +4,16 @@ const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 
-exports.deleteUserRecentlySearch = async (userIdx, searchIdx) => {
+exports.deleteUserRecentlySearch = async (userIdx, word) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
+
+      //word의 searchIdx가져오기
+      const getSearchIdx = await searchDao.getSearchIdx(connection, word);
+      if (!getSearchIdx) return errResponse(baseResponse.INVALID_USER_SEARCH_IDX);
+      
+      const searchIdx = getSearchIdx.searchIdx;
       
       //유효한 user의 word인지
       const isExistUserSearchIdx = await searchDao.isExistUserSearchIdx(connection, userIdx, searchIdx);
