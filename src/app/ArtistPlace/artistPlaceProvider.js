@@ -124,7 +124,7 @@ exports.getArtistCraftTotalPage = async (artistIdx) => {
   }
 }
 
-exports.getArtistCraft = async (artistIdx, page, filter, userIdx) => {
+exports.getArtistCraft = async (artistIdx, page, sort, userIdx) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
@@ -142,8 +142,8 @@ exports.getArtistCraft = async (artistIdx, page, filter, userIdx) => {
       const startItemIdx = (page - 1) * pageItemCnt;
 
       //작가의 craft 가져오기
-      //filter popular: 인기순 / new: 최신순 / comment: 댓글많은순 / price: 가격낮은순
-      const artistCraft = await artistPlaceDao.getArtistCraft(connection, artistIdx, filter, startItemIdx, pageItemCnt);
+      //sort popular: 인기순 / new: 최신순 / comment: 댓글많은순 / price: 가격낮은순
+      const artistCraft = await artistPlaceDao.getArtistCraft(connection, artistIdx, sort, startItemIdx, pageItemCnt);
 
       let result = {};
       result.totalCraftCnt = artistCraft.length;
@@ -215,7 +215,7 @@ exports.getArtistArticleTotalPage = async (artistIdx) => {
   }
 }
 
-exports.getArtistArticle = async (artistIdx, page, filter, userIdx) => {
+exports.getArtistArticle = async (artistIdx, page, sort, userIdx) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
@@ -255,8 +255,8 @@ exports.getArtistArticle = async (artistIdx, page, filter, userIdx) => {
       result.totalArticleCnt = articleCnt;
 
       //작가의 article 가져오기
-      //filter popular: 인기순 / new: 최신순
-      const artistArticle = await artistPlaceDao.getArtistArticle(connection, articleList, filter, startItemIdx, pageItemCnt);
+      //sort popular: 인기순 / new: 최신순
+      const artistArticle = await artistPlaceDao.getArtistArticle(connection, articleList, sort, startItemIdx, pageItemCnt);
 
       result.article = [];
 

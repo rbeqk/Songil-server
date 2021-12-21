@@ -35,13 +35,14 @@ exports.getArtistCraftTotalPage = async (req, res) => {
   API No. 9.3
   API Name: 작가 별 craft 조회 API
   [GET] /artist/:artistIdx/crafts
-  query: page, filter
+  query: page, sort
 */
 exports.getArtistCraft = async (req, res) => {
   const {artistIdx} = req.params;
-  const {page, filter} = req.query;
+  const {page, sort} = req.query;
 
-  if (!(page && filter)) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (!(page && sort)) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (!['popular', 'new', 'comment', 'price'].includes(sort)) return res.send(errResponse(baseResponse.INVALID_SORT_NAME));
 
   const token = req.headers['x-access-token'];
 
@@ -55,7 +56,7 @@ exports.getArtistCraft = async (req, res) => {
     }
   }
 
-  const getArtistCraft = await artistPlaceProvider.getArtistCraft(artistIdx, page, filter, userIdx);
+  const getArtistCraft = await artistPlaceProvider.getArtistCraft(artistIdx, page, sort, userIdx);
 
   return res.send(getArtistCraft);
 }
@@ -79,11 +80,12 @@ exports.getArtistArticleTotalPage = async (req, res) => {
   API No. 9.5
   API Name: 작가 별 article 조회 API
   [GET] /artist/:artistIdx/articles
-  query: page, filter
+  query: page, sort
 */
 exports.getArtistArticle = async (req, res) => {
-  const {page, filter} = req.query;
-  if (!(page && filter)) return res.send(errResponse(baseResponse.IS_EMPTY));
+  const {page, sort} = req.query;
+  if (!(page && sort)) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (!['popular', 'new'].includes(sort)) return res.send(errResponse(baseResponse.INVALID_SORT_NAME));
 
   const {artistIdx} = req.params;
 
@@ -98,7 +100,7 @@ exports.getArtistArticle = async (req, res) => {
     }
   }
 
-  const getArtistArticle = await artistPlaceProvider.getArtistArticle(artistIdx, page, filter, userIdx);
+  const getArtistArticle = await artistPlaceProvider.getArtistArticle(artistIdx, page, sort, userIdx);
 
   return res.send(getArtistArticle);
 }

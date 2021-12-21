@@ -53,7 +53,7 @@ async function getArtistCraftCnt(connection, artistIdx){
 }
 
 //작가 별 craft 조회
-async function getArtistCraft(connection, artistIdx, filter, startItemIdx, pageItemCnt){
+async function getArtistCraft(connection, artistIdx, sort, startItemIdx, pageItemCnt){
   const query = `
   SELECT C.craftIdx,
     C.mainImageUrl,
@@ -76,10 +76,10 @@ async function getArtistCraft(connection, artistIdx, filter, startItemIdx, pageI
                 FROM CraftLike
                 GROUP BY craftIdx) L ON C.craftIdx = L.craftIdx
   WHERE C.isDeleted = 'N' && C.artistIdx = ${artistIdx}
-  ORDER BY (CASE WHEN '${filter}' = 'new' THEN C.createdAt END) ASC,
-      (CASE WHEN '${filter}' = 'price' THEN C.price END) DESC,
-      (CASE WHEN '${filter}' = 'comment' THEN totalCommentCnt END) ASC,
-      (CASE WHEN '${filter}' = 'popular' THEN totalLikeCnt END) ASC
+  ORDER BY (CASE WHEN '${sort}' = 'new' THEN C.createdAt END) ASC,
+      (CASE WHEN '${sort}' = 'price' THEN C.price END) DESC,
+      (CASE WHEN '${sort}' = 'comment' THEN totalCommentCnt END) ASC,
+      (CASE WHEN '${sort}' = 'popular' THEN totalLikeCnt END) ASC
   LIMIT ${startItemIdx}, ${pageItemCnt};
   `;
   const [rows] = await connection.query(query);
@@ -122,7 +122,7 @@ async function getArticleWithArtistCraft(connection, artistIdx){
 }
 
 //작가 별 아티클 조회
-async function getArtistArticle(connection, articleList, filter, startItemIdx, pageItemCnt){
+async function getArtistArticle(connection, articleList, sort, startItemIdx, pageItemCnt){
   const query = `
   SELECT A.articleIdx,
         A.articleCategoryIdx,
@@ -138,8 +138,8 @@ async function getArtistArticle(connection, articleList, filter, startItemIdx, p
                       FROM ArticleLike
                       GROUP BY articleIdx) as AL ON AL.articleIdx = A.articleIdx
   WHERE A.isDeleted = 'N' && A.articleIdx IN (${articleList})
-  ORDER BY (CASE WHEN '${filter}' = 'new' THEN A.createdAt END) ASC,
-          (CASE WHEN '${filter}' = 'popular' THEN totalLikeCnt END) ASC
+  ORDER BY (CASE WHEN '${sort}' = 'new' THEN A.createdAt END) ASC,
+          (CASE WHEN '${sort}' = 'popular' THEN totalLikeCnt END) ASC
   LIMIT ${startItemIdx}, ${pageItemCnt}
   `;
   const [rows] = await connection.query(query);
