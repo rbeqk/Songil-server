@@ -14,21 +14,21 @@ exports.changeCraftLikeStatus = async (userIdx, craftIdx) => {
     try{
       
       //존재하는 craftIdx인지
-      const isExistCraftIdx = await craftDao.isExistCraftIdx(connection, [craftIdx]);
+      const isExistCraftIdx = await craftDao.isExistCraftIdx(connection, craftIdx);
       if (!isExistCraftIdx) return errResponse(baseResponse.INVALID_CRAFT_IDX);
 
       //현재 상품 좋아요 status 확인
-      const isCraftLike = await likeDao.craftIsLike(connection, [userIdx, craftIdx]);
+      const isCraftLike = await likeDao.craftIsLike(connection, userIdx, craftIdx);
 
       await connection.beginTransaction();
 
       //상품 좋아요 status 변경
       if (isCraftLike)
-        await likeDao.changeCraftToDisLike(connection, [userIdx, craftIdx]);  //좋아요 눌렀을 경우 => delete record
+        await likeDao.changeCraftToDisLike(connection, userIdx, craftIdx);  //좋아요 눌렀을 경우 => delete record
       else
-        await likeDao.changeCraftToLike(connection, [userIdx, craftIdx]);  //좋아요 아닐 경우 => create record
+        await likeDao.changeCraftToLike(connection, userIdx, craftIdx);  //좋아요 아닐 경우 => create record
       
-      const totalCraftLikeCnt = await likeDao.getTotalCraftLikeCnt(connection, [craftIdx]);
+      const totalCraftLikeCnt = await likeDao.getTotalCraftLikeCnt(connection, craftIdx);
 
       //craft의 최종 좋아요 상태 가져오기(현재와 반대)
       let result = {};

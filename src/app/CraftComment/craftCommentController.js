@@ -19,8 +19,7 @@ exports.getCommentTotalPage = async (req, res) => {
 
   if (!onlyPhoto) return res.send(errResponse(baseResponse.IS_EMPTY));
 
-  let params = [craftIdx, onlyPhoto];
-  const getCommentTotalPage = await craftCommentController.getCommentTotalPage(params);
+  const getCommentTotalPage = await craftCommentController.getCommentTotalPage(craftIdx, onlyPhoto);
 
   return res.send(getCommentTotalPage);
 }
@@ -54,7 +53,6 @@ exports.reportComment = async (req, res) => {
 
   const totalReportedReasonLength = 7;  //총 신고 사유 개수
   const etcReasonIdx = 7; //직접입력idx
-  const etcReasonLength = 150;  //직접입력 글자수 제한
 
   if (!reportedReasonIdx) return res.send(errResponse(baseResponse.IS_EMPTY));
   if (reportedReasonIdx < 1 || reportedReasonIdx > totalReportedReasonLength) return res.send(errResponse(baseResponse.INVALID_REPORTED_REASON_IDX));
@@ -66,7 +64,7 @@ exports.reportComment = async (req, res) => {
   if (reportedReasonIdx != etcReasonIdx && etcReason) return res.send(errResponse(baseResponse.SELECT_ANOTHER_ETC_REASON_IDX));
 
   //직접입력 시 글자수 초과
-  if (etcReason && etcReason.length > etcReasonLength) return res.send(errResponse(baseResponse.EXCEED_REPORTED_REASON));
+  if (etcReason && etcReason.length > 150) return res.send(errResponse(baseResponse.EXCEED_REPORTED_REASON));
 
   const reportComment = await craftCommentService.reportComment(userIdx, craftCommentIdx, reportedReasonIdx, etcReason);
 

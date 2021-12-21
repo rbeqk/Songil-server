@@ -14,10 +14,8 @@ require('dotenv').config();
 */
 exports.getCraftDetail = async (req, res) => {
   const {craftIdx} = req.params;
-  let params = [craftIdx];
   
-  //상품 detail
-  const craftDetail = await craftProvider.getCraftDetail(params);
+  const craftDetail = await craftProvider.getCraftDetail(craftIdx);
 
   return res.send(craftDetail);
 }

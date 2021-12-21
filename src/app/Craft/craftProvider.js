@@ -4,23 +4,23 @@ const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 
-exports.getCraftDetail = async (params) => {
+exports.getCraftDetail = async (craftIdx) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
 
       //존재하는 craftIdx인지
-      const isExistCraftIdx = await craftDao.isExistCraftIdx(connection, params);
+      const isExistCraftIdx = await craftDao.isExistCraftIdx(connection, craftIdx);
       if (!isExistCraftIdx) return errResponse(baseResponse.INVALID_CRAFT_IDX);
 
       //상세 정보
-      const basicInfo = await craftDao.getCraftBasicInfo(connection, params);  //기본 정보
-      const detailImage = await craftDao.getCraftDetailImage(connection, params);  //상세 이미지
-      const cautions = await craftDao.getCraftCautions(connection, params);  //유의사항
-      const material = await craftDao.getCraftMaterial(connection, params);  //소재
-      const usage = await craftDao.getCraftUsage(connection, params);  //용도
+      const basicInfo = await craftDao.getCraftBasicInfo(connection, craftIdx);  //기본 정보
+      const detailImage = await craftDao.getCraftDetailImage(connection, craftIdx);  //상세 이미지
+      const cautions = await craftDao.getCraftCautions(connection, craftIdx);  //유의사항
+      const material = await craftDao.getCraftMaterial(connection, craftIdx);  //소재
+      const usage = await craftDao.getCraftUsage(connection, craftIdx);  //용도
 
-      const isFreeShippingFee = await craftDao.isFreeShippingFee(connection, params);  //조건 없이 전체 무료배송인지
+      const isFreeShippingFee = await craftDao.isFreeShippingFee(connection, craftIdx);  //조건 없이 전체 무료배송인지
       let shippingFeeList = [];
       
       if (isFreeShippingFee === 'Y'){
@@ -29,7 +29,7 @@ exports.getCraftDetail = async (params) => {
       else{
         
         //다른 경우의 수 있을 때 변경 예정
-        const shippingFee = await craftDao.getShippingFeeList(connection, params);
+        const shippingFee = await craftDao.getShippingFeeList(connection, craftIdx);
         shippingFeeList = shippingFee.map(item => item.shippingFee);
       }
 
@@ -41,6 +41,7 @@ exports.getCraftDetail = async (params) => {
       let result = {
         'craftIdx': basicInfo.craftIdx,
         'isNew': basicInfo.isNew,
+        'isSoldOut': basicInfo.isSoldOut,
         'name': basicInfo.name,
         'mainImageUrl': basicInfo.mainImageUrl,
         'price': basicInfo.price,

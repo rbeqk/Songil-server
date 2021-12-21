@@ -1,10 +1,10 @@
 //1:1문의 작성
-async function createCraftAsk(connection, params){
+async function createCraftAsk(connection, userIdx, craftIdx, content){
   const query = `
   INSERT INTO CraftAsk (userIdx, craftIdx, content)
-  VALUES (?, ?, ?);
+  VALUES (${userIdx}, ${craftIdx}, '${content}');
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows;
 }
 

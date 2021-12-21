@@ -1,40 +1,40 @@
 //현재 사용자의 상품 좋아요 상태 가져오기
-async function craftIsLike(connection, params){
+async function craftIsLike(connection, userIdx, craftIdx){
   const query = `
   SELECT EXISTS(SELECT *
     FROM CraftLike
-    WHERE userIdx = ? && craftIdx = ?) as isLike;
+    WHERE userIdx = ${userIdx} && craftIdx = ${craftIdx}) as isLike;
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows[0]['isLike'];
 }
 
 //사용자의 상품 좋아요 삭제
-async function changeCraftToDisLike(connection, params){
+async function changeCraftToDisLike(connection, userIdx, craftIdx){
   const query = `
   DELETE
   FROM CraftLike
-  WHERE userIdx = ? && craftIdx = ?;
+  WHERE userIdx = ${userIdx} && craftIdx = ${craftIdx};
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows;
 }
 
 //사용자의 상품 좋아요 추가
-async function changeCraftToLike(connection, params){
+async function changeCraftToLike(connection, userIdx, craftIdx){
   const query = `
-  INSERT INTO CraftLike(userIdx, craftIdx) VALUES (?, ?);
+  INSERT INTO CraftLike(userIdx, craftIdx) VALUES (${userIdx}, ${craftIdx});
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows;
 }
 
 //상품의 총 좋아요 개수
-async function getTotalCraftLikeCnt(connection, params){
+async function getTotalCraftLikeCnt(connection, craftIdx){
   const query = `
-  SELECT COUNT(*) as totalLikeCnt FROM CraftLike WHERE craftIdx = ?;
+  SELECT COUNT(*) as totalLikeCnt FROM CraftLike WHERE craftIdx = ${craftIdx};
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows[0]['totalLikeCnt'];
 }
 

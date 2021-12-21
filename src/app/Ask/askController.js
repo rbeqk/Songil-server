@@ -17,8 +17,7 @@ exports.createCraftAsk = async (req, res) => {
   if (!content) return res.send(errResponse(baseResponse.IS_EMPTY));
   if (content.length > 300) return res.send(errResponse(baseResponse.EXCEED_ASK_CONTENT));
 
-  let params = [userIdx, craftIdx, content];
-  const createCraftAsk = await askService.createCraftAsk(params);
+  const createCraftAsk = await askService.createCraftAsk(userIdx, craftIdx, content);
 
   return res.send(createCraftAsk);
 }
