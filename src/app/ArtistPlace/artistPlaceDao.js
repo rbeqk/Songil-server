@@ -1,59 +1,59 @@
 //존재하는 artistIdx인지
-async function isExistArtistIdx(connection, params){
+async function isExistArtistIdx(connection, artistIdx){
   const query = `
   SELECT EXISTS(SELECT artistIdx
     FROM Artist
-    WHERE isDeleted = 'N' && artistIdx = ?) as isExist;
+    WHERE isDeleted = 'N' && artistIdx = ${artistIdx}) as isExist;
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows[0]['isExist'];
 }
 
 //작가 기본 정보
-async function getArtistInfo(connection, params){
+async function getArtistInfo(connection, artistIdx){
   const query = `
   SELECT A.artistIdx, U.nickname as name, U.imageUrl, A.introduction, A.company, A.major
   FROM Artist A
           JOIN User U on A.userIdx = U.userIdx && U.isDeleted = 'N'
-  WHERE A.isDeleted = 'N' && A.artistIdx = ?;
+  WHERE A.isDeleted = 'N' && A.artistIdx = ${artistIdx};
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows[0];
 }
 
 //작가 약력
-async function getArtistProfile(connection, params){
+async function getArtistProfile(connection, artistIdx){
   const query = `
   SELECT content FROM ArtistProfile
-  WHERE isDeleted = 'N' && artistIdx = ?;
+  WHERE isDeleted = 'N' && artistIdx = ${artistIdx};
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows;
 }
 
 //작가 전시정보
-async function getArtistExhibition(connection, params){
+async function getArtistExhibition(connection, artistIdx){
   const query = `
   SELECT content FROM ArtistExhibition
-  WHERE isDeleted = 'N' && artistIdx = ?;
+  WHERE isDeleted = 'N' && artistIdx = ${artistIdx};
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows;
 }
 
 //작가 별 총 craft 개수 
-async function getArtistCraftCnt(connection, params){
+async function getArtistCraftCnt(connection, artistIdx){
   const query = `
   SELECT COUNT(craftIdx) as totalCnt
   FROM Craft
-  WHERE isDeleted = 'N' && artistIdx = ?;
+  WHERE isDeleted = 'N' && artistIdx = ${artistIdx};
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows[0]['totalCnt'];
 }
 
 //작가 별 craft 조회
-async function getArtistCraft(connection, params){
+async function getArtistCraft(connection, artistIdx, filter, startItemIdx, pageItemCnt){
   const query = `
   SELECT C.craftIdx,
     C.mainImageUrl,
@@ -61,6 +61,7 @@ async function getArtistCraft(connection, params){
     A.artistIdx,
     U.nickname                                               as artistName,
     C.price,
+    C.isSoldOut,
     IF(TIMESTAMPDIFF(DAY, C.createdAt, NOW()) > 3, 'N', 'Y') as isNew,
     IFNULL(CC.totalCommentCnt, 0)                             as totalCommentCnt,
     IFNULL(L.totalLikeCnt, 0)                                as totalLikeCnt
@@ -74,54 +75,54 @@ async function getArtistCraft(connection, params){
       LEFT JOIN (SELECT craftIdx, COUNT(userIdx) as totalLikeCnt
                 FROM CraftLike
                 GROUP BY craftIdx) L ON C.craftIdx = L.craftIdx
-  WHERE C.isDeleted = 'N' && C.artistIdx = ?
-  ORDER BY (CASE WHEN ? = 'new' THEN C.createdAt END) ASC,
-      (CASE WHEN ? = 'price' THEN C.price END) DESC,
-      (CASE WHEN ? = 'comment' THEN totalCommentCnt END) ASC,
-      (CASE WHEN ? = 'popular' THEN totalLikeCnt END) ASC
-  LIMIT ?, ?;
+  WHERE C.isDeleted = 'N' && C.artistIdx = ${artistIdx}
+  ORDER BY (CASE WHEN '${filter}' = 'new' THEN C.createdAt END) ASC,
+      (CASE WHEN '${filter}' = 'price' THEN C.price END) DESC,
+      (CASE WHEN '${filter}' = 'comment' THEN totalCommentCnt END) ASC,
+      (CASE WHEN '${filter}' = 'popular' THEN totalLikeCnt END) ASC
+  LIMIT ${startItemIdx}, ${pageItemCnt};
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows;
 }
 
 //작가 이름
-async function getArtistName(connection, params){
+async function getArtistName(connection, artistIdx){
   const query = `
   SELECT U.nickname FROM Artist A
   JOIN User U on A.userIdx = U.userIdx && U.isDeleted = 'N'
-  WHERE A.isDeleted = 'N' && A.artistIdx = ?;
+  WHERE A.isDeleted = 'N' && A.artistIdx = ${artistIdx};
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows[0]['nickname'];
 }
 
 //태그에 작가이름이 들어가있는 아티클 목록
-async function getArticleWithArtistTag(connection, params){
+async function getArticleWithArtistTag(connection, artistName){
   const query = `
   SELECT articleIdx
   FROM ArticleTag
-  WHERE tag LIKE CONCAT('%', ?, '%');
+  WHERE tag LIKE CONCAT('%', '${artistName}', '%');
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows;
 }
 
 //작가 상품이 들어가있는 아티클 목록
-async function getArticleWithArtistCraft(connection, params){
+async function getArticleWithArtistCraft(connection, artistIdx){
   const query = `
   SELECT AC.articleIdx
   FROM ArticleCraft AC
           JOIN Craft C on AC.craftIdx = C.craftIdx && C.isDeleted = 'N'
           JOIN Artist A on C.artistIdx = A.artistIdx && A.isDeleted = 'N'
-  WHERE AC.isDeleted = 'N' && A.artistIdx = ?;
+  WHERE AC.isDeleted = 'N' && A.artistIdx = ${artistIdx};
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows;
 }
 
 //작가 별 아티클 조회
-async function getArtistArticle(connection, params){
+async function getArtistArticle(connection, articleList, filter, startItemIdx, pageItemCnt){
   const query = `
   SELECT A.articleIdx,
         A.articleCategoryIdx,
@@ -136,12 +137,12 @@ async function getArtistArticle(connection, params){
           LEFT JOIN (SELECT articleIdx, COUNT(*) as totalLikeCnt
                       FROM ArticleLike
                       GROUP BY articleIdx) as AL ON AL.articleIdx = A.articleIdx
-  WHERE A.isDeleted = 'N' && A.articleIdx IN (?)
-  ORDER BY (CASE WHEN ? = 'new' THEN A.createdAt END) ASC,
-          (CASE WHEN ? = 'popular' THEN totalLikeCnt END) ASC
-  LIMIT ?, ?
+  WHERE A.isDeleted = 'N' && A.articleIdx IN (${articleList})
+  ORDER BY (CASE WHEN '${filter}' = 'new' THEN A.createdAt END) ASC,
+          (CASE WHEN '${filter}' = 'popular' THEN totalLikeCnt END) ASC
+  LIMIT ${startItemIdx}, ${pageItemCnt}
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows;
 }
 

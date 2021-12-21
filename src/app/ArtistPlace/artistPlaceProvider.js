@@ -1,22 +1,57 @@
 const artistPlaceDao = require('./artistPlaceDao');
-const craftDao = require('../Craft/craftDao');
-const articleDao = require('../Article/articleDao');
+const likeDao = require('../Like/likeDao');
 const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 
-exports.getArtistInfo = async (params) => {
+//총 아티클 수 가져오기
+const getTotalArticleCnt = async (connection, artistIdx) => {
+  try{
+    const artistName = await artistPlaceDao.getArtistName(connection, artistIdx);
+
+    //태그에 작가이름이 들어가있는 아티클 목록
+    const articleWithArtistTag = await artistPlaceDao.getArticleWithArtistTag(connection, artistName);
+  
+    //작가 상품이 들어가있는 아티클 목록
+    const articleWithArtistCraft = await artistPlaceDao.getArticleWithArtistCraft(connection, artistIdx);
+  
+    let articleList = [];
+  
+    if (articleWithArtistTag){
+      articleWithArtistTag.forEach(item => {
+        articleList.push(item.articleIdx);
+      });
+    }
+  
+    if (articleWithArtistCraft){
+      articleWithArtistCraft.forEach(item => {
+        articleList.push(item.articleIdx);
+      });
+    }
+  
+    articleList = [...new Set(articleList)];  //작가 관련 아티클 목록
+  
+    return articleList.length;
+
+  }catch(err){
+    connection.release();
+    logger.error(`getTotalArticleCnt DB Query Error: ${err}`);
+    return false;
+  }
+}
+
+exports.getArtistInfo = async (artistIdx) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
 
       //존재하는 작가idx인지
-      const isExistArtistIdx = await artistPlaceDao.isExistArtistIdx(connection, params);
+      const isExistArtistIdx = await artistPlaceDao.isExistArtistIdx(connection, artistIdx);
       if (!isExistArtistIdx) return errResponse(baseResponse.INVALID_ARTIST_IDX);
 
       //작가 기본 정보 가져오기
-      const artistInfo = await artistPlaceDao.getArtistInfo(connection, params);
+      const artistInfo = await artistPlaceDao.getArtistInfo(connection, artistIdx);
 
       let result = {
         'artistIdx': artistInfo.artistIdx,
@@ -28,18 +63,22 @@ exports.getArtistInfo = async (params) => {
       };
 
       //작가 약력 가져오기
-      const artistProfile = await artistPlaceDao.getArtistProfile(connection, params);
-      result.profile = [];
-      artistProfile.forEach(item => {
-        result.profile.push(item.content);
-      })
+      const artistProfile = await artistPlaceDao.getArtistProfile(connection, artistIdx);
+      result.profile = artistProfile ? artistProfile.map(item => item.content) : [];
 
       //작가 전시정보 가져오기
-      const artistExhibition = await artistPlaceDao.getArtistExhibition(connection, params);
-      result.exhibition = [];
-      artistExhibition.forEach(item => {
-        result.exhibition.push(item.content);
-      })
+      const artistExhibition = await artistPlaceDao.getArtistExhibition(connection, artistIdx);
+      result.exhibition = artistExhibition ? artistExhibition.map(item => item.content) : [];
+
+      //총 상품 개수 가져오기
+      const craftCnt = await artistPlaceDao.getArtistCraftCnt(connection, artistIdx);
+      result.totalCraftCnt = craftCnt;
+
+      //총 아티클 개수 가져오기
+      const totalArticleCnt = await getTotalArticleCnt(connection, artistIdx);
+      if (totalArticleCnt === false) return errResponse(baseResponse.DB_ERROR);
+
+      result.totalArticleCnt = totalArticleCnt;
       
       connection.release();
       return response(baseResponse.SUCCESS, result);
@@ -61,10 +100,10 @@ exports.getArtistCraftTotalPage = async (artistIdx) => {
     try{
 
       //존재하는 작가idx인지
-      const isExistArtistIdx = await artistPlaceDao.isExistArtistIdx(connection, [artistIdx]);
+      const isExistArtistIdx = await artistPlaceDao.isExistArtistIdx(connection, artistIdx);
       if (!isExistArtistIdx) return errResponse(baseResponse.INVALID_ARTIST_IDX);
 
-      const craftCnt = await artistPlaceDao.getArtistCraftCnt(connection, [artistIdx]);
+      const craftCnt = await artistPlaceDao.getArtistCraftCnt(connection, artistIdx);
       
       const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
       const totalPages = (craftCnt % pageItemCnt == 0) ? craftCnt / pageItemCnt : parseInt(craftCnt / pageItemCnt) + 1;  //총 페이지 수
@@ -91,10 +130,10 @@ exports.getArtistCraft = async (artistIdx, page, filter, userIdx) => {
     try{
 
       //존재하는 작가idx인지
-      const isExistArtistIdx = await artistPlaceDao.isExistArtistIdx(connection, [artistIdx]);
+      const isExistArtistIdx = await artistPlaceDao.isExistArtistIdx(connection, artistIdx);
       if (!isExistArtistIdx) return errResponse(baseResponse.INVALID_ARTIST_IDX);
 
-      const craftCnt = await artistPlaceDao.getArtistCraftCnt(connection, [artistIdx]);
+      const craftCnt = await artistPlaceDao.getArtistCraftCnt(connection, artistIdx);
       
       const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
       const totalPages = (craftCnt % pageItemCnt == 0) ? craftCnt / pageItemCnt : parseInt(craftCnt / pageItemCnt) + 1;  //총 페이지 수
@@ -104,16 +143,14 @@ exports.getArtistCraft = async (artistIdx, page, filter, userIdx) => {
 
       //작가의 craft 가져오기
       //filter popular: 인기순 / new: 최신순 / comment: 댓글많은순 / price: 가격낮은순
-      const artistCraft = await artistPlaceDao.getArtistCraft(connection, [artistIdx, filter, filter, filter, filter, startItemIdx, pageItemCnt]);
+      const artistCraft = await artistPlaceDao.getArtistCraft(connection, artistIdx, filter, startItemIdx, pageItemCnt);
 
       let result = {};
       result.totalCraftCnt = artistCraft.length;
-      result.craft = null;
+      result.craft = [];
 
-      if (artistCraft.length){
-        result.craft = [];
+      if (artistCraft){
         for (item of artistCraft){
-          const isLike = await craftDao.getUserLikeCraft(connection, [item.craftIdx, userIdx]);
           result.craft.push({
             'craftIdx': item.craftIdx,
             'mainImageUrl': item.mainImageUrl,
@@ -122,39 +159,15 @@ exports.getArtistCraft = async (artistIdx, page, filter, userIdx) => {
             'artistName': item.artistName,
             'price': item.price,
             'isNew': item.isNew,
+            'isSoldOut': item.isSoldOut,
             'totalLikeCnt': item.totalLikeCnt,
-            'isLike': !userIdx ? 'N' : (isLike ? 'Y': 'N'),
+            'isLike': !userIdx ? 'N' : (await likeDao.craftIsLike(connection, userIdx, item.craftIdx) ? 'Y': 'N'),
             'totalCommentCnt': item.totalCommentCnt
           });
         }
       }
 
       result.craft.reverse();
-
-      //총 작가의 아티클 개수 가져오기
-      //작가 이름
-      const artistName = await artistPlaceDao.getArtistName(connection, [artistIdx]);
-
-      //태그에 작가이름이 들어가있는 아티클 목록
-      const articleWithArtistTag = await artistPlaceDao.getArticleWithArtistTag(connection, [artistName]);
-
-      //작가 상품이 들어가있는 아티클 목록
-      const articleWithArtistCraft = await artistPlaceDao.getArticleWithArtistCraft(connection, [artistIdx]);
-
-      let articleList = [];
-      articleWithArtistTag.forEach(item => {
-        articleList.push(item.articleIdx);
-      });
-
-      articleWithArtistCraft.forEach(item => {
-        articleList.push(item.articleIdx);
-      });
-
-      articleList = [...new Set(articleList)];  //작가 관련 아티클 목록
-
-      const articleCnt = articleList.length;  //총 아티클 개수
-
-      result.totalArticleCnt = articleCnt;
       
       connection.release();
       return response(baseResponse.SUCCESS, result);
@@ -170,36 +183,18 @@ exports.getArtistCraft = async (artistIdx, page, filter, userIdx) => {
   }
 }
 
-exports.getArtistCraftTotalPage = async (params) => {
+exports.getArtistArticleTotalPage = async (artistIdx) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
 
       //존재하는 작가 idx인지
-      const isExistArtistIdx = await artistPlaceDao.isExistArtistIdx(connection, params);
+      const isExistArtistIdx = await artistPlaceDao.isExistArtistIdx(connection, artistIdx);
       if (!isExistArtistIdx) return errResponse(baseResponse.INVALID_ARTIST_IDX);
 
-      //작가 이름
-      const artistName = await artistPlaceDao.getArtistName(connection, params);
-
-      //태그에 작가이름이 들어가있는 아티클 목록
-      const articleWithArtistTag = await artistPlaceDao.getArticleWithArtistTag(connection, [artistName]);
-
-      //작가 상품이 들어가있는 아티클 목록
-      const articleWithArtistCraft = await artistPlaceDao.getArticleWithArtistCraft(connection, params);
-
-      let articleList = [];
-      articleWithArtistTag.forEach(item => {
-        articleList.push(item.articleIdx);
-      });
-
-      articleWithArtistCraft.forEach(item => {
-        articleList.push(item.articleIdx);
-      });
-
-      articleList = [...new Set(articleList)];  //작가 관련 아티클 목록
-
-      const articleCnt = articleList.length;  //총 아티클 개수
+      //총 아티클 개수 가져오기
+      const articleCnt = await getTotalArticleCnt(connection, artistIdx);
+      if (articleCnt === false) return errResponse(baseResponse.DB_ERROR);
 
       const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
       const totalPages = (articleCnt % pageItemCnt == 0) ? articleCnt / pageItemCnt : parseInt(articleCnt / pageItemCnt) + 1;  //총 페이지 수
@@ -211,11 +206,11 @@ exports.getArtistCraftTotalPage = async (params) => {
 
     }catch(err){
       connection.release();
-      logger.error(`getArtistCraftTotalPage DB Query Error: ${err}`);
+      logger.error(`getArtistArticleTotalPage DB Query Error: ${err}`);
       return errResponse(baseResponse.DB_ERROR);
     }
   }catch(err){
-    logger.error(`getArtistCraftTotalPage DB Connection Error: ${err}`);
+    logger.error(`getArtistArticleTotalPage DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }
@@ -226,17 +221,17 @@ exports.getArtistArticle = async (artistIdx, page, filter, userIdx) => {
     try{
 
       //존재하는 작가 idx인지
-      const isExistArtistIdx = await artistPlaceDao.isExistArtistIdx(connection, [artistIdx]);
+      const isExistArtistIdx = await artistPlaceDao.isExistArtistIdx(connection, artistIdx);
       if (!isExistArtistIdx) return errResponse(baseResponse.INVALID_ARTIST_IDX);
 
       //작가 이름
-      const artistName = await artistPlaceDao.getArtistName(connection, [artistIdx]);
+      const artistName = await artistPlaceDao.getArtistName(connection, artistIdx);
 
       //태그에 작가이름이 들어가있는 아티클 목록
-      const articleWithArtistTag = await artistPlaceDao.getArticleWithArtistTag(connection, [artistName]);
+      const articleWithArtistTag = await artistPlaceDao.getArticleWithArtistTag(connection, artistName);
 
       //작가 상품이 들어가있는 아티클 목록
-      const articleWithArtistCraft = await artistPlaceDao.getArticleWithArtistCraft(connection, [artistIdx]);
+      const articleWithArtistCraft = await artistPlaceDao.getArticleWithArtistCraft(connection, artistIdx);
 
       let articleList = [];
       articleWithArtistTag.forEach(item => {
@@ -261,12 +256,11 @@ exports.getArtistArticle = async (artistIdx, page, filter, userIdx) => {
 
       //작가의 article 가져오기
       //filter popular: 인기순 / new: 최신순
-      const artistArticle = await artistPlaceDao.getArtistArticle(connection, [articleList, filter, filter, startItemIdx, pageItemCnt]);
+      const artistArticle = await artistPlaceDao.getArtistArticle(connection, articleList, filter, startItemIdx, pageItemCnt);
 
-      result.article = null;
+      result.article = [];
 
-      if (artistArticle.length){
-        result.article = [];
+      if (artistArticle){
         for (item of artistArticle){
           result.article.push({
             'articleIdx': item.articleIdx,
@@ -276,17 +270,12 @@ exports.getArtistArticle = async (artistIdx, page, filter, userIdx) => {
             'editorName': item.editorName,
             'createdAt': item.createdAt,
             'totalLikeCnt': item.totalLikeCnt,
-            'isLike': !userIdx ? 'N' : (await articleDao.getArticleIsLike(connection, [item.articleIdx, userIdx]) === 1 ? 'Y' : 'N')
+            'isLike': !userIdx ? 'N' : (await likeDao.articleLikeStatus(connection, userIdx, item.articleIdx) === 1 ? 'Y' : 'N')
           });
         }
       }
 
       result.article.reverse();
-
-      //총 상품 개수 추가
-      const totalCraftCnt = await artistPlaceDao.getArtistCraftCnt(connection, [artistIdx]);
-
-      result.totalCraftCnt = totalCraftCnt;
 
       connection.release();
       return response(baseResponse.SUCCESS, result);

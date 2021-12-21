@@ -14,10 +14,8 @@ require('dotenv').config();
 */
 exports.getArtistInfo = async (req, res) => {
   const {artistIdx} = req.params;
-  let params = [artistIdx];
 
-  const getArtistInfo = await artistPlaceProvider.getArtistInfo(params);
-
+  const getArtistInfo = await artistPlaceProvider.getArtistInfo(artistIdx);
   return res.send(getArtistInfo);
 }
 
@@ -28,9 +26,8 @@ exports.getArtistInfo = async (req, res) => {
 */
 exports.getArtistCraftTotalPage = async (req, res) => {
   const {artistIdx} = req.params;
-  let params = [artistIdx];
-  const getArtistCraftTotalPage = await artistPlaceProvider.getArtistCraftTotalPage(params);
 
+  const getArtistCraftTotalPage = await artistPlaceProvider.getArtistCraftTotalPage(artistIdx);
   return res.send(getArtistCraftTotalPage);
 }
 
@@ -73,7 +70,7 @@ exports.getArtistCraft = async (req, res) => {
 exports.getArtistArticleTotalPage = async (req, res) => {
   const {artistIdx} = req.params;
 
-  const getArtistArticleTotalPage = await artistPlaceProvider.getArtistCraftTotalPage(artistIdx);
+  const getArtistArticleTotalPage = await artistPlaceProvider.getArtistArticleTotalPage(artistIdx);
 
   return res.send(getArtistArticleTotalPage);
 }
