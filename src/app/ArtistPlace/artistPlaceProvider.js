@@ -133,12 +133,10 @@ exports.getArtistCraft = async (artistIdx, page, sort, userIdx) => {
       const isExistArtistIdx = await artistPlaceDao.isExistArtistIdx(connection, artistIdx);
       if (!isExistArtistIdx) return errResponse(baseResponse.INVALID_ARTIST_IDX);
 
-      const craftCnt = await artistPlaceDao.getArtistCraftCnt(connection, artistIdx);
+      //작가의 총 craft 개수
+      const totalCraftCnt = await artistPlaceDao.getArtistCraftCnt(connection, artistIdx);
       
       const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
-      const totalPages = (craftCnt % pageItemCnt == 0) ? craftCnt / pageItemCnt : parseInt(craftCnt / pageItemCnt) + 1;  //총 페이지 수
-      if (page <= 0 || page > totalPages) return errResponse(baseResponse.INVALID_PAGE);  //존재하는 page인지
-      
       const startItemIdx = (page - 1) * pageItemCnt;
 
       //작가의 craft 가져오기
@@ -146,7 +144,7 @@ exports.getArtistCraft = async (artistIdx, page, sort, userIdx) => {
       const artistCraft = await artistPlaceDao.getArtistCraft(connection, artistIdx, sort, startItemIdx, pageItemCnt);
 
       let result = {};
-      result.totalCraftCnt = artistCraft.length;
+      result.totalCraftCnt = totalCraftCnt;
       result.craft = [];
 
       if (artistCraft){
@@ -234,25 +232,28 @@ exports.getArtistArticle = async (artistIdx, page, sort, userIdx) => {
       const articleWithArtistCraft = await artistPlaceDao.getArticleWithArtistCraft(connection, artistIdx);
 
       let articleList = [];
-      articleWithArtistTag.forEach(item => {
-        articleList.push(item.articleIdx);
-      });
-
-      articleWithArtistCraft.forEach(item => {
-        articleList.push(item.articleIdx);
-      });
+      
+      if (articleWithArtistTag){
+        articleWithArtistTag.forEach(item => {
+          articleList.push(item.articleIdx);
+        });
+      }
+    
+      if (articleWithArtistCraft){
+        articleWithArtistCraft.forEach(item => {
+          articleList.push(item.articleIdx);
+        });
+      }
 
       articleList = [...new Set(articleList)];  //작가 관련 아티클 목록
 
-      const articleCnt = articleList.length;
-      const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
-      const totalPages = (articleCnt % pageItemCnt == 0) ? articleCnt / pageItemCnt : parseInt(articleCnt / pageItemCnt) + 1;  //총 페이지 수
-      if (page <= 0 || page > totalPages) return errResponse(baseResponse.INVALID_PAGE);  //존재하는 page인지
+      const totalArticleCnt = articleList.length;
 
+      const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
       const startItemIdx = (page - 1) * pageItemCnt;
 
       let result = {};
-      result.totalArticleCnt = articleCnt;
+      result.totalArticleCnt = totalArticleCnt;
 
       //작가의 article 가져오기
       //sort popular: 인기순 / new: 최신순
