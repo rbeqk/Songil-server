@@ -42,6 +42,9 @@ module.exports = {
   EXCEED_STORY_TITLE: {"isSuccess": false, "code": 2357, "message": "title은 100자 이하로 입력해주세요"},
   EXCEED_STORY_CONTENT: {"isSuccess": false, "code": 2358, "message": "content는 2000자 이하로 입력해주세요"},
   EXCEED_STORY_TAG: {"isSuccess": false, "code": 2359, "message": "tag는 3개 이하로 입력해주세요"},
+  EXCEED_ABTEST_CONTENT: {"isSuccess": false, "code": 2360, "message": "content는 3000자 이하로 입력해주세요"},
+  EXCEED_DATE: {"isSuccess": false, "code": 2361, "message": "유효한 날짜를 입력해주세요"},
+  INVALID_IMAGE_QUANTITY: {"isSuccess": false, "code": 2362, "message": "이미지 개수를 확인해주세요"},
 
   NO_PERMISSION: {"isSuccess": false, "code": 2400, "message": "권한이 없습니다"},
   CAN_NOT_REPORT_SELF: {"isSuccess": false, "code": 2401, "message": "자신의 댓글은 신고할 수 없습니다"},

@@ -21,6 +21,19 @@ const storyUpload = multer({
   })
 })
 
+const ABTestUpload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: process.env.bucketName + '/with/abTest',
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    acl: 'public-read',
+    key: function (req, file, cb) {
+      cb(null, Date.now() + '_' + file.originalname.split('.')[0] + '.' + file.originalname.split('.').pop())
+    }
+  })
+})
+
 module.exports = {
   storyUpload,
+  ABTestUpload,
 }

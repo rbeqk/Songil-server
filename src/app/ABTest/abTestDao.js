@@ -87,6 +87,37 @@ async function getEarlyArrivedImage(connection, abTestIdx){
   return rows[0]['earlyArrivedImage'];
 }
 
+//작가의 userIdx인지
+async function isArtistUserIdx(connection, userIdx){
+  const query = `
+  SELECT EXISTS(SELECT artistIdx
+              FROM Artist
+              WHERE userIdx = ${userIdx} && isDeleted = 'N') as isExist;
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['isExist'];
+}
+
+//작가 idx
+async function getArtistIdx(connection, userIdx){
+  const query = `
+  SELECT artistIdx
+  FROM Artist
+  WHERE userIdx = ${userIdx} && isDeleted = 'N';
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['artistIdx'];
+}
+
+async function createABTest(connection, content, deadline, imageArr, artistIdx){
+  const query = `
+  INSERT INTO ABTest(artistIdx, content, imageA, imageB, deadline)
+  VALUES (${artistIdx}, '${content}', '${imageArr[0]}', '${imageArr[1]}', '${deadline}');
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   isExistABTestIdx,
   getABTestInfo,
@@ -95,4 +126,7 @@ module.exports = {
   getCurrentUserVoteTotalCnt,
   getFinalVoteInfo,
   getEarlyArrivedImage,
+  isArtistUserIdx,
+  getArtistIdx,
+  createABTest,
 }
