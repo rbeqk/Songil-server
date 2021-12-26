@@ -4,4 +4,7 @@ module.exports  = function(app){
 
   //내 코멘트 페이지 개수 조회 API
   app.get('/my-page/comments/page', jwtMiddleware, myPageController.getMyCommentTotalPage);
+
+  //내 코멘트 조회 API
+  app.get('/my-page/comments', jwtMiddleware, myPageController.getMyComment);
 }

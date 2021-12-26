@@ -13,10 +13,29 @@ const {errResponse} = require("../../../config/response");
 exports.getMyCommentTotalPage = async (req, res) => {
   const {userIdx} = req.verifiedToken;
   const {type} = req.query;
+
   if (!type) return res.send(errResponse(baseResponse.IS_EMPTY));
   if (!['available', 'written'].includes(type)) return res.send(errResponse(baseResponse.INVALID_TYPE_NAME));
 
   const getMyCommentTotalPage = await myPageProvider.getMyCommentTotalPage(userIdx, type);
 
   return res.send(getMyCommentTotalPage);
+}
+
+/*
+  API No. 8.7
+  API Name: 내 코멘트 조회 API
+  [GET] /my-page/comments
+  query: type, page
+*/
+exports.getMyComment = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {type, page} = req.query;
+
+  if (!(type && page)) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (!['available', 'written'].includes(type)) return res.send(errResponse(baseResponse.INVALID_TYPE_NAME));
+
+  const getMyComment = await myPageProvider.getMyComment(userIdx, type, page);
+
+  return res.send(getMyComment);
 }
