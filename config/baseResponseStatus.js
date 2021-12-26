@@ -32,6 +32,7 @@ module.exports = {
   INVALID_SORT_NAME: {"isSuccess": false, "code": 2315, "message": "존재하지 않는 sort입니다"},
   INVALID_STORY_COMMENT_IDX: {"isSuccess": false, "code": 2316, "message": "존재하지 않는 스토리 commentIdx입니다"},
   INVALID_QNA_COMMENT_IDX: {"isSuccess": false, "code": 2317, "message": "존재하지 않는 QnA commentIdx입니다"},
+  INVALID_ABTEST_COMMENT_IDX: {"isSuccess": false, "code": 2318, "message": "존재하지 않는 AB 테스트 commentIdx입니다"},
 
   EXCEED_ASK_CONTENT: {"isSuccess": false, "code": 2350, "message": "content는 300자 이하로 입력해주세요"},
   EXCEED_REPORTED_REASON: {"isSuccess": false, "code": 2351, "message": "신고 사유는 150자 이하로 입력해주세요"},

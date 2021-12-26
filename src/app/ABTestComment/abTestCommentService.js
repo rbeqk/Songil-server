@@ -48,3 +48,36 @@ exports.createABTestComment = async (userIdx, abTestIdx, parentIdx, comment) => 
     return errResponse(baseResponse.DB_ERROR);
   }
 }
+
+//ABTest 댓글 삭제
+exports.deleteABTestComment = async (userIdx, abTestCommentIdx) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+      
+      //존재하는 abTest 댓글 idx인지
+      const isExistABTestCommentIdx = await abTestCommentDao.isExistABTestCommentIdx(connection, abTestCommentIdx);
+      if (!isExistABTestCommentIdx) return errResponse(baseResponse.INVALID_ABTEST_COMMENT_IDX);
+
+      //abTest 댓글의 userIdx 가져오기
+      const abTestCommentUserIdx = await abTestCommentDao.getABTestommentUserIdx(connection, abTestCommentIdx);
+      if (userIdx !== abTestCommentUserIdx) return errResponse(baseResponse.NO_PERMISSION);
+
+      await connection.beginTransaction();
+      await abTestCommentDao.deleteABTestomment(connection, abTestCommentIdx);
+      await connection.commit();
+      
+      connection.release();
+      return response(baseResponse.SUCCESS);
+      
+    }catch(err){
+      await connection.rollback();
+      connection.release();
+      logger.error(`deleteABTestComment DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`deleteABTestComment DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}

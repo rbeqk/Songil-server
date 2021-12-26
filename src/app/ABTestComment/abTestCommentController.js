@@ -21,3 +21,17 @@ exports.createABTestComment = async (req, res) => {
 
   return res.send(createABTestComment);
 }
+
+/*
+  API No. 5.25
+  API Name: AB Test 댓글 삭제 API
+  [DELETE] /with/ab-test/ocomments/:commentIdx
+*/
+exports.deleteABTestComment = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {commentIdx: abTestCommentIdx} = req.params;
+  
+  const deleteABTestComment = await abTestCommentService.deleteABTestComment(userIdx, abTestCommentIdx);
+
+  return res.send(deleteABTestComment);
+}
