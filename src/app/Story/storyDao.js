@@ -71,6 +71,27 @@ async function createStoryImage(connection, storyIdx, imageUrl){
   return rows;
 }
 
+//스토리의 userIdx 가져오기
+async function getStoryUserIdx(connection, storyIdx){
+  const query = `
+  SELECT userIdx FROM Story
+  WHERE storyIdx = ${storyIdx} && isDeleted = 'N';
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['userIdx'];
+}
+
+//스토리 삭제
+async function deleteStory(connection, storyIdx){
+  const query = `
+  UPDATE Story
+  SET isDeleted = 'Y'
+  WHERE storyIdx = ${storyIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   isExistStoryIdx,
   getStoryDetail,
@@ -78,4 +99,6 @@ module.exports = {
   createStoryInfo,
   createStoryTag,
   createStoryImage,
+  getStoryUserIdx,
+  deleteStory,
 }

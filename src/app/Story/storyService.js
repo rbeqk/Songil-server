@@ -43,3 +43,36 @@ exports.createStory = async (userIdx, title, content, tag, imageArr) => {
     return errResponse(baseResponse.DB_ERROR);
   }
 }
+
+//스토리 삭제
+exports.deleteStory = async (userIdx, storyIdx) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+
+      //존재하는 스토리인지
+      const isExistStoryIdx = await storyDao.isExistStoryIdx(connection, storyIdx);
+      if (!isExistStoryIdx) return errResponse(baseResponse.INVALID_ABTEST_IDX);
+
+      //스토리의 userIdx 가져오기
+      const storyUserIdx = await storyDao.getStoryUserIdx(connection, storyIdx);
+      if (storyUserIdx !== userIdx) return errResponse(baseResponse.NO_PERMISSION);
+      
+      await connection.beginTransaction();
+      await storyDao.deleteStory(connection, storyIdx);
+      await connection.commit();
+      
+      connection.release();
+      return response(baseResponse.SUCCESS);
+      
+    }catch(err){
+      await connection.rollback();
+      connection.release();
+      logger.error(`deleteStory DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`deleteStory DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}

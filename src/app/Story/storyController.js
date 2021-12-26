@@ -53,3 +53,17 @@ exports.createStory = async (req, res) => {
   
   return res.send(createStory);
 }
+
+/*
+  API No. 5.20
+  API Name: 스토리 삭제 API
+  [DELETE] /with/stories/:storyIdx
+*/
+exports.deleteStory = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {storyIdx} = req.params;
+
+  const deleteStory = await storyService.deleteStory(userIdx, storyIdx);
+
+  return res.send(deleteStory);
+}

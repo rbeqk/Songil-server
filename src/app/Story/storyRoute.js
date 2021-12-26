@@ -8,4 +8,7 @@ module.exports = function(app){
 
   //스토리 등록 API
   app.post('/with/stories', jwtMiddleware, storyUpload.array('image'), storyController.createStory);
+
+  //스토리 삭제 API
+  app.delete('/with/stories/:storyIdx', jwtMiddleware, storyController.deleteStory);
 }
