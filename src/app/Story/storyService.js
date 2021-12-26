@@ -52,7 +52,7 @@ exports.deleteStory = async (userIdx, storyIdx) => {
 
       //존재하는 스토리인지
       const isExistStoryIdx = await storyDao.isExistStoryIdx(connection, storyIdx);
-      if (!isExistStoryIdx) return errResponse(baseResponse.INVALID_ABTEST_IDX);
+      if (!isExistStoryIdx) return errResponse(baseResponse.INVALID_STORY_IDX);
 
       //스토리의 userIdx 가져오기
       const storyUserIdx = await storyDao.getStoryUserIdx(connection, storyIdx);
