@@ -106,3 +106,39 @@ exports.getMyComment = async (userIdx, type, page) => {
     return errResponse(baseResponse.DB_ERROR);
   }
 }
+
+//좋아요한 게시글 페이지(Story && QnA)
+exports.getLikePostCnt = async (userIdx) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+
+      //좋아요한 Story 개수
+      const likedStoryCnt = await myPageDao.getLikedStoryCnt(connection, userIdx);
+
+      //좋아요한 QnA 개수
+      const likedQnACnt = await myPageDao.getLikedQnACnt(connection, userIdx);
+
+      //좋아요한 게시글 개수
+      const likedPostCnt = likedStoryCnt + likedQnACnt;
+
+      const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
+      const totalPages = (likedPostCnt % pageItemCnt == 0) ? likedPostCnt / pageItemCnt : parseInt(likedPostCnt / pageItemCnt) + 1;  //총 페이지 수
+
+      const result = {
+        'totalPages': totalPages
+      }
+
+      connection.release();
+      return response(baseResponse.SUCCESS, result);
+
+    }catch(err){
+      connection.release();
+      logger.error(`getLikePostCnt DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`getLikePostCnt DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}

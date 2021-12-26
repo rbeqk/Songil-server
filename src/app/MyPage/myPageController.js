@@ -39,3 +39,16 @@ exports.getMyComment = async (req, res) => {
 
   return res.send(getMyComment);
 }
+
+/*
+  API No. 8.10
+  API Name: 좋아요한 게시글 페이지 개수 조회 API
+  [GET] /my-page/with/liked/page
+*/
+exports.getLikePostCnt = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+
+  const getLikePostCnt = await myPageProvider.getLikePostCnt(userIdx);
+
+  return res.send(getLikePostCnt);
+}

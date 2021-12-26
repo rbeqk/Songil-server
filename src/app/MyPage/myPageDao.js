@@ -29,7 +29,29 @@ async function getWrittenComment(connection, userIdx, startItemIdx, pageItemCnt)
   return rows;
 }
 
+//좋아요한 Story 개수
+async function getLikedStoryCnt(connection, userIdx){
+  const query = `
+  SELECT COUNT(*) as totalCnt FROM StoryLike
+  WHERE userIdx = ${userIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['totalCnt'];
+}
+
+//좋아요한 QnA 개수
+async function getLikedQnACnt(connection, userIdx){
+  const query = `
+  SELECT COUNT(*) as totalCnt FROM QnALike
+  WHERE userIdx = ${userIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['totalCnt'];
+}
+
 module.exports = {
   getTotalWrittenCommentCnt,
   getWrittenComment,
+  getLikedStoryCnt,
+  getLikedQnACnt,
 }

@@ -7,4 +7,7 @@ module.exports  = function(app){
 
   //내 코멘트 조회 API
   app.get('/my-page/comments', jwtMiddleware, myPageController.getMyComment);
+
+  //좋아요한 게시글 페이지 개수 조회 API
+  app.get('/my-page/with/liked/page', jwtMiddleware, myPageController.getLikePostCnt);
 }
