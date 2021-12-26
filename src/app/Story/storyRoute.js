@@ -11,4 +11,7 @@ module.exports = function(app){
 
   //스토리 삭제 API
   app.delete('/with/stories/:storyIdx', jwtMiddleware, storyController.deleteStory);
+
+  //스토리 수정 API
+  app.patch('/with/stories/:storyIdx', jwtMiddleware, storyUpload.array('image'), storyController.updateStory);
 }

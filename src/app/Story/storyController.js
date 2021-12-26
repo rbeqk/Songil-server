@@ -67,3 +67,30 @@ exports.deleteStory = async (req, res) => {
 
   return res.send(deleteStory);
 }
+
+/*
+  API No. 5.18
+  API Name: 스토리 수정 API
+  [PATCH] /with/stories/:storyIdx
+  body: title, content, tag, image
+*/
+exports.updateStory = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {title, content, tag} = req.body;
+  const {storyIdx} = req.params;
+
+  if (!(title || content || tag || req.files)) return res.send(errResponse(baseResponse.UPDATE_INFO_EMPTY));
+
+  if (title && title.length > 100) return res.send(errResponse(baseResponse.EXCEED_STORY_TITLE));
+  if (content && content.length > 2000) return res.send(errResponse(baseResponse.EXCEED_STORY_CONTENT));
+  if (tag && tag.length > 3) return res.send(errResponse(baseResponse.EXCEED_STORY_TAG));
+
+  let imageArr;
+  if (req.files){
+    imageArr = req.files.map(item => item.location);
+  }
+
+  const updateStory = await storyService.updateStory(storyIdx, userIdx, title, content, tag, imageArr);
+
+  return res.send(updateStory);
+}

@@ -92,6 +92,39 @@ async function deleteStory(connection, storyIdx){
   return rows;
 }
 
+//스토리 기본 정보 수정하기
+async function updateStoryInfo(connection, storyIdx, title, content){
+  const query = `
+  UPDATE Story
+  SET title = IFNULL(?, title),
+      content = IFNULL(?, content)
+  WHERE storyIdx = ?;
+  `;
+  const [rows] = await connection.query(query, [title, content, storyIdx]);
+  return rows;
+}
+
+//스토리 태그 삭제
+async function deleteStoryTag(connection, storyIdx){
+  const query = `
+  DELETE FROM StoryTag
+  WHERE storyIdx = ${storyIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
+//스토리 사진 삭제
+async function deleteStoryImage(connection, storyIdx){
+  const query = `
+  UPDATE StoryImage
+  SET isDeleted = 'Y'
+  WHERE storyIdx = ${storyIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   isExistStoryIdx,
   getStoryDetail,
@@ -101,4 +134,7 @@ module.exports = {
   createStoryImage,
   getStoryUserIdx,
   deleteStory,
+  updateStoryInfo,
+  deleteStoryTag,
+  deleteStoryImage,
 }
