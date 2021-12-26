@@ -22,3 +22,17 @@ exports.createQnAComment = async (req, res) => {
 
   return res.send(createQnAComment);
 }
+
+/*
+  API No. 5.24
+  API Name: QnA 댓글 삭제 API
+  [DELETE] /with/qna/comments/:commentIdx
+*/
+exports.deleteQnAComment = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {commentIdx: qnaCommentIdx} = req.params;
+
+  const deleteQnAComment = await qnaCommentService.deleteQnAComment(userIdx, qnaCommentIdx);
+
+  return res.send(deleteQnAComment);
+}

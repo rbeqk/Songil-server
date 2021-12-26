@@ -48,3 +48,36 @@ exports.createQnAComment = async (userIdx, qnaIdx, parentIdx, comment) => {
     return errResponse(baseResponse.DB_ERROR);
   }
 }
+
+//QnA 댓글 삭제
+exports.deleteQnAComment = async (userIdx, qnaCommentIdx) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+      
+      //존재하는 QnA 댓글 idx인지
+      const isExistSQnACommentIdx = await qnaCommentDao.isExistSQnACommentIdx(connection, qnaCommentIdx);
+      if (!isExistSQnACommentIdx) return errResponse(baseResponse.INVALID_QNA_COMMENT_IDX);
+
+      //QnA 댓글의 userIdx 가져오기
+      const qnaCommentUserIdx = await qnaCommentDao.getQnACommentUserIdx(connection, qnaCommentIdx);
+      if (userIdx !== qnaCommentUserIdx) return errResponse(baseResponse.NO_PERMISSION);
+
+      await connection.beginTransaction();
+      await qnaCommentDao.deleteStoryComment(connection, qnaCommentIdx);
+      await connection.commit();
+      
+      connection.release();
+      return response(baseResponse.SUCCESS);
+      
+    }catch(err){
+      await connection.rollback();
+      connection.release();
+      logger.error(`deleteQnAComment DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`deleteQnAComment DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}
