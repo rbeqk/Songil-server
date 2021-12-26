@@ -48,3 +48,17 @@ exports.createQnA = async (req, res) => {
 
   return res.send(createQnA);
 }
+
+/*
+  API No. 5.11
+  API Name: QnA 등록 API
+  [POST] /with/qna/:qnaIdx
+*/
+exports.deleteQnA = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {qnaIdx} = req.params;
+
+  const deleteQnA = await qnaService.deleteQnA(userIdx, qnaIdx);
+
+  return res.send(deleteQnA);
+}

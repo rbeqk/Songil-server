@@ -46,8 +46,31 @@ async function createQnA(connection, userIdx, title, content){
   return rows;
 }
 
+//qna의 userIdx 가져오기
+async function getStoryUserIdx(connection, qnaIdx){
+  const query = `
+  SELECT userIdx FROM QnA
+  WHERE qnaIdx = ${qnaIdx} && isDeleted = 'N';
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['userIdx'];
+}
+
+//qna 삭제
+async function deleteQnA(connection, qnaIdx){
+  const query = `
+  UPDATE QnA
+  SET isDeleted = 'Y'
+  WHERE qnaIdx = ${qnaIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   isExistQnaIdx,
   getQnADetail,
   createQnA,
+  getStoryUserIdx,
+  deleteQnA,
 }
