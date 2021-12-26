@@ -118,6 +118,28 @@ async function createABTest(connection, content, deadline, imageArr, artistIdx){
   return rows;
 }
 
+//abTest 작가의 userIdx 가져오기
+async function getAbTestUserIdx(connection, abTestIdx){
+  const query = `
+  SELECT A.userIdx FROM ABTest AT
+  JOIN Artist A ON A.artistIdx = AT.artistIdx && A.isDeleted = 'N'
+  WHERE AT.abTestIdx = ${abTestIdx} && AT.isDeleted = 'N';
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['userIdx'];
+}
+
+//abTest 삭제
+async function deleteABTest(connection, abTestIdx){
+  const query = `
+  UPDATE ABTest
+  SET isDeleted = 'Y'
+  WHERE abTestIdx = ${abTestIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   isExistABTestIdx,
   getABTestInfo,
@@ -129,4 +151,6 @@ module.exports = {
   isArtistUserIdx,
   getArtistIdx,
   createABTest,
+  getAbTestUserIdx,
+  deleteABTest,
 }

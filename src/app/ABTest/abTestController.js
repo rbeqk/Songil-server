@@ -67,3 +67,17 @@ exports.createABTest = async (req, res) => {
 
   return res.send(createABTest);
 }
+
+/*
+  API No. 5.22
+  API Name: ABTest 삭제 API
+  [DELETE] /with/ab-test/:abTestIdx
+*/
+exports.deleteABTest = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {abTestIdx} = req.params;
+
+  const deleteABTest = await abTestService.deleteABTest(userIdx, abTestIdx);
+
+  return res.send(deleteABTest);
+}

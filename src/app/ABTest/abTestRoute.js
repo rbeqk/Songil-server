@@ -8,4 +8,7 @@ module.exports = function (app){
 
   //AB테스트 등록 API
   app.post('/with/ab-test', jwtMiddleware, ABTestUpload.array('image'), abTestController.createABTest);
+
+  //ABTest 삭제 API
+  app.delete('/with/ab-test/:abTestIdx', jwtMiddleware, abTestController.deleteABTest);
 }
