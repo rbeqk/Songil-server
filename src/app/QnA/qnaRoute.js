@@ -10,4 +10,7 @@ module.exports = function(app){
 
   //QnA 삭제 API
   app.delete('/with/qna/:qnaIdx', jwtMiddleware, qnaController.deleteQnA);
+
+  //QnA 수정 API
+  app.patch('/with/qna/:qnaIdx', jwtMiddleware, qnaController.updateQnA);
 }

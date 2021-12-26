@@ -62,3 +62,23 @@ exports.deleteQnA = async (req, res) => {
 
   return res.send(deleteQnA);
 }
+
+/*
+  API No. 5.19
+  API Name: QnA 수정 API
+  [POST] /with/qna/:qnaIdx
+*/
+exports.updateQnA = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {qnaIdx} = req.params;
+  const {title, content} = req.body;
+
+  if (!(title || content)) return res.send(errResponse(baseResponse.UPDATE_INFO_EMPTY));
+
+  if (title && title.length > 300) return res.send(errResponse(baseResponse.EXCEED_QNA_TITLE));
+  if (content && content.length > 3000) return res.send(errResponse(baseResponse.EXCEED_QNA_CONTENT));
+
+  const updateQnA = await qnaService.updateQnA(userIdx, qnaIdx, title, content);
+
+  return res.send(updateQnA);
+}

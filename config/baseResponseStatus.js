@@ -6,6 +6,7 @@ module.exports = {
 
   //Request
   IS_EMPTY: {"isSuccess": false, "code": 2100, "message": "공백이 있습니다"},
+  UPDATE_INFO_EMPTY:{"isSuccess": false, "code": 2101, "message": "수정할 정보를 입력해주세요"},
 
   INVALID_PHONE_PATTERN: {"isSuccess": false, "code": 2200, "message": "올바르지 않은 핸드폰 번호 형식입니다"},
   NOT_SIGN_UP_PHONE: {"isSuccess": false, "code": 2201, "message": "가입한 핸드폰 번호가 아닙니다"},

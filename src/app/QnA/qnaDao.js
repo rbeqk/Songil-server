@@ -67,10 +67,23 @@ async function deleteQnA(connection, qnaIdx){
   return rows;
 }
 
+//qna 수정
+async function updateQnA(connection, qnaIdx, title, content){
+  const query = `
+  UPDATE QnA
+  SET title   = IFNULL(?, title),
+      content = IFNULL(?, content)
+  WHERE qnaIdx = ${qnaIdx};
+  `;
+  const [rows] = await connection.query(query, [title, content]);
+  return rows;
+}
+
 module.exports = {
   isExistQnaIdx,
   getQnADetail,
   createQnA,
   getStoryUserIdx,
   deleteQnA,
+  updateQnA,
 }
