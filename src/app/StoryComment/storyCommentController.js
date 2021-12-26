@@ -35,3 +35,17 @@ exports.createStoryComment = async (req, res) => {
 
   return res.send(createStoryComment);
 }
+
+/*
+  API No. 5.23
+  API Name: 스토리 댓글 삭제 API
+  [DELETE] /with/stories/comments/:commentIdx
+*/
+exports.deleteStoryComment = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {commentIdx: storyCommentIdx} = req.params;
+
+  const deleteStoryComment = await storyCommentService.deleteStoryComment(userIdx, storyCommentIdx);
+
+  return res.send(deleteStoryComment);
+}
