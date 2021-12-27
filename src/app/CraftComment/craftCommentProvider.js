@@ -74,36 +74,36 @@ exports.getComment = async (craftIdx, page, type) => {
       let commentInfo;
       const startItemIdx = (page - 1) * pageItemCnt;
 
-      //포토댓글만
-      if (type === 'photo'){
-        commentInfo = await craftCommentDao.getCommentInfoOnlyPhoto(connection, craftIdx, startItemIdx, pageItemCnt);
-      }
-      //댓글 전체
-      else if (type === 'all'){
-        commentInfo = await craftCommentDao.getCommentInfo(connection, craftIdx, startItemIdx, pageItemCnt);
-      }
+      if (commentCnt > 0){
 
-      let commentIdx;
-      let commentPhoto;
-      for (let item of commentInfo){
-        commentIdx = item.commentIdx;
-        commentPhoto = await craftCommentDao.getCommentPhoto(connection, commentIdx);
+        //포토댓글만
+        if (type === 'photo'){
+          commentInfo = await craftCommentDao.getCommentInfoOnlyPhoto(connection, craftIdx, startItemIdx, pageItemCnt);
+        }
+        //댓글 전체
+        else if (type === 'all'){
+          commentInfo = await craftCommentDao.getCommentInfo(connection, craftIdx, startItemIdx, pageItemCnt);
+        }
 
-        //이미지 배열로 변환
-        let commentPhotoList = commentPhoto ? commentPhoto.map(item => item.imageUrl) : [];
+        let commentIdx;
+        let commentPhoto;
+        for (let item of commentInfo){
+          commentIdx = item.commentIdx;
+          commentPhoto = await craftCommentDao.getCommentPhoto(connection, commentIdx);
 
-        result.comments.push({
-          'commentIdx': item.commentIdx,
-          'userIdx': item.userIdx,
-          'nickname': item.nickname,
-          'createdAt': item.createdAt,
-          'imageUrl': commentPhotoList,
-          'content': item.content,
-          'isReported': item.isReported
-        })
+          result.comments.push({
+            'commentIdx': item.commentIdx,
+            'userIdx': item.userIdx,
+            'nickname': item.nickname,
+            'createdAt': item.createdAt,
+            'imageUrl': commentPhoto ? commentPhoto.map(item => item.imageUrl) : [],
+            'content': item.content,
+            'isReported': item.isReported
+          })
+        }
+        
+        result.comments.reverse();
       }
-      
-      result.comments.reverse();
       
       connection.release();
       return response(baseResponse.SUCCESS, result);
