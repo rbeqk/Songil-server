@@ -99,7 +99,7 @@ exports.updateStory = async (storyIdx, userIdx, title, content, tag, imageArr) =
       }
 
       //스토리 태그 수정하기
-      if (tag){
+      if (tag?.length){
 
         //스토리 태그 삭제
         await storyDao.deleteStoryTag(connection, storyIdx);
@@ -111,7 +111,7 @@ exports.updateStory = async (storyIdx, userIdx, title, content, tag, imageArr) =
       }
 
       //스토리 사진 수정하기
-      if (imageArr){
+      if (imageArr?.length){
 
         //스토리 사진 삭제
         await storyDao.deleteStoryImage(connection, storyIdx);

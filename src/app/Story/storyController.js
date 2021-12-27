@@ -86,7 +86,7 @@ exports.updateStory = async (req, res) => {
   if (tag && tag.length > 3) return res.send(errResponse(baseResponse.EXCEED_STORY_TAG));
 
   let imageArr;
-  if (req.files){
+  if (req.files?.length){
     imageArr = req.files.map(item => item.location);
   }
 
