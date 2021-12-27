@@ -33,6 +33,7 @@ exports.getMyComment = async (req, res) => {
   const {type, page} = req.query;
 
   if (!(type && page)) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (page < 1) return res.send(errResponse(baseResponse.INVALID_PAGE));
   if (!['available', 'written'].includes(type)) return res.send(errResponse(baseResponse.INVALID_TYPE_NAME));
 
   const getMyComment = await myPageProvider.getMyComment(userIdx, type, page);
@@ -51,4 +52,22 @@ exports.getLikePostCnt = async (req, res) => {
   const getLikePostCnt = await myPageProvider.getLikePostCnt(userIdx);
 
   return res.send(getLikePostCnt);
+}
+
+/*
+  API No. 8.11
+  API Name: 좋아요한 게시글 조회 API
+  [GET] /my-page/with/liked
+  query: page
+*/
+exports.getLikedPost = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {page} = req.query;
+
+  if (!page) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (page < 1) return res.send(errResponse(baseResponse.INVALID_PAGE));
+
+  const getLikedPost = await myPageProvider.getLikedPost(userIdx, page);
+
+  return res.send(getLikedPost);
 }

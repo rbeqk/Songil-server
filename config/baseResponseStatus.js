@@ -18,7 +18,7 @@ module.exports = {
 
   INVALID_CRAFT_IDX: {"isSuccess": false, "code": 2301, "message": "존재하지 않는 craftIdx입니다"},
   INVALID_CONSUMER_IDX: {"isSuccess": false, "code": 2302, "message": "존재하지 않는 소비자입니다"},
-  INVALID_PAGE: {"isSuccess": false, "code": 2303, "message": "존재하지 않는 page입니다"},
+  INVALID_PAGE: {"isSuccess": false, "code": 2303, "message": "페이지는 1 이상 입력해주세요"},
   INVALID_USER_SEARCH_IDX: {"isSuccess": false, "code": 2304, "message": "유저의 검색항목이 아닙니다"},
   INVALD_CRAFT_COMMENT_IDX: {"isSuccess": false, "code": 2305, "message": "존재하지 않는 commentIdx입니다"},
   INVALID_REPORTED_REASON_IDX: {"isSuccess": false, "code": 2306, "message": "존재하지 않는 reportedReasonIdx입니다"},

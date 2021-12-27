@@ -10,4 +10,7 @@ module.exports  = function(app){
 
   //좋아요한 게시글 페이지 개수 조회 API
   app.get('/my-page/with/liked/page', jwtMiddleware, myPageController.getLikePostCnt);
+
+  //좋아요한 게시글 조회 API
+  app.get('/my-page/with/liked', jwtMiddleware, myPageController.getLikedPost);
 }
