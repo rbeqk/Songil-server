@@ -41,7 +41,9 @@ exports.createStory = async (req, res) => {
   const {userIdx} = req.verifiedToken;
   const {title, content, tag} = req.body;
 
-  if (!(title && content)) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (!(title && content) || req.files.length < 1) return res.send(errResponse(baseResponse.IS_EMPTY));
+
+  if (req.files.length > 3) return res.send(errResponse(baseResponse.EXCEED_IMAGE_QUANTITY));
 
   if (title.length > 100) return res.send(errResponse(baseResponse.EXCEED_STORY_TITLE));
   if (content.length > 2000) return res.send(errResponse(baseResponse.EXCEED_STORY_CONTENT));
@@ -87,6 +89,7 @@ exports.updateStory = async (req, res) => {
 
   let imageArr;
   if (req.files?.length){
+    if (req.files.length > 3) return res.send(errResponse(baseResponse.EXCEED_IMAGE_QUANTITY));
     imageArr = req.files.map(item => item.location);
   }
 
