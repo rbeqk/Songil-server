@@ -18,13 +18,13 @@ const getTotalArticleCnt = async (connection, artistIdx) => {
   
     let articleList = [];
   
-    if (articleWithArtistTag){
+    if (articleWithArtistTag?.length){
       articleWithArtistTag.forEach(item => {
         articleList.push(item.articleIdx);
       });
     }
   
-    if (articleWithArtistCraft){
+    if (articleWithArtistCraft?.length){
       articleWithArtistCraft.forEach(item => {
         articleList.push(item.articleIdx);
       });
@@ -71,8 +71,8 @@ exports.getArtistInfo = async (artistIdx) => {
       result.exhibition = artistExhibition ? artistExhibition.map(item => item.content) : [];
 
       //총 상품 개수 가져오기
-      const craftCnt = await artistPlaceDao.getArtistCraftCnt(connection, artistIdx);
-      result.totalCraftCnt = craftCnt;
+      const totalCraftCnt = await artistPlaceDao.getArtistCraftCnt(connection, artistIdx);
+      result.totalCraftCnt = totalCraftCnt;
 
       //총 아티클 개수 가져오기
       const totalArticleCnt = await getTotalArticleCnt(connection, artistIdx);
@@ -141,13 +141,13 @@ exports.getArtistCraft = async (artistIdx, page, sort, userIdx) => {
 
       //작가의 craft 가져오기
       //sort popular: 인기순 / new: 최신순 / comment: 댓글많은순 / price: 가격낮은순
-      const artistCraft = await artistPlaceDao.getArtistCraft(connection, artistIdx, sort, startItemIdx, pageItemCnt);
+      const artistCraft = (totalCraftCnt !== 0) ? await artistPlaceDao.getArtistCraft(connection, artistIdx, sort, startItemIdx, pageItemCnt) : [];
 
       let result = {};
       result.totalCraftCnt = totalCraftCnt;
       result.craft = [];
 
-      if (artistCraft){
+      if (artistCraft.length > 0){
         for (item of artistCraft){
           result.craft.push({
             'craftIdx': item.craftIdx,
@@ -233,13 +233,13 @@ exports.getArtistArticle = async (artistIdx, page, sort, userIdx) => {
 
       let articleList = [];
       
-      if (articleWithArtistTag){
+      if (articleWithArtistTag?.length){
         articleWithArtistTag.forEach(item => {
           articleList.push(item.articleIdx);
         });
       }
     
-      if (articleWithArtistCraft){
+      if (articleWithArtistCraft?.length){
         articleWithArtistCraft.forEach(item => {
           articleList.push(item.articleIdx);
         });
@@ -257,11 +257,11 @@ exports.getArtistArticle = async (artistIdx, page, sort, userIdx) => {
 
       //작가의 article 가져오기
       //sort popular: 인기순 / new: 최신순
-      const artistArticle = await artistPlaceDao.getArtistArticle(connection, articleList, sort, startItemIdx, pageItemCnt);
+      const artistArticle = (totalArticleCnt !== 0) ? await artistPlaceDao.getArtistArticle(connection, articleList, sort, startItemIdx, pageItemCnt) : [];
 
       result.article = [];
 
-      if (artistArticle){
+      if (artistArticle.length > 0){
         for (item of artistArticle){
           result.article.push({
             'articleIdx': item.articleIdx,
