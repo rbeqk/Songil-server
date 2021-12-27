@@ -98,7 +98,7 @@ exports.getShopEtc = async () => {
       newCraft.forEach(item => {
         result.newCraft.push({
           'craftIdx': item.craftIdx,
-          'imageUrl': item.mainImageUrl
+          'mainImageUrl': item.mainImageUrl
         })
       });
 
