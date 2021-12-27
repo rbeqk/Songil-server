@@ -11,15 +11,16 @@ require('dotenv').config();
   API No. 3.13
   API Name: 상품 댓글 페이지 개수 조회 API
   [GET] /shop/crafts/:craftIdx/comments/page
-  query: onlyPhoto
+  query: type
 */
 exports.getCommentTotalPage = async (req, res) => {
-  const {onlyPhoto} = req.query;
+  const {type} = req.query;
   const {craftIdx} = req.params;
 
-  if (!onlyPhoto) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (!type) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (!['all', 'photo'].includes(type)) return res.send(errResponse(baseResponse.INVALID_TYPE_NAME));
 
-  const getCommentTotalPage = await craftCommentController.getCommentTotalPage(craftIdx, onlyPhoto);
+  const getCommentTotalPage = await craftCommentController.getCommentTotalPage(craftIdx, type);
 
   return res.send(getCommentTotalPage);
 }
@@ -28,15 +29,17 @@ exports.getCommentTotalPage = async (req, res) => {
   API No. 3.12
   API Name: 상품 댓글 조회 API
   [GET] /shop/crafts/:craftIdx/comments
-  query: page, onlyPhoto
+  query: page, type
 */
 exports.getComment = async (req, res) => {
-  const {page, onlyPhoto} = req.query;
+  const {page, type} = req.query;
   const {craftIdx} = req.params;
 
-  if (!(page && onlyPhoto)) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (!(page && type)) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (!['all', 'photo'].includes(type)) return res.send(errResponse(baseResponse.INVALID_TYPE_NAME));
+  if (page < 1) return res.send(errResponse(baseResponse.INVALID_PAGE));
 
-  const getComment = await craftCommentController.getComment(craftIdx, page, onlyPhoto);
+  const getComment = await craftCommentController.getComment(craftIdx, page, type);
 
   return res.send(getComment);
 }
