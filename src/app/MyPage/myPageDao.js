@@ -52,8 +52,8 @@ async function getLikedQnACnt(connection, userIdx){
 //좋아요한 게시물
 async function getLikedPost(connection, userIdx, startItemIdx, pageItemCnt){
   const query = `
-  SELECT NULL                                                    as qnaIdx,
-        SL.storyIdx,
+  SELECT SL.storyIdx as idx,
+        1 as categoryIdx,
         S.title,
         S.content,
         (SELECT imageUrl
@@ -75,11 +75,11 @@ async function getLikedPost(connection, userIdx, startItemIdx, pageItemCnt){
           JOIN User U ON U.userIdx = S.userIdx && U.isDeleted = 'N'
   WHERE SL.userIdx = ${userIdx}
   UNION ALL
-  SELECT QL.qnaIdx,
-        NULL                                                            as storyIdx,
+  SELECT QL.qnaIdx as idx,
+        2 as categoryIdx,
         Q.title,
         Q.content,
-        NULL as imageUrl,
+        NULL                                                            as imageUrl,
         Q.userIdx,
         U.nickname                                                      as userName,
         DATE_FORMAT(Q.createdAt, '%Y.%m.%d')                            as createdAt,

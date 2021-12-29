@@ -158,8 +158,8 @@ exports.getLikedPost = async (userIdx, page) => {
 
       likedPost.forEach(item => {
         result.push({
-          'qnaIdx': item.qnaIdx,
-          'storyIdx': item.storyIdx,
+          'idx': item.idx,
+          'categoryIdx': item.categoryIdx,
           'imageUrl': item.imageUrl,
           'title': item.title,
           'content': item.content,
