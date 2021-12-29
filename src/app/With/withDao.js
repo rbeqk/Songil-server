@@ -61,9 +61,65 @@ async function getABTestTotalCnt(connection){
   return rows[0]['totalCnt'];
 }
 
+//스토리 목록 가져오기
+async function getStory(connection, userIdx, sort, startItemIdx, pageItemCnt){
+  const query = `
+  SELECT S.storyIdx,
+        (SELECT SI.imageUrl
+          FROM StoryImage SI
+          WHERE SI.isDeleted = 'N' && SI.storyIdx = S.storyIdx
+          LIMIT 1)                                                                   as mainImageUrl,
+        S.title,
+        S.userIdx,
+        U.nickname as userName,
+        (SELECT COUNT(*)
+          FROM StoryLike SL
+          WHERE SL.storyIdx = S.storyIdx)                                            as totalLikeCnt,
+        IF((SELECT EXISTS(
+                        SELECT *
+                        FROM StoryLike SL
+                        WHERE SL.storyIdx = S.storyIdx && SL.userIdx = ${userIdx})), 'Y', 'N') as isLike
+  FROM Story S
+          JOIN User U on S.userIdx = U.useridx && U.isDeleted = 'N'
+  WHERE S.isDeleted = 'N'
+  ORDER BY (CASE WHEN '${sort}' = 'new' THEN S.createdAt END) ASC,
+          (CASE WHEN '${sort}' = 'popular' THEN totalLikeCnt END) ASC
+  LIMIT ${startItemIdx}, ${pageItemCnt};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
+//QnA 목록 가져오기
+async function getQnA(connection, userIdx, sort, startItemIdx, pageItemCnt){
+  const query = `
+  SELECT Q.qnaIdx,
+        Q.title,
+        Q.content,
+        DATE_FORMAT(Q.createdAt, '%Y.%m.%d.')                                                  as createdAt,
+        Q.userIdx,
+        U.nickname                                                                            as userName,
+        (SELECT COUNT(QL.userIdx) FROM QnALike QL WHERE QL.qnaIdx = Q.qnaIdx)                 as totalLikeCnt,
+        IF((SELECT EXISTS(
+                            SELECT *
+                            FROM QnALike QL
+                            WHERE QL.qnaIdx = Q.qnaIdx && QL.userIdx = ${userIdx})), 'Y', 'N') as isLike
+  FROM QnA Q
+          JOIN User U on U.userIdx = Q.userIdx && U.isDeleted = 'N'
+  WHERE Q.isDeleted = 'N'
+  ORDER BY (CASE WHEN '${sort}' = 'new' THEN Q.createdAt END) ASC,
+          (CASE WHEN '${sort}' = 'popular' THEN totalLikeCnt END) ASC
+  LIMIT ${startItemIdx}, ${pageItemCnt};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   getHotTalk,
   getStoryTotalCnt,
   getQnaTotalCnt,
   getABTestTotalCnt,
+  getStory,
+  getQnA,
 }
