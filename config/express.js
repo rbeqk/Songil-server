@@ -52,7 +52,7 @@ module.exports = function (){
   require('../src/app/ABTestComment/abTestCommentRoute')(app);
   require('../src/app/MyPage/myPageRoute')(app);
   require('../src/app/Home/homeRoute')(app);
-  require('../src/app/HotTalk/hotTalkRoute')(app);
+  require('../src/app/With/withRoute')(app);
 
   return app;
 }

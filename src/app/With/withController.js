@@ -1,4 +1,4 @@
-const hotTalkProvider = require("./hotTalkProvider");
+const withProvider = require("./withProvider");
 
 /*
   API No. 5.1
@@ -6,7 +6,7 @@ const hotTalkProvider = require("./hotTalkProvider");
   [GET] /with/hot-talk
 */
 exports.getHotTalk = async (req, res) => {  
-  const getHotTalk = await hotTalkProvider.getHotTalk();
+  const getHotTalk = await withProvider.getHotTalk();
 
   return res.send(getHotTalk);
 }

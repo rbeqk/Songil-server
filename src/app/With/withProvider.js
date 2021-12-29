@@ -1,4 +1,4 @@
-const hotTalkDao = require('./hotTalkDao');
+const withDao = require('./withDao');
 const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
@@ -8,7 +8,7 @@ exports.getHotTalk = async () => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
-      const getHotTalk = await hotTalkDao.getHotTalk(connection);
+      const getHotTalk = await withDao.getHotTalk(connection);
 
       let result = [];
 

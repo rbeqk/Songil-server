@@ -1,7 +1,7 @@
 module.exports = function (app){
   const jwtMiddleware = require('../../../config/jwtMiddleware');
-  const hotTalkController = require('./hotTalkController');
+  const withController = require('./withController');
 
   //Hot Talk 조회
-  app.get('/with/hot-talk', hotTalkController.getHotTalk);
+  app.get('/with/hot-talk', withController.getHotTalk);
 }
