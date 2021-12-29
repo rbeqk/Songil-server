@@ -72,7 +72,7 @@ exports.getHome = async () => {
           result.talkWith.push({
             'idx': item.idx,
             'categoryIdx': item.categoryIdx,
-            'content': item.content
+            'text': item.text
           });
         });
       }
