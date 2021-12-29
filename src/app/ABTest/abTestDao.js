@@ -172,6 +172,16 @@ async function voteABTest(connection, userIdx, abTestIdx, vote){
   return rows;
 }
 
+//ABTest 투표 삭제
+async function deleteVoteABTest(connection, userIdx, abTestIdx){
+  const query = `
+  DELETE FROM ABTestVote
+  WHERE userIdx = ${userIdx} && abTestIdx = ${abTestIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   isExistABTestIdx,
   getABTestInfo,
@@ -188,4 +198,5 @@ module.exports = {
   isFinishedAbTest,
   isExistVoteResult,
   voteABTest,
+  deleteVoteABTest,
 }

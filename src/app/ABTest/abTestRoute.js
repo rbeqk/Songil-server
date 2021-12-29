@@ -14,4 +14,7 @@ module.exports = function (app){
 
   //ABTest 투표 API
   app.post('/with/ab-test/:abTestIdx/vote', jwtMiddleware, abTestController.voteABTest);
+
+  //ABTest 투표 취소 API
+  app.delete('/with/ab-test/:abTestIdx/vote', jwtMiddleware, abTestController.deleteVoteABTest);
 }

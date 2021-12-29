@@ -100,3 +100,17 @@ exports.voteABTest = async (req, res) => {
 
   return res.send(voteABTest);
 }
+
+/*
+  API No. 5.27
+  API Name: ABTest 투표 취소 API
+  [DELETE] /with/ab-test/:abTestIdx/vote
+*/
+exports.deleteVoteABTest = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {abTestIdx} = req.params;
+  
+  const deleteVoteABTest = await abTestService.deleteVoteABTest(userIdx, abTestIdx);
+
+  return res.send(deleteVoteABTest);
+}

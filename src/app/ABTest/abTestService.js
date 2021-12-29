@@ -108,3 +108,40 @@ exports.voteABTest = async (userIdx, abTestIdx, vote) => {
     return errResponse(baseResponse.DB_ERROR);
   }
 }
+
+//abTest 투표 취소
+exports.deleteVoteABTest = async (userIdx, abTestIdx) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+
+      //존재하는 abTestIdx인지
+      const isExistABTestIdx = await abTestDao.isExistABTestIdx(connection, abTestIdx);
+      if (!isExistABTestIdx) return errResponse(baseResponse.INVALID_ABTEST_IDX);
+
+      //투표 마감된 ABTest인지
+      const isFinishedAbTest = await abTestDao.isFinishedAbTest(connection, abTestIdx);
+      if (isFinishedAbTest) return errResponse(baseResponse.ALREADY_FINISHED_ABTEST_IDX);
+
+      //기존에 투표한 ABTest인지
+      const isExistVoteResult = await abTestDao.isExistVoteResult(connection, userIdx, abTestIdx);
+      if (!isExistVoteResult) return errResponse(baseResponse.NO_VOTE_DATA);
+
+      await connection.beginTransaction();
+      await abTestDao.deleteVoteABTest(connection, userIdx, abTestIdx);
+      await connection.commit();
+      
+      connection.release();
+      return response(baseResponse.SUCCESS);
+      
+    }catch(err){
+      await connection.rollback();
+      connection.release();
+      logger.error(`deleteVoteABTest DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`deleteVoteABTest DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}
