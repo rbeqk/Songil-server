@@ -35,6 +35,7 @@ module.exports = {
   INVALID_QNA_COMMENT_IDX: {"isSuccess": false, "code": 2317, "message": "존재하지 않는 QnA commentIdx입니다"},
   INVALID_ABTEST_COMMENT_IDX: {"isSuccess": false, "code": 2318, "message": "존재하지 않는 AB 테스트 commentIdx입니다"},
   INVALID_TYPE_NAME: {"isSuccess": false, "code": 2319, "message": "존재하지 않는 type입니다"},
+  INVALID_VOTE_NAME: {"isSuccess": false, "code": 2320, "message": "존재하지 않는 vote입니다"},
 
   EXCEED_ASK_CONTENT: {"isSuccess": false, "code": 2350, "message": "content는 300자 이하로 입력해주세요"},
   EXCEED_REPORTED_REASON: {"isSuccess": false, "code": 2351, "message": "신고 사유는 150자 이하로 입력해주세요"},
@@ -64,6 +65,8 @@ module.exports = {
   DUPLICATED_PHONE: {"isSuccess": false, "code": 3200, "message": "이미 가입한 핸드폰 번호입니다"},
   DUPLICATED_NICKNAME: {"isSuccess": false, "code": 3201, "message": "중복된 닉네임입니다"},
   ALREADY_REPORTED_CRAFT_COMMENT_IDX: {"isSuccess": false, "code": 3202, "message": "기존에 신고한 댓글입니다"},
+  ALREADY_FINISHED_ABTEST_IDX: {"isSuccess": false, "code": 3203, "message": "이미 마감된 투표입니다"},
+  ALREADY_VOTE_ABTEST_IDX: {"isSuccess": false, "code": 3204, "message": "이미 투표 완료한 abTest입니다"},
 
   EMPTY_USER_SEARCH: {"isSuccess": false, "code": 3300, "message": "사용자의 최근 검색어가 없습니다"},
 

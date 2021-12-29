@@ -81,3 +81,22 @@ exports.deleteABTest = async (req, res) => {
 
   return res.send(deleteABTest);
 }
+
+/*
+  API No. 5.26
+  API Name: ABTest 투표 API
+  [POST] /with/ab-test/:abTestIdx/vote
+  body: image
+*/
+exports.voteABTest = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {abTestIdx} = req.params;
+  const {vote} = req.body;
+
+  if (!vote) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (!['A', 'B'].includes(vote)) return res.send(errResponse(baseResponse.INVALID_VOTE_NAME));
+
+  const voteABTest = await abTestService.voteABTest(userIdx, abTestIdx, vote);
+
+  return res.send(voteABTest);
+}

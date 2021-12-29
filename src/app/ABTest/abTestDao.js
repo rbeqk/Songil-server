@@ -140,6 +140,38 @@ async function deleteABTest(connection, abTestIdx){
   return rows;
 }
 
+//투표 마감된 ABTest인지
+async function isFinishedAbTest(connection, abTestIdx){
+  const query = `
+  SELECT NOW() > deadline as isFinished
+  FROM ABTest
+  WHERE abTestIdx = ${abTestIdx} && isDeleted = 'N';
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['isFinished'];
+}
+
+//기존에 투표한 ABTest인지
+async function isExistVoteResult(connection, userIdx, abTestIdx){
+  const query = `
+  SELECT EXISTS(SELECT *
+    FROM ABTestVote
+    WHERE abTestIdx = ${abTestIdx} && userIdx = ${userIdx}) as isExist;
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['isExist'];
+}
+
+//ABTest 투표
+async function voteABTest(connection, userIdx, abTestIdx, vote){
+  const query = `
+  INSERT INTO ABTestVote(abTestIdx, userIdx, vote)
+  VALUES (${abTestIdx}, ${userIdx}, '${vote}');
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   isExistABTestIdx,
   getABTestInfo,
@@ -153,4 +185,7 @@ module.exports = {
   createABTest,
   getAbTestUserIdx,
   deleteABTest,
+  isFinishedAbTest,
+  isExistVoteResult,
+  voteABTest,
 }
