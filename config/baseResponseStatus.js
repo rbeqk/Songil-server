@@ -36,6 +36,7 @@ module.exports = {
   INVALID_ABTEST_COMMENT_IDX: {"isSuccess": false, "code": 2318, "message": "존재하지 않는 AB 테스트 commentIdx입니다"},
   INVALID_TYPE_NAME: {"isSuccess": false, "code": 2319, "message": "존재하지 않는 type입니다"},
   INVALID_VOTE_NAME: {"isSuccess": false, "code": 2320, "message": "존재하지 않는 vote입니다"},
+  INVALID_CATEGORY_NAME: {"isSuccess": false, "code": 2321, "message": "존재하지 않는 category입니다"},
 
   EXCEED_ASK_CONTENT: {"isSuccess": false, "code": 2350, "message": "content는 300자 이하로 입력해주세요"},
   EXCEED_REPORTED_REASON: {"isSuccess": false, "code": 2351, "message": "신고 사유는 150자 이하로 입력해주세요"},

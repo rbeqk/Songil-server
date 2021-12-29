@@ -37,3 +37,42 @@ exports.getHotTalk = async () => {
     return errResponse(baseResponse.DB_ERROR);
   }
 }
+
+//카테고리 별 WITH 페이지 개수 조회
+exports.getTotalWithPage = async (category) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+
+      let totalCnt;
+
+      if (category === 'story'){
+        totalCnt = await withDao.getStoryTotalCnt(connection);
+      }
+      else if (category === 'qna'){
+        totalCnt = await withDao.getQnaTotalCnt(connection);
+      }
+      else if (category === 'ab-test'){
+        totalCnt = await withDao.getABTestTotalCnt(connection);
+      }
+
+      const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
+      const totalPages = (totalCnt % pageItemCnt == 0) ? totalCnt / pageItemCnt : parseInt(totalCnt / pageItemCnt) + 1;  //총 페이지 수
+
+      const result = {
+        'totalPages': totalPages
+      }
+
+      connection.release();
+      return response(baseResponse.SUCCESS, result);
+      
+    }catch(err){
+      connection.release();
+      logger.error(`getTotalWithPage DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`getTotalWithPage DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}

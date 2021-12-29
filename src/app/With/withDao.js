@@ -31,6 +31,39 @@ async function getHotTalk(connection){
   return rows;
 }
 
+//스토리 총 개수 가져오기
+async function getStoryTotalCnt(connection){
+  const query = `
+  SELECT COUNT(storyIdx) as totalCnt FROM Story
+  WHERE isDeleted = 'N';
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['totalCnt'];
+}
+
+//qna 총 개수 가져오기
+async function getQnaTotalCnt(connection){
+  const query = `
+  SELECT COUNT(qnaIdx) as totalCnt FROM QnA
+  WHERE isDeleted = 'N';
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['totalCnt'];
+}
+
+//ABTest 총 개수 가져오기
+async function getABTestTotalCnt(connection){
+  const query = `
+  SELECT COUNT(abTestIdx) as totalCnt FROM ABTest
+  WHERE isDeleted = 'N';
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['totalCnt'];
+}
+
 module.exports = {
   getHotTalk,
+  getStoryTotalCnt,
+  getQnaTotalCnt,
+  getABTestTotalCnt,
 }
