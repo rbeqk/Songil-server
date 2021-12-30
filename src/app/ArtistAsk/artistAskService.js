@@ -10,31 +10,31 @@ exports.createAskComment = async (userIdx, craftAskIdx, comment) => {
     try{
 
       //존재하는 askIdx인지
-      const isExistCraftAskIdx = await artistAskDao.isExistCraftAskIdx(connection, [craftAskIdx]);
+      const isExistCraftAskIdx = await artistAskDao.isExistCraftAskIdx(connection, craftAskIdx);
       if (!isExistCraftAskIdx) return errResponse(baseResponse.INVALID_ASK_IDX);
 
       //작가 여부
-      const isArtist = await artistAskDao.isArtist(connection, [userIdx]);
+      const isArtist = await artistAskDao.isArtist(connection, userIdx);
       if (!isArtist) return errResponse(baseResponse.NO_PERMISSION);
 
       //작가idx 가져오기
-      const artistIdx = await artistAskDao.getArtistIdx(connection, [userIdx]);
+      const artistIdx = await artistAskDao.getArtistIdx(connection, userIdx);
 
       //문의에 대한 작가 권한 확인
-      const isArtistAsk = await artistAskDao.isArtistAsk(connection, [craftAskIdx, artistIdx]);
+      const isArtistAsk = await artistAskDao.isArtistAsk(connection, craftAskIdx, artistIdx);
       if (!isArtistAsk) return errResponse(baseResponse.NO_PERMISSION);
 
       //이미 답변한 문의인지
-      const isAlreadyCommentAskIdx = await artistAskDao.isAlreadyCommentAskIdx(connection, [craftAskIdx]);
+      const isAlreadyCommentAskIdx = await artistAskDao.isAlreadyCommentAskIdx(connection, craftAskIdx);
       if (isAlreadyCommentAskIdx) return errResponse(baseResponse.IS_ALREADY_COMMENT_ASK_IDX);
 
       //삭제된 상품에 대한 문의인지
-      const isDeletedCraftAskIdx = await artistAskDao.isDeletedCraftAskIdx(connection, [craftAskIdx]);
+      const isDeletedCraftAskIdx = await artistAskDao.isDeletedCraftAskIdx(connection, craftAskIdx);
       if (isDeletedCraftAskIdx) return errResponse(baseResponse.CAN_NOT_COMMENT_TO_DELETED_CRAFT);
 
       //1:1문의 답변 작성
       await connection.beginTransaction();
-      await artistAskDao.createAskComment(connection, [craftAskIdx, comment]);
+      await artistAskDao.createAskComment(connection, craftAskIdx, comment);
       await connection.commit();
 
       connection.release();

@@ -10,13 +10,13 @@ exports.getAskTotalPage = async (userIdx) => {
     try{
 
       //작가 여부
-      const isArtist = await artistAskDao.isArtist(connection, [userIdx]);
+      const isArtist = await artistAskDao.isArtist(connection, userIdx);
       if (!isArtist) return errResponse(baseResponse.NO_PERMISSION);
 
       //작가idx 가져오기
-      const artistIdx = await artistAskDao.getArtistIdx(connection, [userIdx]);
+      const artistIdx = await artistAskDao.getArtistIdx(connection, userIdx);
 
-      const askCnt = await artistAskDao.getAskCnt(connection, [artistIdx]);
+      const askCnt = await artistAskDao.getAskCnt(connection, artistIdx);
       
       const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
       const totalPages = (askCnt % pageItemCnt == 0) ? askCnt / pageItemCnt : parseInt(askCnt / pageItemCnt) + 1;  //총 페이지 수
@@ -43,26 +43,24 @@ exports.getAsk = async (userIdx, page) => {
     try{
 
       //작가 여부
-      const isArtist = await artistAskDao.isArtist(connection, [userIdx]);
+      const isArtist = await artistAskDao.isArtist(connection, userIdx);
       if (!isArtist) return errResponse(baseResponse.NO_PERMISSION);
 
       //작가idx 가져오기
-      const artistIdx = await artistAskDao.getArtistIdx(connection, [userIdx]);
-
-      const askCnt = await artistAskDao.getAskCnt(connection, [artistIdx]);
+      const artistIdx = await artistAskDao.getArtistIdx(connection, userIdx);
       
       const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
-      const totalPages = (askCnt % pageItemCnt == 0) ? askCnt / pageItemCnt : parseInt(askCnt / pageItemCnt) + 1;  //총 페이지 수
-      if (page <= 0 || page > totalPages) return errResponse(baseResponse.INVALID_PAGE);  //존재하는 page인지
-
       const startItemIdx = (page - 1) * pageItemCnt;
 
       //작가의 문의 목록 가져오기
-      const askList = await artistAskDao.getAskList(connection, [artistIdx]);
-      const askIdxList = askList.map(item => item.askIdx);
+      const askList = await artistAskDao.getAskList(connection, artistIdx);
+
+      //작가의 문의 목록 없을 경우 유효하지 않은 값으로 설정
+      let askIdxList;
+      askIdxList = askList.length > 0 ? askList.map(item => item.askIdx) : -1;
 
       //문의 목록 상세 정보 가져오기
-      const askInfo = await artistAskDao.getAskInfo(connection, [askIdxList, startItemIdx, pageItemCnt]);
+      const askInfo = await artistAskDao.getAskInfo(connection, askIdxList, startItemIdx, pageItemCnt);
 
       let result = [];
       
@@ -99,21 +97,21 @@ exports.getAskDetail = async (craftAskIdx, userIdx) => {
     try{
 
       //존재하는 craftAskIdx인지
-      const isExistCraftAskIdx = await artistAskDao.isExistCraftAskIdx(connection, [craftAskIdx]);
+      const isExistCraftAskIdx = await artistAskDao.isExistCraftAskIdx(connection, craftAskIdx);
       if (!isExistCraftAskIdx) return errResponse(baseResponse.INVALID_ASK_IDX);
 
       //작가 여부
-      const isArtist = await artistAskDao.isArtist(connection, [userIdx]);
+      const isArtist = await artistAskDao.isArtist(connection, userIdx);
       if (!isArtist) return errResponse(baseResponse.NO_PERMISSION);
 
       //작가idx 가져오기
-      const artistIdx = await artistAskDao.getArtistIdx(connection, [userIdx]);
+      const artistIdx = await artistAskDao.getArtistIdx(connection, userIdx);
 
       //문의에 대한 작가 권한 확인
-      const isArtistAsk = await artistAskDao.isArtistAsk(connection, [craftAskIdx, artistIdx]);
+      const isArtistAsk = await artistAskDao.isArtistAsk(connection, craftAskIdx, artistIdx);
       if (!isArtistAsk) return errResponse(baseResponse.NO_PERMISSION);
 
-      const askDetail = await artistAskDao.getAskDetail(connection, [craftAskIdx]);
+      const askDetail = await artistAskDao.getAskDetail(connection, craftAskIdx);
 
       const result = {
         'askIdx': askDetail.askIdx,
