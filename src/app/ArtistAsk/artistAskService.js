@@ -28,10 +28,6 @@ exports.createAskComment = async (userIdx, craftAskIdx, comment) => {
       const isAlreadyCommentAskIdx = await artistAskDao.isAlreadyCommentAskIdx(connection, craftAskIdx);
       if (isAlreadyCommentAskIdx) return errResponse(baseResponse.IS_ALREADY_COMMENT_ASK_IDX);
 
-      //삭제된 상품에 대한 문의인지
-      const isDeletedCraftAskIdx = await artistAskDao.isDeletedCraftAskIdx(connection, craftAskIdx);
-      if (isDeletedCraftAskIdx) return errResponse(baseResponse.CAN_NOT_COMMENT_TO_DELETED_CRAFT);
-
       //1:1문의 답변 작성
       await connection.beginTransaction();
       await artistAskDao.createAskComment(connection, craftAskIdx, comment);
