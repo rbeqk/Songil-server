@@ -41,6 +41,16 @@ async function getStoryImage(connection, storyIdx){
   return rows;
 }
 
+//storyIdx의 태그
+async function getStoryTag(connection, storyIdx){
+  const query = `
+  SELECT tag FROM StoryTag
+  WHERE storyIdx = ${storyIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 //스토리 기본 정보 등록
 async function createStoryInfo(connection, userIdx, title, content){
   const query = `
@@ -129,6 +139,7 @@ module.exports = {
   isExistStoryIdx,
   getStoryDetail,
   getStoryImage,
+  getStoryTag,
   createStoryInfo,
   createStoryTag,
   createStoryImage,

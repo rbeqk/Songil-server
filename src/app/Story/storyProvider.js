@@ -18,6 +18,9 @@ exports.getStoryDetail = async (storyIdx, userIdx) => {
       const storyImage = await storyDao.getStoryImage(connection, storyIdx);
       const storyImageArr = storyImage.map(item => item.imageUrl);
 
+      const storyTag = await storyDao.getStoryTag(connection, storyIdx);
+      const storyTagArr = storyTag.length > 0 ? storyTag.map(item => item.tag) : [];
+
       const result = {
         'storyIdx': storyInfo.storyIdx,
         'imageUrl': storyImageArr,
@@ -31,6 +34,7 @@ exports.getStoryDetail = async (storyIdx, userIdx) => {
         'totalLikeCnt': storyInfo.totalLikeCnt,
         'isLike': userIdx ? await likeDao.getStoryLikeStatus(connection, storyIdx, userIdx): 'N',
         'totalCommentCnt': storyInfo.totalCommentCnt,
+        'tag': storyTagArr
       };
 
       connection.release();
