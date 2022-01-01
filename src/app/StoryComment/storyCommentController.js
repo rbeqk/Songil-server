@@ -3,6 +3,9 @@ const storyCommentService = require("./storyCommentService");
 const baseResponse = require("../../../config/baseResponseStatus");
 const {response} = require("../../../config/response");
 const {errResponse} = require("../../../config/response");
+const jwt = require('jsonwebtoken');
+
+require('dotenv').config();
 
 /*
   API No. 5.13
@@ -35,4 +38,33 @@ exports.deleteStoryComment = async (req, res) => {
   const deleteStoryComment = await storyCommentService.deleteStoryComment(userIdx, storyCommentIdx);
 
   return res.send(deleteStoryComment);
+}
+
+/*
+  API No. 5.5
+  API Name: 스토리 댓글 조회 API
+  [GET] /with/stories/:storyIdx/comments
+  query: page
+*/
+exports.getStoryComment = async (req, res) => {
+  const {storyIdx} = req.params;
+  const {page} = req.query;
+  const token = req.headers['x-access-token'];
+
+  if (!page) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (page < 1) return res.send(errResponse(baseResponse.INVALID_PAGE));
+
+  //jwt가 있을 경우 유효한지 확인
+  let userIdx;
+  if (token){
+    try{
+      userIdx = jwt.verify(token, process.env.jwtSecret).userIdx;
+    }catch(err){
+      return res.send(errResponse(baseResponse.TOKEN_VERIFICATION_FAILURE));
+    }
+  }
+
+  const getStoryComment = await storyCommentProvider.getStoryComment(storyIdx, userIdx, page);
+
+  return res.send(getStoryComment);
 }

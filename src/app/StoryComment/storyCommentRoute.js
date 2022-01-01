@@ -7,4 +7,7 @@ module.exports = function(app){
 
   //스토리 댓글 삭제 API
   app.delete('/with/stories/comments/:commentIdx', jwtMiddleware, storyCommentController.deleteStoryComment);
+
+  //스토리 댓글 조회 API
+  app.get('/with/stories/:storyIdx/comments', storyCommentController.getStoryComment);
 }
