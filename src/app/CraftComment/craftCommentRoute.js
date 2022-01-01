@@ -10,7 +10,7 @@ module.exports = function (app){
   app.get('/shop/crafts/:craftIdx/comments', craftCommentController.getComment);
 
   //상품 댓글 신고 API
-  app.post('/comments/:commentIdx/reported', jwtMiddleware, craftCommentController.reportComment);
+  app.post('/shop/crafts/comments/:commentIdx/reported', jwtMiddleware, craftCommentController.reportComment);
 
   //상품 댓글 작성 API
   app.post('/shop/crafts/:craftIdx/comments', jwtMiddleware, craftCommentUpload.array('image'), craftCommentController.createCraftComment);
