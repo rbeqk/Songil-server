@@ -32,7 +32,7 @@ exports.getStoryDetail = async (storyIdx, userIdx) => {
         'userProfile': storyInfo.userProfile,
         'createdAt': storyInfo.createdAt,
         'totalLikeCnt': storyInfo.totalLikeCnt,
-        'isLike': userIdx ? await likeDao.getStoryLikeStatus(connection, storyIdx, userIdx): 'N',
+        'isLike': userIdx != -1 ? await likeDao.getStoryLikeStatus(connection, storyIdx, userIdx): 'N',
         'totalCommentCnt': storyInfo.totalCommentCnt,
         'tag': storyTagArr
       };

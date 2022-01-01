@@ -83,9 +83,6 @@ exports.getWith = async (category, sort, page, userIdx) => {
     const connection = await pool.getConnection(async conn => conn);
     try{
 
-      //로그인하지 않았을 시 유효하지 않는 userIdx로 변경
-      if (!userIdx) userIdx = -1;
-
       let result;
       const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
       const startItemIdx = (page - 1) * pageItemCnt;

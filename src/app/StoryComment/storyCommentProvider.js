@@ -47,9 +47,6 @@ exports.getStoryComment = async (storyIdx, userIdx, page) => {
       const isExistStoryIdx = await storyDao.isExistStoryIdx(connection, storyIdx);
       if (!isExistStoryIdx) return errResponse(baseResponse.INVALID_STORY_IDX);
 
-      //로그인하지 않았다면 존재하지 않는 userIdx로 변경
-      if (!userIdx) userIdx = -1;
-
       const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
       const startItemIdx = (page - 1) * pageItemCnt;
 

@@ -3,9 +3,7 @@ const storyCommentService = require("./storyCommentService");
 const baseResponse = require("../../../config/baseResponseStatus");
 const {response} = require("../../../config/response");
 const {errResponse} = require("../../../config/response");
-const jwt = require('jsonwebtoken');
-
-require('dotenv').config();
+const {getUserIdx} = require('../../../config/userInfo');
 
 /*
   API No. 5.13
@@ -54,15 +52,8 @@ exports.getStoryComment = async (req, res) => {
   if (!page) return res.send(errResponse(baseResponse.IS_EMPTY));
   if (page < 1) return res.send(errResponse(baseResponse.INVALID_PAGE));
 
-  //jwt가 있을 경우 유효한지 확인
-  let userIdx;
-  if (token){
-    try{
-      userIdx = jwt.verify(token, process.env.jwtSecret).userIdx;
-    }catch(err){
-      return res.send(errResponse(baseResponse.TOKEN_VERIFICATION_FAILURE));
-    }
-  }
+  const userIdx = getUserIdx(token);
+  if (userIdx === false) return res.send(errResponse(baseResponse.TOKEN_VERIFICATION_FAILURE));
 
   const getStoryComment = await storyCommentProvider.getStoryComment(storyIdx, userIdx, page);
 

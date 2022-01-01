@@ -17,7 +17,7 @@ exports.getABTestDetail = async (abTestIdx, userIdx) => {
       }
 
       //abTest 기본 정보
-      const abTestInfo = await abTestDao.getABTestInfo(connection, abTestIdx, userIdx);
+      const abTestInfo = await abTestDao.getABTestInfo(connection, abTestIdx);
 
       let result = {
         'abTestIdx': abTestInfo.abTestIdx,
@@ -36,7 +36,7 @@ exports.getABTestDetail = async (abTestIdx, userIdx) => {
       const currentVoteTotalCnt = await abTestDao.getCurrentVoteTotalCnt(connection, abTestIdx);
 
       //로그인 한 경우
-      if (userIdx){
+      if (userIdx != -1){
 
         //유저의 투표 여부 및 투표 이미지 정보
         const userVote = await abTestDao.getUserVote(connection, abTestIdx, userIdx);

@@ -159,7 +159,7 @@ exports.getArtistCraft = async (artistIdx, page, sort, userIdx) => {
             'isNew': item.isNew,
             'isSoldOut': item.isSoldOut,
             'totalLikeCnt': item.totalLikeCnt,
-            'isLike': !userIdx ? 'N' : (await likeDao.craftIsLike(connection, userIdx, item.craftIdx) ? 'Y': 'N'),
+            'isLike': (userIdx != -1) ? 'N' : (await likeDao.craftIsLike(connection, userIdx, item.craftIdx) ? 'Y': 'N'),
             'totalCommentCnt': item.totalCommentCnt
           });
         }
@@ -271,7 +271,7 @@ exports.getArtistArticle = async (artistIdx, page, sort, userIdx) => {
             'editorName': item.editorName,
             'createdAt': item.createdAt,
             'totalLikeCnt': item.totalLikeCnt,
-            'isLike': !userIdx ? 'N' : (await likeDao.articleLikeStatus(connection, userIdx, item.articleIdx) === 1 ? 'Y' : 'N')
+            'isLike': (userIdx != -1) ? 'N' : (await likeDao.articleLikeStatus(connection, userIdx, item.articleIdx) === 1 ? 'Y' : 'N')
           });
         }
       }

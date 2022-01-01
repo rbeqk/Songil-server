@@ -1,9 +1,7 @@
 const baseResponseStatus = require('../../../config/baseResponseStatus');
 const { errResponse } = require('../../../config/response');
 const withProvider = require("./withProvider");
-const jwt = require("jsonwebtoken");
-
-require('dotenv').config();
+const {getUserIdx} = require('../../../config/userInfo');
 
 /*
   API No. 5.1
@@ -46,15 +44,8 @@ exports.getWith = async (req, res) => {
   if (!['story', 'qna', 'ab-test'].includes(category)) return res.send(errResponse(baseResponseStatus.INVALID_CATEGORY_NAME));
   if (!['popular', 'new'].includes(sort)) return res.send(errResponse(baseResponseStatus.INVALID_SORT_NAME));
 
-  //jwt가 있을 경우 유효한지 확인
-  let userIdx;
-  if (token){
-    try{
-      userIdx = jwt.verify(token, process.env.jwtSecret).userIdx;
-    }catch(err){
-      return res.send(errResponse(baseResponse.TOKEN_VERIFICATION_FAILURE));
-    }
-  }
+  const userIdx = getUserIdx(token);
+  if (userIdx === false) return res.send(errResponse(baseResponse.TOKEN_VERIFICATION_FAILURE));
 
   const getWith = await withProvider.getWith(category, sort, page, userIdx);
 

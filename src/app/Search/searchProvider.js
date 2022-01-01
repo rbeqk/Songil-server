@@ -12,7 +12,7 @@ exports.getSearchKeywords = async (userIdx) => {
       let result = {};
 
       //최근검색어
-      if (userIdx){
+      if (userIdx != -1){
         const recentlySearch = await searchDao.getRecentlySearch(connection, userIdx);
         result.recentlySearch = recentlySearch ? recentlySearch.map(item => item.word) : [];
       }

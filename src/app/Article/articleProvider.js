@@ -43,9 +43,6 @@ exports.getArticleDetail = async (articleIdx, userIdx) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
-      
-      //로그인하지 않았다면 존재하지 않는 userIdx로
-      if (!userIdx) userIdx = -1;
 
       //존재하는 articleIdx인지
       const isExistArticleIdx = await articleDao.isExistArticleIdx(connection, articleIdx);
