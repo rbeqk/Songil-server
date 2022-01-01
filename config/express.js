@@ -35,7 +35,6 @@ module.exports = function (){
   }));
 
   require('../src/app/User/userRoute')(app);
-  require('../src/app/Craft/craftRoute')(app);
   require('../src/app/CraftComment/craftCommentRoute')(app);
   require('../src/app/Like/likeRoute')(app);
   require('../src/app/Shop/shopRoute')(app);
@@ -53,6 +52,7 @@ module.exports = function (){
   require('../src/app/MyPage/myPageRoute')(app);
   require('../src/app/Home/homeRoute')(app);
   require('../src/app/With/withRoute')(app);
+  require('../src/app/Craft/craftRoute')(app);
 
   return app;
 }

@@ -67,10 +67,54 @@ async function getProductByCategory(connection, craftCategoryIdx){
   return rows[0]['totalCnt'];
 }
 
+//카테고리 별 인기 상품 가져오기
+async function getWeeklyPopularCraftByCategory(connection, categoryIdx){
+  const query = `
+  SELECT C.craftIdx,
+        C.mainImageUrl,
+        C.name,
+        C.artistIdx,
+        U.nickname                                               as artistName,
+        C.price,
+        IF(TIMESTAMPDIFF(DAY, C.createdAt, NOW()) > 3, 'N', 'Y') as isNew
+  FROM Craft C
+          JOIN Artist A ON A.artistIdx = C.artistIdx && A.isDeleted = 'N'
+          JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
+  WHERE C.isDeleted = 'N' && C.isSoldOut = 'N' && C.craftCategoryIdx = ${categoryIdx}
+  ORDER BY RAND()
+  LIMIT 15;
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
+//전체 상품에서 인기 상품 가져오기
+async function getWeeklyPopularCraft(connection){
+  const query = `
+  SELECT C.craftIdx,
+        C.mainImageUrl,
+        C.name,
+        C.artistIdx,
+        U.nickname                                               as artistName,
+        C.price,
+        IF(TIMESTAMPDIFF(DAY, C.createdAt, NOW()) > 3, 'N', 'Y') as isNew
+  FROM Craft C
+          JOIN Artist A ON A.artistIdx = C.artistIdx && A.isDeleted = 'N'
+          JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
+  WHERE C.isDeleted = 'N' && C.isSoldOut = 'N'
+  ORDER BY RAND()
+  LIMIT 15;
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   getTodayCraft,
   getBanner,
   getTodayArtist,
   getNewCraft,
   getProductByCategory,
+  getWeeklyPopularCraftByCategory,
+  getWeeklyPopularCraft,
 }

@@ -35,3 +35,20 @@ exports.getProductByCategoryTotalPage = async (req, res) => {
 
   return res.send(getProductByCategoryTotalPage);
 }
+
+/*
+  API No. 3.4
+  API Name: 카테고리 별 이번주 인기 상품 조회 API
+  [GET] /shop/crafts/popular
+  query: categoryIdx
+*/
+exports.getWeeklyPopularCraft = async (req, res) => {
+  const {categoryIdx} = req.query;
+
+  if (!categoryIdx) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (categoryIdx < 0 || categoryIdx > 9) return res.send(errResponse(baseResponse.INVALID_CATEGORY_IDX));
+
+  const getWeeklyPopularCraft = await shopProvider.getWeeklyPopularCraft(categoryIdx);
+
+  return res.send(getWeeklyPopularCraft);
+}

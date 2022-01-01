@@ -72,6 +72,7 @@ module.exports = {
 
   EMPTY_USER_SEARCH: {"isSuccess": false, "code": 3300, "message": "사용자의 최근 검색어가 없습니다"},
   NO_VOTE_DATA: {"isSuccess": false, "code": 3301, "message": "투표 이력이 없습니다"},
+  EMPTY_CRAFT: {"isSuccess": false, "code": 3302, "message": "상품이 없습니다"},
 
   DB_ERROR: {"isSuccess": false, "code": 4000, "message": "DB 에러"},
   SERVER_ERROR: {"isSuccess": false, "code": 4001, "message": "Server 에러"},
