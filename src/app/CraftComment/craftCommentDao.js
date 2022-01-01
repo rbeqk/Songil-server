@@ -112,6 +112,37 @@ async function reportComment(connection, userIdx, craftCommentIdx, reportedReaso
   return rows;
 }
 
+//상품 댓글 내용 추가
+async function createCraftComment(connection, craftIdx, userIdx, comment){
+  const query = `
+  INSERT INTO CraftComment (craftIdx, userIdx, content)
+  VALUES (${craftIdx}, ${userIdx}, '${comment}');
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
+//포토 댓글로 변경
+async function updatePhotoCraftComment(connection, craftCommentIdx){
+  const query = `
+  UPDATE CraftComment
+  SET isPhotoComment = 'Y'
+  WHERE craftCommentIdx = ${craftCommentIdx} && isDeleted = 'N';
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
+//상품 댓글 사진 추가
+async function createCraftCommentImage(connection, craftCommentIdx, image){
+  const query = `
+  INSERT INTO CraftCommentImage(craftCommentIdx, imageUrl)
+  VALUES (${craftCommentIdx}, '${image}');
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   getOnlyPhotoCommentCnt,
   getCommentCnt,
@@ -122,4 +153,7 @@ module.exports = {
   isExistUserReportedCommentIdx,
   isUserCraftComment,
   reportComment,
+  createCraftComment,
+  updatePhotoCraftComment,
+  createCraftCommentImage,
 }

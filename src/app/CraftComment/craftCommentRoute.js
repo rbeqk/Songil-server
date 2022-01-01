@@ -1,6 +1,7 @@
 module.exports = function (app){
   const jwtMiddleware = require('../../../config/jwtMiddleware');
   const craftCommentController = require('./craftCommentController');
+  const {craftCommentUpload} = require('../../../config/multer');
   
   //상품 댓글 페이지 개수 조회 API
   app.get('/shop/crafts/:craftIdx/comments/page', craftCommentController.getCommentTotalPage);
@@ -10,4 +11,7 @@ module.exports = function (app){
 
   //상품 댓글 신고 API
   app.post('/comments/:commentIdx/reported', jwtMiddleware, craftCommentController.reportComment);
+
+  //상품 댓글 작성 API
+  app.post('/shop/crafts/:craftIdx/comments', jwtMiddleware, craftCommentUpload.array('image'), craftCommentController.createCraftComment);
 }
