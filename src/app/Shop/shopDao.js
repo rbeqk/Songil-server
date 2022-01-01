@@ -58,10 +58,20 @@ async function getNewCraft(connection){
 }
 
 //카테고리 별 상품 개수
-async function getProductByCategory(connection, craftCategoryIdx){
+async function getCraftByCategoryCnt(connection, craftCategoryIdx){
   const query = `
   SELECT COUNT(craftIdx) as totalCnt FROM Craft
   WHERE craftCategoryIdx = ${craftCategoryIdx} && isDeleted = 'N';
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['totalCnt'];
+}
+
+//전체 상품 개수 가져오기
+async function getTotalCraftCnt(connection){
+  const query = `
+  SELECT COUNT(craftIdx) as totalCnt FROM Craft
+  WHERE isDeleted = 'N';
   `;
   const [rows] = await connection.query(query);
   return rows[0]['totalCnt'];
@@ -114,7 +124,8 @@ module.exports = {
   getBanner,
   getTodayArtist,
   getNewCraft,
-  getProductByCategory,
+  getCraftByCategoryCnt,
+  getTotalCraftCnt,
   getWeeklyPopularCraftByCategory,
   getWeeklyPopularCraft,
 }

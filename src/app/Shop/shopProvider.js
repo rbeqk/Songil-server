@@ -60,14 +60,23 @@ exports.getShop = async () => {
   }
 }
 
-exports.getProductByCategoryTotalPage = async (craftCategoryIdx) => {
+exports.getCraftByCategoryTotalPage = async (craftCategoryIdx) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
-      const productCnt = await shopDao.getProductByCategory(connection, craftCategoryIdx); //카테고리 별 상품 개수
+      let craftCnt = 0;
+
+      //카테고리 별 상품 개수 가져오기
+      if (craftCategoryIdx != 8){
+        craftCnt = await shopDao.getCraftByCategoryCnt(connection, craftCategoryIdx);
+      }
+      //전체 상품 개수 가져오기
+      else if (craftCategoryIdx == 8){
+        craftCnt = await shopDao.getTotalCraftCnt(connection);
+      }
 
       const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
-      const totalPages = (productCnt % pageItemCnt == 0) ? productCnt / pageItemCnt : parseInt(productCnt / pageItemCnt) + 1;  //총 페이지 수
+      const totalPages = (craftCnt % pageItemCnt == 0) ? craftCnt / pageItemCnt : parseInt(craftCnt / pageItemCnt) + 1;  //총 페이지 수
       const result = {
         'totalPages': totalPages
       }
@@ -77,11 +86,11 @@ exports.getProductByCategoryTotalPage = async (craftCategoryIdx) => {
       
     }catch(err){
       connection.release();
-      logger.error(`getProductByCategoryTotalPage DB Query Error: ${err}`);
+      logger.error(`getCraftByCategoryTotalPage DB Query Error: ${err}`);
       return errResponse(baseResponse.DB_ERROR);
     }
   }catch(err){
-    logger.error(`getProductByCategoryTotalPage DB Connection Error: ${err}`);
+    logger.error(`getCraftByCategoryTotalPage DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }
