@@ -51,10 +51,54 @@ async function deleteStoryComment(connection, qnaCommentIdx){
   return rows;
 }
 
+//QnA 부모 댓글 가져오기
+async function getQnAParentComment(connection, qnaIdx, userIdx, pageItemCnt, startItemIdx){
+  const query = `
+  SELECT QC.qnaCommentIdx                      as commentIdx,
+        QC.userIdx,
+        U.imageUrl                            as userProfile,
+        U.nickname                            as userName,
+        IF(Q.userIdx = QC.userIdx, 'Y', 'N')  as isWriter,
+        QC.comment,
+        DATE_FORMAT(QC.createdAt, '%Y.%m.%d') as createdAt,
+        IF(QC.userIdx = ${userIdx}, 'Y', 'N') as isUserComment,
+        QC.isDeleted
+  FROM QnAComment QC
+          JOIN User U ON U.userIdx = QC.userIdx && U.isDeleted = 'N'
+  JOIN QnA Q ON Q.qnaIdx = QC.qnaIdx && Q.isDeleted = 'N'
+  WHERE QC.parentIdx IS NULL && QC.qnaIdx = ${qnaIdx}
+  LIMIT ${startItemIdx}, ${pageItemCnt};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
+//QnA 대댓글 가져오기
+async function getQnARecomment(connection, parentIdx, userIdx){
+  const query = `
+  SELECT QC.qnaCommentIdx                      as commentIdx,
+        QC.userIdx,
+        U.imageUrl                            as userProfile,
+        U.nickname                            as userName,
+        IF(QC.userIdx = Q.userIdx, 'Y', 'N')  as isWriter,
+        QC.comment,
+        DATE_FORMAT(QC.createdAt, '%Y.%m.%d') as createdAt,
+        IF(QC.userIdx = ${userIdx}, 'Y', 'N') as isUserComment
+  FROM QnAComment QC
+          JOIN User U ON U.userIdx = QC.userIdx && U.isDeleted = 'N'
+          JOIN QnA Q ON Q.qnaIdx = QC.qnaIdx && Q.isDeleted = 'N'
+  WHERE QC.parentIdx IS NOT NULL && QC.isDeleted = 'N' && QC.parentIdx = ${parentIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   isExistQnACommentParentIdx,
   createQnAComment,
   isExistSQnACommentIdx,
   getQnACommentUserIdx,
   deleteStoryComment,
+  getQnAParentComment,
+  getQnARecomment,
 }

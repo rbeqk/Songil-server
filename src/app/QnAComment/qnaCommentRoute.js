@@ -7,4 +7,7 @@ module.exports = function(app){
 
   //QnA 댓글 삭제
   app.delete('/with/qna/comments/:commentIdx', jwtMiddleware, qnaCommentController.deleteQnAComment);
+
+  //QnA 댓글 조회 API
+  app.get('/with/qna/:qnaIdx/comments', qnaCommentController.getQnAComment);
 }
