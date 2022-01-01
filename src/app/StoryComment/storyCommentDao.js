@@ -51,10 +51,54 @@ async function deleteStoryComment(connection, storyCommentIdx){
   return rows;
 }
 
+//스토리 부모 댓글 가져오기
+async function getStoryParentComment(connection, storyIdx, userIdx, startItemIdx, pageItemCnt){
+  const query = `
+  SELECT SC.storyCommentIdx as commentIdx,
+        SC.userIdx,
+        U.imageUrl         as userProfile,
+        U.nickname         as userName,
+        IF(S.userIdx = SC.userIdx, 'Y', 'N') as isWriter,
+        SC.comment,
+        DATE_FORMAT(SC.createdAt, '%Y.%m.%d') as createdAt,
+        IF(SC.userIdx = ${userIdx}, 'Y', 'N') as isUserComment,
+        SC.isDeleted
+  FROM StoryComment SC
+          JOIN User U ON U.userIdx = SC.userIdx && U.isDeleted = 'N'
+          JOIN Story S ON S.storyIdx = SC.storyIdx && S.isDeleted = 'N'
+  WHERE SC.parentIdx IS NULL && SC.storyIdx = ${storyIdx}
+  LIMIT ${startItemIdx}, ${pageItemCnt};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
+//스토리 대댓글 가져오기
+async function getStoryReComment(connection, parentIdx, userIdx){
+  const query = `
+  SELECT SC.storyCommentIdx                    as commentIdx,
+        SC.userIdx,
+        U.imageUrl                            as userProfile,
+        U.nickname                            as userName,
+        IF(S.userIdx = SC.userIdx, 'Y', 'N')  as isWriter,
+        SC.comment,
+        DATE_FORMAT(SC.createdAt, '%Y.%m.%d') as createdAt,
+        IF(SC.userIdx = ${userIdx}, 'Y', 'N') as isUserComment
+  FROM StoryComment SC
+          JOIN User U ON U.userIdx = SC.userIdx && U.isDeleted = 'N'
+          JOIN Story S ON S.storyIdx = SC.storyIdx && S.isDeleted = 'N'
+  WHERE SC.parentIdx IS NOT NULL && SC.isDeleted = 'N' && SC.parentIdx = ${parentIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   createStoryComment,
   isExistStoryCommentParentIdx,
   isExistStoryCommentIdx,
   getStoryCommentUserIdx,
   deleteStoryComment,
+  getStoryParentComment,
+  getStoryReComment,
 }

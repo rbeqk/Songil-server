@@ -51,11 +51,11 @@ exports.getStoryComment = async (storyIdx, userIdx, page) => {
       const startItemIdx = (page - 1) * pageItemCnt;
 
       //부모 댓글 가져오기
-      const comment = await storyDao.getStoryComment(connection, storyIdx, userIdx, startItemIdx, pageItemCnt);
+      const parentComment = await storyCommentDao.getStoryParentComment(connection, storyIdx, userIdx, startItemIdx, pageItemCnt);
 
       let result = [];
 
-      comment.forEach(item => {
+      parentComment.forEach(item => {
         result.push({
           'commentIdx': item.commentIdx,
           'userIdx': item.userIdx,
@@ -72,10 +72,11 @@ exports.getStoryComment = async (storyIdx, userIdx, page) => {
 
       //대댓글 가져오기
       for (let parentComment of result){
-        const recommentInfo = await storyDao.getCommentReComment(connection, parentComment.commentIdx, userIdx);
+        const recommentInfo = await storyCommentDao.getStoryReComment(connection, parentComment.commentIdx, userIdx);
         
         recommentInfo.forEach(item => {
           parentComment.reComment.push({
+            'commentIdx': item.commentIdx,
             'userIdx': item.userIdx,
             'userProfile': item.userProfile,
             'userName': item.userName,
