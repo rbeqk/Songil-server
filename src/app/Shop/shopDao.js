@@ -1,5 +1,5 @@
 //today-craft 가져오기
-async function getTodayCraft(connection, params){
+async function getTodayCraft(connection){
   const query = `
   SELECT C.craftIdx,
         C.mainImageUrl,
@@ -14,9 +14,9 @@ async function getTodayCraft(connection, params){
           JOIN User U ON A.userIdx = U.userIdx && U.isDeleted = 'N'
   WHERE C.isDeleted = 'N'
   ORDER BY RAND()
-  LIMIT ?, ?;
+  LIMIT 15;
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows;
 }
 

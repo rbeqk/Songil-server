@@ -12,10 +12,10 @@ require('dotenv').config();
   API Name: shop 쪽 banner/artist/new 조회 API
   [GET] /shop
 */
-exports.getShopEtc = async (req, res) => {
-  const getShopEtc = await shopProvider.getShopEtc();
+exports.getShop = async (req, res) => {
+  const getShop = await shopProvider.getShop();
 
-  return res.send(getShopEtc);
+  return res.send(getShop);
 }
 
 /*

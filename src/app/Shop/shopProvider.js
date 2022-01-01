@@ -4,19 +4,32 @@ const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 
-exports.getShopEtc = async () => {
+exports.getShop = async () => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
 
-      const banner = await shopDao.getBanner(connection);
-      const todayArtist = await shopDao.getTodayArtist(connection);
-      const newCraft = await shopDao.getNewCraft(connection);
-
       let result = {};
 
+      const banner = await shopDao.getBanner(connection);
       result.banner = banner.map(item => item.imageUrl);
 
+      const todayCraft = await shopDao.getTodayCraft(connection);
+      result.todayCraft = [];
+      todayCraft.forEach(item => {
+        result.todayCraft.push({
+          'craftIdx': item.craftIdx,
+          'mainImageUrl': item.mainImageUrl,
+          'imageUrl': item.imageUrl,
+          'name': item.name,
+          'artistIdx': item.artistIdx,
+          'artistName': item.artistName,
+          'price': item.price,
+          'isNew': item.isNew,
+        })
+      });
+
+      const todayArtist = await shopDao.getTodayArtist(connection);
       result.todayArtist = {
         'artistIdx': todayArtist.artistIdx,
         'artistName': todayArtist.artistName,
@@ -24,8 +37,8 @@ exports.getShopEtc = async () => {
         'major': todayArtist.major
       }
 
+      const newCraft = await shopDao.getNewCraft(connection);
       result.newCraft = [];
-
       newCraft.forEach(item => {
         result.newCraft.push({
           'craftIdx': item.craftIdx,
@@ -38,11 +51,11 @@ exports.getShopEtc = async () => {
       
     }catch(err){
       connection.release();
-      logger.error(`getShopEtc DB Query Error: ${err}`);
+      logger.error(`getShop DB Query Error: ${err}`);
       return errResponse(baseResponse.DB_ERROR);
     }
   }catch(err){
-    logger.error(`getShopEtc DB Connection Error: ${err}`);
+    logger.error(`getShop DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }
