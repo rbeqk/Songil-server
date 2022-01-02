@@ -7,7 +7,7 @@ const {getUserIdx} = require('../../../config/userInfo');
 const moment = require('moment');
 
 /*
-  API No. 5.8
+  API No. 5.22
   API Name: ABTest 상세 조회 API
   [GET] /with/ab-test/:abTestIdx
 */

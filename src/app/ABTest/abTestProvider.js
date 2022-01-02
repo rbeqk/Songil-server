@@ -45,12 +45,13 @@ exports.getABTestDetail = async (abTestIdx, userIdx) => {
         if (userVote){
 
           //유저가 투표한 표의 총 투표 수
-          const currentUserVoteTotalCnt = await abTestDao.getCurrentUserVoteTotalCnt(connection, abTestIdx, userVote['voteImage']);
+          const currentUserVoteTotalCnt = await abTestDao.getCurrentUserVoteTotalCnt(connection, abTestIdx, userVote['vote']);
 
-          result.voteInfo = {};
-          result.voteInfo.voteImage = userVote['voteImage']; //유저가 투표한 이미지
-          result.voteInfo.totalVoteCnt = currentUserVoteTotalCnt; //유저가 투표한 표의 총 투표 수
-          result.voteInfo.percent = parseInt(currentUserVoteTotalCnt / currentVoteTotalCnt * 100);  //유저가 투표한 표의 총 퍼센트
+          result.voteInfo = {
+            'vote': userVote['vote'],
+            'totalVoteCnt': currentUserVoteTotalCnt,
+            'percent': parseInt(currentUserVoteTotalCnt / currentVoteTotalCnt * 100)
+          };
         }
         //투표 안 했을 경우
         else{
@@ -71,31 +72,39 @@ exports.getABTestDetail = async (abTestIdx, userIdx) => {
         result.finalInfo = {};
 
         //투표 결과가 있을 경우(두가지 모두 표를 받았을 경우)
-        if (finalInfo.length > 1){
+        if (finalInfo.length === 2){
 
           //서로 비겼을 경우
           if (finalInfo[0]['totalCnt'] === finalInfo[1]['totalCnt']){
-            result.finalInfo.voteImage = await abTestDao.getEarlyArrivedImage(connection, abTestIdx);  //더 빨리 퍼센트에 도달된 이미지
-            result.finalInfo.totalVoteCnt = finalInfo[0]['totalCnt'];  //총 투표 수
-            result.finalInfo.percent = 50;
+            result.finalInfo = {
+              'vote': 'DRAW',
+              'totalVoteCnt': finalInfo[0]['totalCnt'],
+              'percent': 50
+            };
           }
           else{
-            result.finalInfo.voteImage = finalInfo[0]['voteImage'];  //표를 많이 받은 표
-            result.finalInfo.totalVoteCnt = finalInfo[0]['totalCnt'];  //총 투표 수
-            result.finalInfo.percent = parseInt(finalInfo[0]['totalCnt'] / currentVoteTotalCnt * 100);  //표를 더 많이 받은 표의 총 퍼센트
+            result.finalInfo = {
+              'vote': finalInfo[0]['vote'],
+              'totalVoteCnt': finalInfo[0]['totalCnt'],
+              'percent': parseInt(finalInfo[0]['totalCnt'] / currentVoteTotalCnt * 100)
+            };
           }
         }
-        //투표 결과가 있을 경우(몰표로 받았을 경우)
+        //투표 결과가 하나일 경우(몰표)
         else if (finalInfo.length === 1){
-          result.finalInfo.voteImage = finalInfo[0]['voteImage'];  //몰표로 받은 표
-          result.finalInfo.totalVoteCnt = finalInfo[0]['totalCnt'];  //총 투표 수
-          result.finalInfo.percent = 100;
+          result.finalInfo = {
+            'vote': finalInfo[0]['vote'],
+            'totalVoteCnt': finalInfo[0]['totalCnt'],
+            'percent': 100
+          };
         }
         //아무도 투표하지 않았을 경우
-        else{
-          result.finalInfo.voteImage = 'A';
-          result.finalInfo.totalVoteCnt = 0;
-          result.finalInfo.percent = 50;
+        else if (finalInfo.length === 0){
+          result.finalInfo = {
+            'vote': 'DRAW',
+            'totalVoteCnt': 0,
+            'percent': 50
+          };
         }
       }
       //마감 이전

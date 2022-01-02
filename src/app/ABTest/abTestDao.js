@@ -36,7 +36,7 @@ async function getABTestInfo(connection, abTestIdx){
 //유저의 투표 정보 가져오기
 async function getUserVote(connection, abTestIdx, userIdx){
   const query = `
-  SELECT vote as voteImage FROM ABTestVote
+  SELECT vote FROM ABTestVote
   WHERE abTestIdx = ${abTestIdx} && userIdx = ${userIdx};
   `;
   const [rows] = await connection.query(query);
@@ -66,7 +66,7 @@ async function getCurrentUserVoteTotalCnt(connection, abTestIdx, userVote){
 //투표 결과(투표 많은 순)
 async function getFinalVoteInfo(connection, abTestIdx){
   const query = `
-  SELECT vote as voteImage, COUNT(*) as totalCnt FROM ABTestVote
+  SELECT vote, COUNT(*) as totalCnt FROM ABTestVote
   WHERE abTestIdx = ${abTestIdx}
   GROUP BY vote
   ORDER BY totalCnt DESC;
