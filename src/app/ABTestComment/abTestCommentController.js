@@ -3,6 +3,7 @@ const abTestCommentService = require("./abTestCommentService");
 const baseResponse = require("../../../config/baseResponseStatus");
 const {response} = require("../../../config/response");
 const {errResponse} = require("../../../config/response");
+const {getUserIdx} = require('../../../config/userInfo');
 
 /*
   API No. 5.15
@@ -34,4 +35,26 @@ exports.deleteABTestComment = async (req, res) => {
   const deleteABTestComment = await abTestCommentService.deleteABTestComment(userIdx, abTestCommentIdx);
 
   return res.send(deleteABTestComment);
+}
+
+/*
+  API No. 5.23
+  API Name: AB Test 댓글 조회 API
+  [GET] /with/ab-test/:abTestIdx/comments
+  query: page
+*/
+exports.getABTestComment = async (req, res) => {
+  const {abTestIdx} = req.params;
+  const {page} = req.query;
+  const token = req.headers['x-access-token'];
+
+  if (!page) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (page < 1) return res.send(errResponse(baseResponse.INVALID_PAGE));
+
+  const userIdx = getUserIdx(token);
+  if (userIdx === false) return res.send(errResponse(baseResponse.TOKEN_VERIFICATION_FAILURE));
+
+  const getABTestComment = await abTestCommentProvider.getABTestComment(abTestIdx, userIdx, page);
+
+  return res.send(getABTestComment);
 }

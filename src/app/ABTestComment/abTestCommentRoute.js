@@ -7,4 +7,7 @@ module.exports = function (app){
 
   //AB Test 댓글 삭제 API
   app.delete('/with/ab-test/ocomments/:commentIdx', jwtMiddleware, abTestCommentController.deleteABTestComment);
+
+  //AB Test 댓글 조회 API
+  app.get('/with/ab-test/:abTestIdx/comments', abTestCommentController.getABTestComment);
 }
