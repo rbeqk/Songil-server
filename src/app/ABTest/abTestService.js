@@ -145,3 +145,40 @@ exports.deleteVoteABTest = async (userIdx, abTestIdx) => {
     return errResponse(baseResponse.DB_ERROR);
   }
 }
+
+//abTest 수정
+exports.updateABTest = async (userIdx, abTestIdx, content) => { 
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+
+      //존재하는 abTestIdx인지
+      const isExistABTestIdx = await abTestDao.isExistABTestIdx(connection, abTestIdx);
+      if (!isExistABTestIdx) return errResponse(baseResponse.INVALID_ABTEST_IDX);
+
+      //작가의 userIdx인지
+      const isArtistUserIdx = await abTestDao.isArtistUserIdx(connection, userIdx);
+      if (!isArtistUserIdx) return errResponse(baseResponse.NO_PERMISSION);
+
+      //abTest 작가의 userIdx 가져오기
+      const abTestUserIdx = await abTestDao.getAbTestUserIdx(connection, abTestIdx);
+      if (abTestUserIdx !== userIdx) return errResponse(baseResponse.NO_PERMISSION);
+
+      await connection.beginTransaction();
+      await abTestDao.updateABTest(connection, abTestIdx, content);
+      await connection.commit();
+      
+      connection.release();
+      return response(baseResponse.SUCCESS);
+      
+    }catch(err){
+      await connection.rollback();
+      connection.release();
+      logger.error(`updateABTest DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`updateABTest DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}

@@ -182,6 +182,17 @@ async function deleteVoteABTest(connection, userIdx, abTestIdx){
   return rows;
 }
 
+//ABTest 수정
+async function updateABTest(connection, abTestIdx, content){
+  const query = `
+  UPDATE ABTest
+  SET content = '${content}'
+  WHERE abTestIdx = ${abTestIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   isExistABTestIdx,
   getABTestInfo,
@@ -199,4 +210,5 @@ module.exports = {
   isExistVoteResult,
   voteABTest,
   deleteVoteABTest,
+  updateABTest,
 }

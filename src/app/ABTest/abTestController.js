@@ -105,3 +105,22 @@ exports.deleteVoteABTest = async (req, res) => {
 
   return res.send(deleteVoteABTest);
 }
+
+/*
+  API No. 5.26
+  API Name: ABTest 수정 API
+  [PATCH] /with/ab-test/:abTestIdx
+  body: content
+*/
+exports.updateABTest = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {abTestIdx} = req.params;
+  const {content} = req.body;
+
+  if (!content) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (content > 3000) return res.send(errResponse(baseResponse.EXCEED_ABTEST_CONTENT));
+
+  const updateABTest = await abTestService.updateABTest(userIdx, abTestIdx, content);
+
+  return res.send(updateABTest);
+}
