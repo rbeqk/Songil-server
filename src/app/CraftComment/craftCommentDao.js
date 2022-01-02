@@ -103,10 +103,10 @@ async function isUserCraftComment(connection, userIdx, craftCommentIdx){
 }
 
 //댓글 신고
-async function reportComment(connection, userIdx, craftCommentIdx, reportedReasonIdx, etcReason){
+async function reportComment(connection, userIdx, craftCommentIdx, reportedCommentReasonIdx, etcReason){
   const query = `
-  INSERT INTO ReportedCraftComment(userIdx, craftCommentIdx, reportedCraftReasonIdx, etcContent)
-  VALUES (${userIdx}, ${craftCommentIdx}, ${reportedReasonIdx}, ${etcReason});
+  INSERT INTO ReportedCraftComment(userIdx, craftCommentIdx, reportedCommentReasonIdx, etcContent)
+  VALUES (${userIdx}, ${craftCommentIdx}, ${reportedCommentReasonIdx}, ${etcReason});
   `;
   const [rows] = await connection.query(query);
   return rows;

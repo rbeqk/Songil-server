@@ -5,7 +5,7 @@ const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 
-exports.reportComment = async (userIdx, craftCommentIdx, reportedReasonIdx, etcReason) => {
+exports.reportComment = async (userIdx, craftCommentIdx, reportedCommentReasonIdx, etcReason) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
@@ -27,7 +27,7 @@ exports.reportComment = async (userIdx, craftCommentIdx, reportedReasonIdx, etcR
       //댓글 신고
       if (!etcReason) etcReason = null;
 
-      await craftCommentDao.reportComment(connection, userIdx, craftCommentIdx, reportedReasonIdx, etcReason);
+      await craftCommentDao.reportComment(connection, userIdx, craftCommentIdx, reportedCommentReasonIdx, etcReason);
       await connection.commit();
 
       connection.release();
