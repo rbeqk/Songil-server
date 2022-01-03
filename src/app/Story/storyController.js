@@ -31,7 +31,7 @@ exports.createStory = async (req, res) => {
   const {userIdx} = req.verifiedToken;
   const {title, content, tag} = req.body;
 
-  if (!(title && content && req.files.length < 1)) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (!(title && content) || req.files.length < 1) return res.send(errResponse(baseResponse.IS_EMPTY));
 
   if (req.files.length > 3) return res.send(errResponse(baseResponse.EXCEED_IMAGE_QUANTITY));
 
