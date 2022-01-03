@@ -117,6 +117,8 @@ exports.changeQnALikeStatus = async (userIdx, qnaIdx) => {
       //현재 QnA 좋아요 status 확인
       const isQnALike = await likeDao.getQnALikeStatus(connection, userIdx, qnaIdx);
 
+      await connection.beginTransaction();
+
       //QnA status 변경
       if (isQnALike){
         await likeDao.deleteQnALike(connection, userIdx, qnaIdx);  //좋아요 눌렀을 경우 => delete record
@@ -124,6 +126,8 @@ exports.changeQnALikeStatus = async (userIdx, qnaIdx) => {
       else{
         await likeDao.createQnALike(connection, userIdx, qnaIdx);  //좋아요 아닐 경우 => create record
       }
+
+      await connection.commit();
 
       //QnA 총 좋아요 개수
       const totalQnALikeCnt = await likeDao.getTotalQnALikeCnt(connection, qnaIdx);
@@ -133,10 +137,7 @@ exports.changeQnALikeStatus = async (userIdx, qnaIdx) => {
         'isLike': isQnALike ? 'N' : 'Y',
         'totalLikeCnt': totalQnALikeCnt
       };
-
-      await connection.beginTransaction();
-
-      await connection.commit();
+      
       connection.release();
 
       return response(baseResponse.SUCCESS, result);
