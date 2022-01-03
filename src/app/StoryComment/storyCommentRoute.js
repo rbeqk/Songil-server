@@ -10,4 +10,7 @@ module.exports = function(app){
 
   //스토리 댓글 조회 API
   app.get('/with/stories/:storyIdx/comments', storyCommentController.getStoryComment);
+
+  //스토리 댓글 신고 API
+  app.post('/with/stories/comments/:commentIdx/reported', jwtMiddleware, storyCommentController.reportStoryComment);
 }

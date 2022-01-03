@@ -93,6 +93,38 @@ async function getStoryReComment(connection, parentIdx, userIdx){
   return rows;
 }
 
+//스토리 댓글 신고
+async function reportStoryComment(connection, storyCommentIdx, userIdx, reportedCommentReasonIdx, etcReason){
+  const query = `
+  INSERT INTO ReportedStoryComment(userIdx, storyCommentIdx, reportedCommentReasonIdx, etcContent)
+  VALUES (${userIdx}, ${storyCommentIdx}, ${reportedCommentReasonIdx}, ${etcReason});
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
+//사용자가 기존에 신고한 스토리 댓글 idx인지
+async function isExistUserReportedCommentIdx(connection, userIdx, storyCommentIdx){
+  const query = `
+  SELECT EXISTS(SELECT *
+    FROM ReportedStoryComment
+    WHERE userIdx = ${userIdx} && storyCommentIdx = ${storyCommentIdx}) as isExist;
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['isExist'];
+}
+
+//자기 댓글인지
+async function isUserStoryComment(connection, userIdx, storyCommentIdx){
+  const query = `
+  SELECT EXISTS(SELECT *
+    FROM StoryComment
+    WHERE storyCommentIdx = ${storyCommentIdx} && userIdx = ${userIdx} && isDeleted = 'N') as isExist;
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['isExist'];
+}
+
 module.exports = {
   createStoryComment,
   isExistStoryCommentParentIdx,
@@ -101,4 +133,7 @@ module.exports = {
   deleteStoryComment,
   getStoryParentComment,
   getStoryReComment,
+  reportStoryComment,
+  isExistUserReportedCommentIdx,
+  isUserStoryComment,
 }

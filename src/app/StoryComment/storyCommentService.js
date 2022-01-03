@@ -81,3 +81,42 @@ exports.deleteStoryComment = async (userIdx, storyCommentIdx) => {
     return errResponse(baseResponse.DB_ERROR);
   }
 }
+
+//스토리 댓글 신고
+exports.reportStoryComment = async (storyCommentIdx, userIdx, reportedCommentReasonIdx, etcReason) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+      
+      //존재하는 스토리 댓글 idx인지
+      const isExistStoryCommentIdx = await storyCommentDao.isExistStoryCommentIdx(connection, storyCommentIdx);
+      if (!isExistStoryCommentIdx) return errResponse(baseResponse.INVALID_STORY_COMMENT_IDX);
+
+      //사용자가 기존에 신고한 스토리 댓글 idx인지
+      const isExistUserReportedCommentIdx = await storyCommentDao.isExistUserReportedCommentIdx(connection, userIdx, storyCommentIdx);
+      if (isExistUserReportedCommentIdx) return errResponse(baseResponse.ALREADY_REPORTED_STORY_COMMENT_IDX);
+
+      //자기 댓글인지
+      const isUserStoryComment = await storyCommentDao.isUserStoryComment(connection, userIdx, storyCommentIdx);
+      if (isUserStoryComment) return errResponse(baseResponse.CAN_NOT_REPORT_SELF);
+
+      if (!etcReason) etcReason = null;
+
+      await connection.beginTransaction();
+      await storyCommentDao.reportStoryComment(connection, storyCommentIdx, userIdx, reportedCommentReasonIdx, etcReason);
+      await connection.commit();
+      
+      connection.release();
+      return response(baseResponse.SUCCESS);
+      
+    }catch(err){
+      await connection.rollback();
+      connection.release();
+      logger.error(`reportStoryComment DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`reportStoryComment DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}
