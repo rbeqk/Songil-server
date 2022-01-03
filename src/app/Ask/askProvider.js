@@ -40,7 +40,10 @@ exports.getAsk = async (params) => {
       
       const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
       const totalPages = (askCnt % pageItemCnt == 0) ? askCnt / pageItemCnt : parseInt(askCnt / pageItemCnt) + 1;  //총 페이지 수
-      if (page <= 0 || page > totalPages) return errResponse(baseResponse.INVALID_PAGE);  //존재하는 page인지
+      if (page <= 0 || page > totalPages){
+        connection.release();
+        return errResponse(baseResponse.INVALID_PAGE);  //존재하는 page인지
+      }
 
       let result = [];
       const startItemIdx = (page - 1) * pageItemCnt;

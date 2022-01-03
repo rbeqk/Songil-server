@@ -12,7 +12,10 @@ exports.getStoryCommentTotalPage = async (storyIdx) => {
 
       //존재하는 storyIdx인지
       const isExistStoryIdx = await storyDao.isExistStoryIdx(connection, storyIdx);
-      if (!isExistStoryIdx) return errResponse(baseResponse.INVALID_STORY_IDX);
+      if (!isExistStoryIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_STORY_IDX);
+      }
 
       const storyParentCommentCnt = await storyCommentDao.getStoryParentCommentCnt(connection, storyIdx);  //총 story Parent댓글 개수
       const storyReCommentCnt = await storyCommentDao.getStoryReCommentCnt(connection, storyIdx);  //총 story Re댓글 개수
@@ -45,7 +48,10 @@ exports.getStoryComment = async (storyIdx, userIdx, page) => {
 
       //존재하는 storyIdx인지
       const isExistStoryIdx = await storyDao.isExistStoryIdx(connection, storyIdx);
-      if (!isExistStoryIdx) return errResponse(baseResponse.INVALID_STORY_IDX);
+      if (!isExistStoryIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_STORY_IDX);
+      }
 
       const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
       const startItemIdx = (page - 1) * pageItemCnt;

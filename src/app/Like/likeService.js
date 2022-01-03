@@ -15,7 +15,10 @@ exports.changeCraftLikeStatus = async (userIdx, craftIdx) => {
       
       //존재하는 craftIdx인지
       const isExistCraftIdx = await craftDao.isExistCraftIdx(connection, craftIdx);
-      if (!isExistCraftIdx) return errResponse(baseResponse.INVALID_CRAFT_IDX);
+      if (!isExistCraftIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_CRAFT_IDX);
+      }
 
       //현재 상품 좋아요 status 확인
       const isCraftLike = await likeDao.craftIsLike(connection, userIdx, craftIdx);
@@ -59,7 +62,10 @@ exports.changeArticleLikeStuatus = async (userIdx, articleIdx) => {
       
       //존재하는 articleIdx인지
       const isExistArticleIdx = await articleDao.isExistArticleIdx(connection, articleIdx);
-      if (!isExistArticleIdx) return errResponse(baseResponse.INVALID_ARTICLE_IDX);
+      if (!isExistArticleIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_ARTICLE_IDX);
+      }
 
       //현재 아티클 좋아요 status 확인
       const isArticleLike = await likeDao.articleLikeStatus(connection, userIdx, articleIdx);

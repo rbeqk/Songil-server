@@ -52,11 +52,17 @@ exports.deleteStory = async (userIdx, storyIdx) => {
 
       //존재하는 스토리인지
       const isExistStoryIdx = await storyDao.isExistStoryIdx(connection, storyIdx);
-      if (!isExistStoryIdx) return errResponse(baseResponse.INVALID_STORY_IDX);
+      if (!isExistStoryIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_STORY_IDX);
+      }
 
       //스토리의 userIdx 가져오기
       const storyUserIdx = await storyDao.getStoryUserIdx(connection, storyIdx);
-      if (storyUserIdx !== userIdx) return errResponse(baseResponse.NO_PERMISSION);
+      if (storyUserIdx !== userIdx){
+        connection.release();
+        return errResponse(baseResponse.NO_PERMISSION);
+      }
       
       await connection.beginTransaction();
       await storyDao.deleteStory(connection, storyIdx);
@@ -85,11 +91,17 @@ exports.updateStory = async (storyIdx, userIdx, title, content, tag, imageArr) =
 
       //존재하는 스토리인지
       const isExistStoryIdx = await storyDao.isExistStoryIdx(connection, storyIdx);
-      if (!isExistStoryIdx) return errResponse(baseResponse.INVALID_STORY_IDX);
+      if (!isExistStoryIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_STORY_IDX);
+      }
 
       //스토리의 userIdx 가져오기
       const storyUserIdx = await storyDao.getStoryUserIdx(connection, storyIdx);
-      if (storyUserIdx !== userIdx) return errResponse(baseResponse.NO_PERMISSION);
+      if (storyUserIdx !== userIdx){
+        connection.release();
+        return errResponse(baseResponse.NO_PERMISSION);
+      }
       
       await connection.beginTransaction();
       

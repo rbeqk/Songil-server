@@ -11,7 +11,10 @@ exports.getCraftDetail = async (craftIdx) => {
 
       //존재하는 craftIdx인지
       const isExistCraftIdx = await craftDao.isExistCraftIdx(connection, craftIdx);
-      if (!isExistCraftIdx) return errResponse(baseResponse.INVALID_CRAFT_IDX);
+      if (!isExistCraftIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_CRAFT_IDX);
+      }
 
       //상세 정보
       const basicInfo = await craftDao.getCraftBasicInfo(connection, craftIdx);  //기본 정보
@@ -58,6 +61,8 @@ exports.getCraftDetail = async (craftIdx) => {
         'artistImageUrl': basicInfo.artistImageUrl,
         'totalCommentCnt': basicInfo.totalCommentCnt
       };
+
+      connection.release();
 
       return response(baseResponse.SUCCESS, result);
       

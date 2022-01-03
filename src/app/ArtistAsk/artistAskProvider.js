@@ -11,7 +11,10 @@ exports.getAskTotalPage = async (userIdx) => {
 
       //작가 여부
       const isArtist = await artistAskDao.isArtist(connection, userIdx);
-      if (!isArtist) return errResponse(baseResponse.NO_PERMISSION);
+      if (!isArtist){
+        connection.release();
+        return errResponse(baseResponse.NO_PERMISSION);
+      }
 
       //작가idx 가져오기
       const artistIdx = await artistAskDao.getArtistIdx(connection, userIdx);
@@ -44,7 +47,10 @@ exports.getAsk = async (userIdx, page) => {
 
       //작가 여부
       const isArtist = await artistAskDao.isArtist(connection, userIdx);
-      if (!isArtist) return errResponse(baseResponse.NO_PERMISSION);
+      if (!isArtist){
+        connection.release();
+        return errResponse(baseResponse.NO_PERMISSION);
+      }
 
       //작가idx 가져오기
       const artistIdx = await artistAskDao.getArtistIdx(connection, userIdx);
@@ -98,18 +104,27 @@ exports.getAskDetail = async (craftAskIdx, userIdx) => {
 
       //존재하는 craftAskIdx인지
       const isExistCraftAskIdx = await artistAskDao.isExistCraftAskIdx(connection, craftAskIdx);
-      if (!isExistCraftAskIdx) return errResponse(baseResponse.INVALID_ASK_IDX);
+      if (!isExistCraftAskIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_ASK_IDX);
+      }
 
       //작가 여부
       const isArtist = await artistAskDao.isArtist(connection, userIdx);
-      if (!isArtist) return errResponse(baseResponse.NO_PERMISSION);
+      if (!isArtist){
+        connection.release();
+        return errResponse(baseResponse.NO_PERMISSION);
+      }
 
       //작가idx 가져오기
       const artistIdx = await artistAskDao.getArtistIdx(connection, userIdx);
 
       //문의에 대한 작가 권한 확인
       const isArtistAsk = await artistAskDao.isArtistAsk(connection, craftAskIdx, artistIdx);
-      if (!isArtistAsk) return errResponse(baseResponse.NO_PERMISSION);
+      if (!isArtistAsk){
+        connection.release();
+        return errResponse(baseResponse.NO_PERMISSION);
+      }
 
       const askDetail = await artistAskDao.getAskDetail(connection, craftAskIdx);
 

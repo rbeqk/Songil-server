@@ -12,7 +12,10 @@ exports.getQnAComment = async (qnaIdx, userIdx, page) => {
 
       //존재하는 qna인지
       const isExistQnaIdx = await qnaDao.isExistQnaIdx(connection, qnaIdx);
-      if (!isExistQnaIdx) return errResponse(baseResponse.INVALID_QNA_IDX);
+      if (!isExistQnaIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_QNA_IDX);
+      }
 
       const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
       const startItemIdx = (page - 1) * pageItemCnt;

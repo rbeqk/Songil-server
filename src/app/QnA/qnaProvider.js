@@ -11,7 +11,10 @@ exports.getQnADetail = async (qnaIdx, userIdx) => {
 
       //존재하는 qna인지
       const isExistQnaIdx = await qnaDao.isExistQnaIdx(connection, qnaIdx);
-      if (!isExistQnaIdx) return errResponse(baseResponse.INVALID_QNA_IDX);
+      if (!isExistQnaIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_QNA_IDX);
+      }
 
       const qnaDetail = await qnaDao.getQnADetail(connection, qnaIdx, userIdx);
       

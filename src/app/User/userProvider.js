@@ -14,9 +14,11 @@ exports.checkDuplicated = async (params) => {
         const isExistPhone = await userDao.isExistPhone(connection, params[0]);
         connection.release();
         if (isExistPhone){
+          connection.release();
           return errResponse(baseResponse.DUPLICATED_PHONE);
         }
         else{
+          connection.release();
           return response(baseResponse.SUCCESS);
         }
       }
@@ -25,9 +27,11 @@ exports.checkDuplicated = async (params) => {
         const isExistNickname = await userDao.isExistNickname(connection, params[0]);
         connection.release();
         if (isExistNickname){
+          connection.release();
           return errResponse(baseResponse.DUPLICATED_NICKNAME);
         }
         else{
+          connection.release();
           return response(baseResponse.SUCCESS);
         }
       }
@@ -89,7 +93,10 @@ exports.getSessionData = async (params, type) => {
       connection.release();
       
       //세션에 저장된 정보가 아예 없을 때
-      if (!sessionData.length) return errResponse(baseResponse.GET_VERIFICATIONCODE_FIRST);
+      if (!sessionData.length){
+        connection.release();
+        return errResponse(baseResponse.GET_VERIFICATIONCODE_FIRST);
+      }
 
       let result = [];  //해당 번호에 대한 인증코드 목록
       sessionData.forEach(item => {
@@ -102,14 +109,26 @@ exports.getSessionData = async (params, type) => {
       });
 
       //해당 번호에 대한 인증번호 없을 때
-      if (!result.length) return errResponse(baseResponse.GET_VERIFICATIONCODE_FIRST);
+      if (!result.length){
+        connection.release();
+        return errResponse(baseResponse.GET_VERIFICATIONCODE_FIRST);
+      }
 
       //가장 최근에 받은 인증번호 = 유효
       if (result[0] === verificationCode){
-        if (type) return true;
-        else return response(baseResponse.SUCCESS);
+        if (type){
+          connection.release();
+          return true;
+        }
+        else{
+          connection.release();
+          return response(baseResponse.SUCCESS);
+        }
       }
-      else return errResponse(baseResponse.INVALD_VERIFICATIONCODE);  //만료 or 유효하지 않은 번호
+      else{
+        connection.release();
+        return errResponse(baseResponse.INVALD_VERIFICATIONCODE);  //만료 or 유효하지 않은 번호
+      }
 
     }catch(err){
       connection.release();

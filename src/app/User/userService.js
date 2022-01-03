@@ -13,11 +13,17 @@ exports.createUser = async (params) => {
     try{
       //핸드폰 번호 중복 확인
       const isExistPhone = await userDao.isExistPhone(connection, params[0]);
-      if (isExistPhone) return errResponse(baseResponse.DUPLICATED_PHONE);
+      if (isExistPhone){
+        connection.release();
+        return errResponse(baseResponse.DUPLICATED_PHONE);
+      }
 
       //닉네임 중복 확인
       const isExistNickname = await userDao.isExistNickname(connection, params[1]);
-      if (isExistNickname)  return errResponse(baseResponse.DUPLICATED_NICKNAME);
+      if (isExistNickname){
+        connection.release();
+        return errResponse(baseResponse.DUPLICATED_NICKNAME);
+      }
 
       await connection.beginTransaction();
 

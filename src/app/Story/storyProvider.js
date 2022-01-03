@@ -12,7 +12,10 @@ exports.getStoryDetail = async (storyIdx, userIdx) => {
       
       //존재하는 storyIdx인지
       const isExistStoryIdx = await storyDao.isExistStoryIdx(connection, storyIdx);
-      if (!isExistStoryIdx) return errResponse(baseResponse.INVALID_STORY_IDX);
+      if (!isExistStoryIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_STORY_IDX);
+      }
 
       const storyInfo = await storyDao.getStoryDetail(connection, storyIdx);
       const storyImage = await storyDao.getStoryImage(connection, storyIdx);

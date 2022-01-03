@@ -11,7 +11,10 @@ exports.createABTest = async (userIdx, content, deadline, imageArr) => {
 
       //작가의 userIdx인지
       const isArtistUserIdx = await abTestDao.isArtistUserIdx(connection, userIdx);
-      if (!isArtistUserIdx) return errResponse(baseResponse.NO_PERMISSION);
+      if (!isArtistUserIdx){
+        connection.release();
+        return errResponse(baseResponse.NO_PERMISSION);
+      }
 
       //작가idx 가져오기
       const artistIdx = await abTestDao.getArtistIdx(connection, userIdx);
@@ -43,15 +46,24 @@ exports.deleteABTest = async (userIdx, abTestIdx) => {
 
       //존재하는 abTestIdx인지
       const isExistABTestIdx = await abTestDao.isExistABTestIdx(connection, abTestIdx);
-      if (!isExistABTestIdx) return errResponse(baseResponse.INVALID_ABTEST_IDX);
+      if (!isExistABTestIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_ABTEST_IDX);
+      }
 
       //작가의 userIdx인지
       const isArtistUserIdx = await abTestDao.isArtistUserIdx(connection, userIdx);
-      if (!isArtistUserIdx) return errResponse(baseResponse.NO_PERMISSION);
+      if (!isArtistUserIdx){
+        connection.release();
+        return errResponse(baseResponse.NO_PERMISSION);
+      }
 
       //abTest 작가의 userIdx 가져오기
       const abTestUserIdx = await abTestDao.getAbTestUserIdx(connection, abTestIdx);
-      if (abTestUserIdx !== userIdx) return errResponse(baseResponse.NO_PERMISSION);
+      if (abTestUserIdx !== userIdx){
+        connection.release();
+        return errResponse(baseResponse.NO_PERMISSION);
+      }
       
       await connection.beginTransaction();
       await abTestDao.deleteABTest(connection, abTestIdx);
@@ -80,15 +92,24 @@ exports.voteABTest = async (userIdx, abTestIdx, vote) => {
 
       //존재하는 abTestIdx인지
       const isExistABTestIdx = await abTestDao.isExistABTestIdx(connection, abTestIdx);
-      if (!isExistABTestIdx) return errResponse(baseResponse.INVALID_ABTEST_IDX);
+      if (!isExistABTestIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_ABTEST_IDX);
+      }
 
       //투표 마감된 ABTest인지
       const isFinishedAbTest = await abTestDao.isFinishedAbTest(connection, abTestIdx);
-      if (isFinishedAbTest) return errResponse(baseResponse.ALREADY_FINISHED_ABTEST_IDX);
+      if (isFinishedAbTest){
+        connection.release();
+        return errResponse(baseResponse.ALREADY_FINISHED_ABTEST_IDX);
+      }
 
       //기존에 투표한 ABTest인지
       const isExistVoteResult = await abTestDao.isExistVoteResult(connection, userIdx, abTestIdx);
-      if (isExistVoteResult) return errResponse(baseResponse.ALREADY_VOTE_ABTEST_IDX);
+      if (isExistVoteResult){
+        connection.release();
+        return errResponse(baseResponse.ALREADY_VOTE_ABTEST_IDX);
+      }
 
       await connection.beginTransaction();
       await abTestDao.voteABTest(connection, userIdx, abTestIdx, vote);
@@ -117,15 +138,24 @@ exports.deleteVoteABTest = async (userIdx, abTestIdx) => {
 
       //존재하는 abTestIdx인지
       const isExistABTestIdx = await abTestDao.isExistABTestIdx(connection, abTestIdx);
-      if (!isExistABTestIdx) return errResponse(baseResponse.INVALID_ABTEST_IDX);
+      if (!isExistABTestIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_ABTEST_IDX);
+      }
 
       //투표 마감된 ABTest인지
       const isFinishedAbTest = await abTestDao.isFinishedAbTest(connection, abTestIdx);
-      if (isFinishedAbTest) return errResponse(baseResponse.ALREADY_FINISHED_ABTEST_IDX);
+      if (isFinishedAbTest){
+        connection.release();
+        return errResponse(baseResponse.ALREADY_FINISHED_ABTEST_IDX);
+      }
 
       //기존에 투표한 ABTest인지
       const isExistVoteResult = await abTestDao.isExistVoteResult(connection, userIdx, abTestIdx);
-      if (!isExistVoteResult) return errResponse(baseResponse.NO_VOTE_DATA);
+      if (!isExistVoteResult){
+        connection.release();
+        return errResponse(baseResponse.NO_VOTE_DATA);
+      }
 
       await connection.beginTransaction();
       await abTestDao.deleteVoteABTest(connection, userIdx, abTestIdx);
@@ -154,15 +184,24 @@ exports.updateABTest = async (userIdx, abTestIdx, content) => {
 
       //존재하는 abTestIdx인지
       const isExistABTestIdx = await abTestDao.isExistABTestIdx(connection, abTestIdx);
-      if (!isExistABTestIdx) return errResponse(baseResponse.INVALID_ABTEST_IDX);
+      if (!isExistABTestIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_ABTEST_IDX);
+      }
 
       //작가의 userIdx인지
       const isArtistUserIdx = await abTestDao.isArtistUserIdx(connection, userIdx);
-      if (!isArtistUserIdx) return errResponse(baseResponse.NO_PERMISSION);
+      if (!isArtistUserIdx){
+        connection.release();
+        return errResponse(baseResponse.NO_PERMISSION);
+      }
 
       //abTest 작가의 userIdx 가져오기
       const abTestUserIdx = await abTestDao.getAbTestUserIdx(connection, abTestIdx);
-      if (abTestUserIdx !== userIdx) return errResponse(baseResponse.NO_PERMISSION);
+      if (abTestUserIdx !== userIdx){
+        connection.release();
+        return errResponse(baseResponse.NO_PERMISSION);
+      }
 
       await connection.beginTransaction();
       await abTestDao.updateABTest(connection, abTestIdx, content);

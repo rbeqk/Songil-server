@@ -55,11 +55,17 @@ exports.deleteStoryComment = async (userIdx, storyCommentIdx) => {
       
       //존재하는 스토리 댓글 idx인지
       const isExistStoryCommentIdx = await storyCommentDao.isExistStoryCommentIdx(connection, storyCommentIdx);
-      if (!isExistStoryCommentIdx) return errResponse(baseResponse.INVALID_STORY_COMMENT_IDX);
+      if (!isExistStoryCommentIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_STORY_COMMENT_IDX);
+      }
 
       //스토리 댓글의 userIdx 가져오기
       const storyCommentUserIdx = await storyCommentDao.getStoryCommentUserIdx(connection, storyCommentIdx);
-      if (userIdx !== storyCommentUserIdx) return errResponse(baseResponse.NO_PERMISSION);
+      if (userIdx !== storyCommentUserIdx){
+        connection.release();
+        return errResponse(baseResponse.NO_PERMISSION);
+      }
 
       await connection.beginTransaction();
       await storyCommentDao.deleteStoryComment(connection, storyCommentIdx);
@@ -88,15 +94,24 @@ exports.reportStoryComment = async (storyCommentIdx, userIdx, reportedCommentRea
       
       //존재하는 스토리 댓글 idx인지
       const isExistStoryCommentIdx = await storyCommentDao.isExistStoryCommentIdx(connection, storyCommentIdx);
-      if (!isExistStoryCommentIdx) return errResponse(baseResponse.INVALID_STORY_COMMENT_IDX);
+      if (!isExistStoryCommentIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_STORY_COMMENT_IDX);
+      }
 
       //사용자가 기존에 신고한 스토리 댓글 idx인지
       const isExistUserReportedCommentIdx = await storyCommentDao.isExistUserReportedCommentIdx(connection, userIdx, storyCommentIdx);
-      if (isExistUserReportedCommentIdx) return errResponse(baseResponse.ALREADY_REPORTED_STORY_COMMENT_IDX);
+      if (isExistUserReportedCommentIdx){
+        connection.release();
+        return errResponse(baseResponse.ALREADY_REPORTED_STORY_COMMENT_IDX);
+      }
 
       //자기 댓글인지
       const isUserStoryComment = await storyCommentDao.isUserStoryComment(connection, userIdx, storyCommentIdx);
-      if (isUserStoryComment) return errResponse(baseResponse.CAN_NOT_REPORT_SELF);
+      if (isUserStoryComment){
+        connection.release();
+        return errResponse(baseResponse.CAN_NOT_REPORT_SELF);
+      }
 
       if (!etcReason) etcReason = null;
 

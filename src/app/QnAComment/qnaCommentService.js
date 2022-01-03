@@ -57,11 +57,17 @@ exports.deleteQnAComment = async (userIdx, qnaCommentIdx) => {
       
       //존재하는 QnA 댓글 idx인지
       const isExistSQnACommentIdx = await qnaCommentDao.isExistSQnACommentIdx(connection, qnaCommentIdx);
-      if (!isExistSQnACommentIdx) return errResponse(baseResponse.INVALID_QNA_COMMENT_IDX);
+      if (!isExistSQnACommentIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_QNA_COMMENT_IDX);
+      }
 
       //QnA 댓글의 userIdx 가져오기
       const qnaCommentUserIdx = await qnaCommentDao.getQnACommentUserIdx(connection, qnaCommentIdx);
-      if (userIdx !== qnaCommentUserIdx) return errResponse(baseResponse.NO_PERMISSION);
+      if (userIdx !== qnaCommentUserIdx){
+        connection.release();
+        return errResponse(baseResponse.NO_PERMISSION);
+      }
 
       await connection.beginTransaction();
       await qnaCommentDao.deleteStoryComment(connection, qnaCommentIdx);

@@ -13,7 +13,10 @@ exports.createCraftAsk = async (userIdx, craftIdx, content) => {
 
       //존재하는 상품인지 확인
       const isExistCraftIdx = await craftDao.isExistCraftIdx(connection, craftIdx);
-      if (!isExistCraftIdx) return errResponse(baseResponse.INVALID_CRAFT_IDX);
+      if (!isExistCraftIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_CRAFT_IDX);
+      }
 
       //1:1 문의 작성
       await connection.beginTransaction();

@@ -57,11 +57,17 @@ exports.deleteABTestComment = async (userIdx, abTestCommentIdx) => {
       
       //존재하는 abTest 댓글 idx인지
       const isExistABTestCommentIdx = await abTestCommentDao.isExistABTestCommentIdx(connection, abTestCommentIdx);
-      if (!isExistABTestCommentIdx) return errResponse(baseResponse.INVALID_ABTEST_COMMENT_IDX);
+      if (!isExistABTestCommentIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_ABTEST_COMMENT_IDX);
+      }
 
       //abTest 댓글의 userIdx 가져오기
       const abTestCommentUserIdx = await abTestCommentDao.getABTestommentUserIdx(connection, abTestCommentIdx);
-      if (userIdx !== abTestCommentUserIdx) return errResponse(baseResponse.NO_PERMISSION);
+      if (userIdx !== abTestCommentUserIdx){
+        connection.release();
+        return errResponse(baseResponse.NO_PERMISSION);
+      }
 
       await connection.beginTransaction();
       await abTestCommentDao.deleteABTestomment(connection, abTestCommentIdx);

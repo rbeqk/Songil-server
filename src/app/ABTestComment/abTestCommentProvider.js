@@ -12,7 +12,10 @@ exports.getABTestComment = async (abTestIdx, userIdx, page) => {
 
       //존재하는 abTestIdx인지
       const isExistABTestIdx = await abTestDao.isExistABTestIdx(connection, abTestIdx);
-      if (!isExistABTestIdx) return errResponse(baseResponse.INVALID_ABTEST_IDX);
+      if (!isExistABTestIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_ABTEST_IDX);
+      }
 
       const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
       const startItemIdx = (page - 1) * pageItemCnt;

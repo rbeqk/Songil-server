@@ -12,7 +12,10 @@ exports.getCommentTotalPage = async (craftIdx, type) => {
       
       //존재하는 craftIdx인지
       const isExistCraftIdx = await craftDao.isExistCraftIdx(connection, craftIdx);
-      if (!isExistCraftIdx) return errResponse(baseResponse.INVALID_CRAFT_IDX);
+      if (!isExistCraftIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_CRAFT_IDX);
+      }
 
       let commentCnt;
       
@@ -52,7 +55,10 @@ exports.getComment = async (craftIdx, page, type) => {
       
       //존재하는 craftIdx인지
       const isExistCraftIdx = await craftDao.isExistCraftIdx(connection, craftIdx);
-      if (!isExistCraftIdx) return errResponse(baseResponse.INVALID_CRAFT_IDX);
+      if (!isExistCraftIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_CRAFT_IDX);
+      }
       
       let commentCnt;
 

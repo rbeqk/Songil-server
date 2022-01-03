@@ -46,7 +46,10 @@ exports.getArticleDetail = async (articleIdx, userIdx) => {
 
       //존재하는 articleIdx인지
       const isExistArticleIdx = await articleDao.isExistArticleIdx(connection, articleIdx);
-      if (!isExistArticleIdx) return errResponse(baseResponse.INVALID_ARTICLE_IDX);
+      if (!isExistArticleIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_ARTICLE_IDX);
+      }
       
       //아티클 기본 정보 가져오기
       const articleDetailInfo = await articleDao.getArticleDetail(connection, articleIdx, userIdx);

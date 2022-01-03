@@ -11,13 +11,19 @@ exports.deleteUserRecentlySearch = async (userIdx, word) => {
 
       //word의 searchIdx가져오기
       const getSearchIdx = await searchDao.getSearchIdx(connection, word);
-      if (!getSearchIdx) return errResponse(baseResponse.INVALID_USER_SEARCH_IDX);
+      if (!getSearchIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_USER_SEARCH_IDX);
+      }
       
       const searchIdx = getSearchIdx.searchIdx;
       
       //유효한 user의 word인지
       const isExistUserSearchIdx = await searchDao.isExistUserSearchIdx(connection, userIdx, searchIdx);
-      if (!isExistUserSearchIdx) return errResponse(baseResponse.INVALID_USER_SEARCH_IDX);
+      if (!isExistUserSearchIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_USER_SEARCH_IDX);
+      }
       
       await connection.beginTransaction();
 
@@ -47,7 +53,10 @@ exports.deleteAllUserRecentlySearch = async (userIdx) => {
       
       //user의 지울 검색어가 있는지
       const isExistUserSearchs = await searchDao.isExistUserSearchs(connection, userIdx);
-      if (!isExistUserSearchs) return errResponse(baseResponse.EMPTY_USER_SEARCH);
+      if (!isExistUserSearchs){
+        connection.release();
+        return errResponse(baseResponse.EMPTY_USER_SEARCH);
+      }
       
       await connection.beginTransaction();
 

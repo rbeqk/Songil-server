@@ -44,11 +44,17 @@ exports.deleteQnA = async (userIdx, qnaIdx) => {
 
       //존재하는 qna인지
       const isExistQnaIdx = await qnaDao.isExistQnaIdx(connection, qnaIdx);
-      if (!isExistQnaIdx) return errResponse(baseResponse.INVALID_QNA_IDX);
+      if (!isExistQnaIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_QNA_IDX);
+      }
 
       //qna의 userIdx 가져오기
       const qnaUserIdx = await qnaDao.getStoryUserIdx(connection, qnaIdx);
-      if (qnaUserIdx !== userIdx) return errResponse(baseResponse.NO_PERMISSION);
+      if (qnaUserIdx !== userIdx){
+        connection.release();
+        return errResponse(baseResponse.NO_PERMISSION);
+      }
       
       await connection.beginTransaction();
       await qnaDao.deleteQnA(connection, qnaIdx);
@@ -77,11 +83,17 @@ exports.updateQnA = async (userIdx, qnaIdx, title, content) => {
 
       //존재하는 qna인지
       const isExistQnaIdx = await qnaDao.isExistQnaIdx(connection, qnaIdx);
-      if (!isExistQnaIdx) return errResponse(baseResponse.INVALID_QNA_IDX);
+      if (!isExistQnaIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_QNA_IDX);
+      }
 
       //qna의 userIdx 가져오기
       const qnaUserIdx = await qnaDao.getStoryUserIdx(connection, qnaIdx);
-      if (qnaUserIdx !== userIdx) return errResponse(baseResponse.NO_PERMISSION);
+      if (qnaUserIdx !== userIdx){
+        connection.release();
+        return errResponse(baseResponse.NO_PERMISSION);
+      }
       
       await connection.beginTransaction();
       await qnaDao.updateQnA(connection, qnaIdx, title, content);
