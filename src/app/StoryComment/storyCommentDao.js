@@ -3,7 +3,7 @@ async function isExistStoryCommentParentIdx(connection, parentIdx){
   const query = `
   SELECT EXISTS(SELECT storyCommentIdx
     FROM StoryComment
-    WHERE storyCommentIdx = ${parentIdx} && isDeleted = 'N' && parentIdx IS NULL) as isExist;
+    WHERE storyCommentIdx = ${parentIdx} && parentIdx IS NULL) as isExist;
   `;
   const [rows] = await connection.query(query);
   return rows[0]['isExist'];

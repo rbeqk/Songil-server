@@ -1,7 +1,6 @@
 const storyCommentProvider = require("./storyCommentProvider");
 const storyCommentService = require("./storyCommentService");
 const baseResponse = require("../../../config/baseResponseStatus");
-const {response} = require("../../../config/response");
 const {errResponse} = require("../../../config/response");
 const {getUserIdx} = require('../../../config/userInfo');
 

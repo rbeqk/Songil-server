@@ -26,9 +26,7 @@ exports.createStoryComment = async (userIdx, storyIdx, parentIdx, comment) => {
         }
       }
       
-      if (!parentIdx){
-        parentIdx = null; //없을 경우 null로 변경
-      }
+      if (!parentIdx) parentIdx = null;
 
       await connection.beginTransaction();
       await storyCommentDao.createStoryComment(connection, storyIdx, userIdx, parentIdx, comment);
