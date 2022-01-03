@@ -86,7 +86,7 @@ exports.createCraftComment = async (req, res) => {
   if (comment.length > 500) return res.send(errResponse(baseResponse.EXCEED_CRAFT_COMMENT));
 
   const imageArr = req.files.map(item => item.location);
-  //TODO: 사진 개수 제한 에러 추가
+  if (imageArr.length > 3) return res.send(errResponse(baseResponse.EXCEED_IMAGE_QUANTITY));
 
   const createCraftComment = await craftCommentService.createCraftComment(craftIdx, userIdx, comment, imageArr);
 
