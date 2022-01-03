@@ -19,7 +19,7 @@ exports.getStoryDetail = async (storyIdx, userIdx) => {
       const storyImageArr = storyImage.map(item => item.imageUrl);
 
       const storyTag = await storyDao.getStoryTag(connection, storyIdx);
-      const storyTagArr = storyTag.length > 0 ? storyTag.map(item => item.tag) : [];
+      const storyTagArr = storyTag.map(item => item.tag);
 
       const result = {
         'storyIdx': storyInfo.storyIdx,

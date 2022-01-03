@@ -1,7 +1,6 @@
 const storyProvider = require("./storyProvider");
 const storyService = require("./storyService");
 const baseResponse = require("../../../config/baseResponseStatus");
-const {response} = require("../../../config/response");
 const {errResponse} = require("../../../config/response");
 const {getUserIdx} = require('../../../config/userInfo');
 
@@ -32,7 +31,7 @@ exports.createStory = async (req, res) => {
   const {userIdx} = req.verifiedToken;
   const {title, content, tag} = req.body;
 
-  if (!(title && content) || req.files.length < 1) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (!(title && content && req.files.length < 1)) return res.send(errResponse(baseResponse.IS_EMPTY));
 
   if (req.files.length > 3) return res.send(errResponse(baseResponse.EXCEED_IMAGE_QUANTITY));
 
@@ -72,17 +71,15 @@ exports.updateStory = async (req, res) => {
   const {title, content, tag} = req.body;
   const {storyIdx} = req.params;
 
-  if (!(title || content || tag || req.files)) return res.send(errResponse(baseResponse.UPDATE_INFO_EMPTY));
+  if (!(title || content || tag || req.files.length < 1)) return res.send(errResponse(baseResponse.UPDATE_INFO_EMPTY));
+
+  if (req.files.length > 3) return res.send(errResponse(baseResponse.EXCEED_IMAGE_QUANTITY));
 
   if (title && title.length > 100) return res.send(errResponse(baseResponse.EXCEED_STORY_TITLE));
   if (content && content.length > 2000) return res.send(errResponse(baseResponse.EXCEED_STORY_CONTENT));
   if (tag && tag.length > 3) return res.send(errResponse(baseResponse.EXCEED_STORY_TAG));
 
-  let imageArr;
-  if (req.files?.length){
-    if (req.files.length > 3) return res.send(errResponse(baseResponse.EXCEED_IMAGE_QUANTITY));
-    imageArr = req.files.map(item => item.location);
-  }
+  const imageArr = req.files.map(item => item.location);
 
   const updateStory = await storyService.updateStory(storyIdx, userIdx, title, content, tag, imageArr);
 
