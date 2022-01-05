@@ -97,9 +97,9 @@ async function getStoryReComment(connection, parentIdx, userIdx){
 async function reportStoryComment(connection, storyCommentIdx, userIdx, reportedCommentReasonIdx, etcReason){
   const query = `
   INSERT INTO ReportedStoryComment(userIdx, storyCommentIdx, reportedCommentReasonIdx, etcContent)
-  VALUES (${userIdx}, ${storyCommentIdx}, ${reportedCommentReasonIdx}, ${etcReason});
+  VALUES (${userIdx}, ${storyCommentIdx}, ${reportedCommentReasonIdx}, IFNULL(?, NULL));
   `;
-  const [rows] = await connection.query(query);
+  const [rows] = await connection.query(query, [etcReason]);
   return rows;
 }
 

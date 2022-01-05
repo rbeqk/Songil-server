@@ -25,8 +25,6 @@ exports.reportComment = async (userIdx, craftCommentIdx, reportedCommentReasonId
       await connection.beginTransaction();
 
       //댓글 신고
-      if (!etcReason) etcReason = null;
-
       await craftCommentDao.reportComment(connection, userIdx, craftCommentIdx, reportedCommentReasonIdx, etcReason);
       await connection.commit();
 

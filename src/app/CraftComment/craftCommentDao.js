@@ -106,9 +106,9 @@ async function isUserCraftComment(connection, userIdx, craftCommentIdx){
 async function reportComment(connection, userIdx, craftCommentIdx, reportedCommentReasonIdx, etcReason){
   const query = `
   INSERT INTO ReportedCraftComment(userIdx, craftCommentIdx, reportedCommentReasonIdx, etcContent)
-  VALUES (${userIdx}, ${craftCommentIdx}, ${reportedCommentReasonIdx}, ${etcReason});
+  VALUES (${userIdx}, ${craftCommentIdx}, ${reportedCommentReasonIdx}, IFNULL(?, NULL));
   `;
-  const [rows] = await connection.query(query);
+  const [rows] = await connection.query(query, [etcReason]);
   return rows;
 }
 

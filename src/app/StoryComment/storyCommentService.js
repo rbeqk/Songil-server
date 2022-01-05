@@ -113,8 +113,6 @@ exports.reportStoryComment = async (storyCommentIdx, userIdx, reportedCommentRea
         return errResponse(baseResponse.CAN_NOT_REPORT_SELF);
       }
 
-      if (!etcReason) etcReason = null;
-
       await connection.beginTransaction();
       await storyCommentDao.reportStoryComment(connection, storyCommentIdx, userIdx, reportedCommentReasonIdx, etcReason);
       await connection.commit();
