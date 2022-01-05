@@ -4,7 +4,7 @@ const {logger} = require('../config/winston');
 //투표 최종 결과 가져오기
 const getABTestFinalInfo = async (connection, abTestIdx) => {
   try{
-    let result = {};
+    let result = null;
 
     const finalInfo = await abTestDao.getFinalVoteInfo(connection, abTestIdx);
 
@@ -56,7 +56,7 @@ const getABTestFinalInfo = async (connection, abTestIdx) => {
 //유저의 투표 정보 가져오기
 const getUserVoteInfo = async (connection, userIdx, abTestIdx) => {
   try{
-    let result = {};
+    let result = null;
 
     //유저의 투표 여부 및 투표 이미지 정보
     const userVote = await abTestDao.getUserVote(connection, abTestIdx, userIdx);

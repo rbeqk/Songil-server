@@ -141,15 +141,23 @@ exports.getWith = async (category, sort, page, userIdx) => {
         for (let item of abTest){
 
           //투표 결과 가져오기
-          let finalInfo = {};
+          let finalInfo = null;
           if (item.isFinished === 'Y'){
             finalInfo = await getABTestFinalInfo(connection, item.abTestIdx);
+            if (finalInfo === false){
+              connection.release();
+              return errResponse(baseResponse.DB_ERROR);
+            }
           }
           
           //유저의 투표 정보 가져오기
-          let voteInfo = {};
+          let voteInfo = null;
           if (userIdx != -1){
             voteInfo = await getUserVoteInfo(connection, userIdx, item.abTestIdx);
+            if (voteInfo === false){
+              connection.release();
+              return errResponse(baseResponse.DB_ERROR);
+            }
           }
           
           result.push({
