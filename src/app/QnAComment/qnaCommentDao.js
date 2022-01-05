@@ -114,6 +114,17 @@ async function isExistUserReportedCommentIdx(connection, userIdx, qnaCommentIdx)
   return rows[0]['isExist'];
 }
 
+//자기 QnA 댓글인지
+async function isUserQnAComment(connection, userIdx, qnaCommentIdx){
+  const query = `
+  SELECT EXISTS(SELECT *
+    FROM QnAComment
+    WHERE userIdx = ${userIdx} && qnaCommentIdx = ${qnaCommentIdx} && isDeleted = 'N') as isExist;
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['isExist'];
+}
+
 module.exports = {
   isExistQnACommentParentIdx,
   createQnAComment,
@@ -124,4 +135,5 @@ module.exports = {
   getQnARecomment,
   reportQnAComment,
   isExistUserReportedCommentIdx,
+  isUserQnAComment,
 }

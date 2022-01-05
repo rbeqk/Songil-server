@@ -108,6 +108,13 @@ exports.reportQnAComment = async (qnaCommentIdx, userIdx, reportedCommentReasonI
         return errResponse(baseResponse.ALREADY_REPORTED_COMMENT_IDX);
       }
 
+      //자기 댓글인지
+      const isUserQnAComment = await qnaCommentDao.isUserQnAComment(connection, userIdx, qnaCommentIdx);
+      if (isUserQnAComment){
+        connection.release();
+        return errResponse(baseResponse.CAN_NOT_REPORT_SELF);
+      }
+
       await connection.beginTransaction();
       await qnaCommentDao.reportQnAComment(connection, qnaCommentIdx, userIdx, reportedCommentReasonIdx, etcReason);
       await connection.commit();
