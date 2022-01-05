@@ -10,4 +10,7 @@ module.exports = function(app){
 
   //QnA 댓글 조회 API
   app.get('/with/qna/:qnaIdx/comments', qnaCommentController.getQnAComment);
+
+  //QnA 댓글 신고 API
+  app.post('/with/qna/comments/:commentIdx/reported', jwtMiddleware, qnaCommentController.reportQnAComment);
 }

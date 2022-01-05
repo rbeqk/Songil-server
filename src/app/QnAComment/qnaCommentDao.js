@@ -93,6 +93,27 @@ async function getQnARecomment(connection, parentIdx, userIdx){
   return rows;
 }
 
+//QnA 댓글 신고
+async function reportQnAComment(connection, qnaCommentIdx, userIdx, reportedCommentReasonIdx, etcReason){
+  const query = `
+  INSERT INTO ReportedQnAComment(userIdx, qnaCommentIdx, reportedCommentReasonIdx, etcContent)
+  VALUES (${userIdx}, ${qnaCommentIdx}, ${reportedCommentReasonIdx}, IFNULL(?, NULL));
+  `;
+  const [rows] = await connection.query(query, [etcReason]);
+  return rows;
+}
+
+//사용자가 기존에 신고한 QnA 댓글 idx인지
+async function isExistUserReportedCommentIdx(connection, userIdx, qnaCommentIdx){
+  const query = `
+  SELECT EXISTS(SELECT *
+    FROM ReportedQnAComment
+    WHERE userIdx = ${userIdx} && qnaCommentIdx = ${qnaCommentIdx}) as isExist;
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['isExist'];
+}
+
 module.exports = {
   isExistQnACommentParentIdx,
   createQnAComment,
@@ -101,4 +122,6 @@ module.exports = {
   deleteStoryComment,
   getQnAParentComment,
   getQnARecomment,
+  reportQnAComment,
+  isExistUserReportedCommentIdx,
 }
