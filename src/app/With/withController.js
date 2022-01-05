@@ -40,12 +40,13 @@ exports.getWith = async (req, res) => {
   const {category, sort, page} = req.query;
   const token = req.headers['x-access-token'];
 
-  if (!(category && sort && page)) return res.send(errResponse(baseResponseStatus.IS_EMPTY));
+  if (!(category && page)) return res.send(errResponse(baseResponseStatus.IS_EMPTY));
   if (!['story', 'qna', 'ab-test'].includes(category)) return res.send(errResponse(baseResponseStatus.INVALID_CATEGORY_NAME));
-  if (!['popular', 'new'].includes(sort)) return res.send(errResponse(baseResponseStatus.INVALID_SORT_NAME));
+  if (['story', 'qna'].includes(category) && !sort) return res.send(errResponse(baseResponseStatus.IS_EMPTY));
+  if (sort && !['popular', 'new'].includes(sort)) return res.send(errResponse(baseResponseStatus.INVALID_SORT_NAME));
 
   const userIdx = getUserIdx(token);
-  if (userIdx === false) return res.send(errResponse(baseResponse.TOKEN_VERIFICATION_FAILURE));
+  if (userIdx === false) return res.send(errResponse(baseResponseStatus.TOKEN_VERIFICATION_FAILURE));
 
   const getWith = await withProvider.getWith(category, sort, page, userIdx);
 

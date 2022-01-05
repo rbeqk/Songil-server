@@ -3,6 +3,7 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
+const {getABTestFinalInfo, getUserVoteInfo} = require('../../../modules/abTestUtil');
 
 exports.getHotTalk = async () => {
   try{
@@ -134,7 +135,39 @@ exports.getWith = async (category, sort, page, userIdx) => {
 
       }
       else if (category === 'ab-test'){
-        
+        result = [];
+        const abTest = await withDao.getABTest(connection, startItemIdx, pageItemCnt);
+
+        for (let item of abTest){
+
+          //투표 결과 가져오기
+          let finalInfo = {};
+          if (item.isFinished === 'Y'){
+            finalInfo = await getABTestFinalInfo(connection, item.abTestIdx);
+          }
+          
+          //유저의 투표 정보 가져오기
+          let voteInfo = {};
+          if (userIdx != -1){
+            voteInfo = await getUserVoteInfo(connection, userIdx, item.abTestIdx);
+          }
+          
+          result.push({
+            'abTestIdx': item.abTestIdx,
+            'artistIdx': item.artistIdx,
+            'artistImageUrl': item.artistImageUrl,
+            'content': item.content,
+            'imageA': item.imageA,
+            'imageB': item.imageB,
+            'deadline': item.deadline,
+            'isFinished': item.isFinished,
+            'totalCommentCnt': item.totalCommentCnt,
+            'voteInfo': voteInfo,
+            'finalInfo': finalInfo
+          });
+        }
+
+        result.reverse();
       }
 
       connection.release();

@@ -115,6 +115,31 @@ async function getQnA(connection, userIdx, sort, startItemIdx, pageItemCnt){
   return rows;
 }
 
+async function getABTest(connection, startItemIdx, pageItemCnt){
+  const query = `
+  SELECT AB.abTestIdx,
+        AB.artistIdx,
+        U.imageUrl                                                  as artistImageUrl,
+        U.nickname                                                  as artistName,
+        AB.content,
+        AB.imageA,
+        AB.imageB,
+        DATE_FORMAT(AB.deadline, '%Y.%m.%d')                        as deadline,
+        (SELECT COUNT(*) as totalCommentCnt
+          FROM ABTestComment ABC
+          WHERE ABC.abTestIdx = AB.abTestIdx && ABC.isDeleted = 'N') as totalCommentCnt,
+        IF(TIMESTAMPDIFF(SECOND, NOW(), deadline) < 0, 'Y', 'N')    as isFinished
+  FROM ABTest AB
+          JOIN Artist A ON A.artistIdx = AB.artistIdx && A.isDeleted = 'N'
+          JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
+  WHERE AB.isDeleted = 'N'
+  ORDER BY isFinished = 'N' DESC
+  LIMIT ${startItemIdx}, ${pageItemCnt};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   getHotTalk,
   getStoryTotalCnt,
@@ -122,4 +147,5 @@ module.exports = {
   getABTestTotalCnt,
   getStory,
   getQnA,
+  getABTest,
 }
