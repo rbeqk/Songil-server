@@ -2,7 +2,7 @@ const storyCommentProvider = require("./storyCommentProvider");
 const storyCommentService = require("./storyCommentService");
 const baseResponse = require("../../../config/baseResponseStatus");
 const {errResponse} = require("../../../config/response");
-const {getUserIdx} = require('../../../config/userInfo');
+const {getUserIdx} = require('../../../modules/userUtil');
 
 /*
   API No. 5.13

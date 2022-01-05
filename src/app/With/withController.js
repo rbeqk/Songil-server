@@ -1,7 +1,7 @@
 const baseResponseStatus = require('../../../config/baseResponseStatus');
 const { errResponse } = require('../../../config/response');
 const withProvider = require("./withProvider");
-const {getUserIdx} = require('../../../config/userInfo');
+const {getUserIdx} = require('../../../modules/userUtil');
 
 /*
   API No. 5.1

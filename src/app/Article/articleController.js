@@ -3,7 +3,7 @@ const articleProvider = require('./articleProvider');
 const baseResponse = require("../../../config/baseResponseStatus");
 const {response} = require("../../../config/response");
 const {errResponse} = require("../../../config/response");
-const {getUserIdx} = require('../../../config/userInfo');
+const {getUserIdx} = require('../../../modules/userUtil');
 
 /*
   API No. 4.1

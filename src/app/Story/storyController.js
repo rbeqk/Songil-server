@@ -2,7 +2,7 @@ const storyProvider = require("./storyProvider");
 const storyService = require("./storyService");
 const baseResponse = require("../../../config/baseResponseStatus");
 const {errResponse} = require("../../../config/response");
-const {getUserIdx} = require('../../../config/userInfo');
+const {getUserIdx} = require('../../../modules/userUtil');
 
 /*
   API No. 5.4
