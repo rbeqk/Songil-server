@@ -21,7 +21,7 @@ exports.reportComment = async (userIdx, craftCommentIdx, reportedCommentReasonId
       const isExistUserReportedCommentIdx = await craftCommentDao.isExistUserReportedCommentIdx(connection, userIdx, craftCommentIdx);
       if (isExistUserReportedCommentIdx){
         connection.release();
-        return errResponse(baseResponse.ALREADY_REPORTED_CRAFT_COMMENT_IDX);
+        return errResponse(baseResponse.ALREADY_REPORTED_COMMENT_IDX);
       }
 
       //자기 댓글인지

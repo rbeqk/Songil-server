@@ -98,6 +98,38 @@ async function getABTestReComment(connection, abTestIdx, parentIdx, userIdx){
   return rows;
 }
 
+//사용자가 기존에 신고한 ABTest 댓글 idx인지
+async function isExistUserReportedCommentIdx(connection, userIdx, abTestCommentIdx){
+  const query = `
+  SELECT EXISTS(SELECT *
+    FROM ReportedABTestComment
+    WHERE userIdx = ${userIdx} && abTestCommentIdx = ${abTestCommentIdx}) as isExist;
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['isExist'];
+}
+
+//자기 댓글인지
+async function isUserABTestComment(connection, userIdx, abTestCommentIdx){
+  const query = `
+  SELECT EXISTS(SELECT *
+    FROM ABTestComment
+    WHERE userIdx = ${userIdx} && abTestCommentIdx = ${abTestCommentIdx} && isDeleted = 'N') as isExist;
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['isExist'];
+}
+
+//ABTest 댓글 신고
+async function reportABTestComment(connection, abTestCommentIdx, userIdx, reportedCommentReasonIdx, etcReason){
+  const query = `
+  INSERT INTO ReportedABTestComment(userIdx, abTestCommentIdx, reportedCommentReasonIdx, etcContent)
+  VALUES (${userIdx}, ${abTestCommentIdx}, ${reportedCommentReasonIdx}, IFNULL(?, NULL));
+  `;
+  const [rows] = await connection.query(query, [etcReason]);
+  return rows;
+}
+
 module.exports = {
   isExistABTestCommentParentIdx,
   createABTestComment,
@@ -106,4 +138,7 @@ module.exports = {
   deleteABTestomment,
   getABTestParentComment,
   getABTestReComment,
+  isExistUserReportedCommentIdx,
+  isUserABTestComment,
+  reportABTestComment,
 }

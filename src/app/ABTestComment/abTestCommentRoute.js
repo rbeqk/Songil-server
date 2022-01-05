@@ -10,4 +10,7 @@ module.exports = function (app){
 
   //AB Test 댓글 조회 API
   app.get('/with/ab-test/:abTestIdx/comments', abTestCommentController.getABTestComment);
+
+  //AB Test 댓글 신고 API
+  app.post('/with/ab-test/comments/:commentIdx/reported', jwtMiddleware, abTestCommentController.reportABTestComment);
 }

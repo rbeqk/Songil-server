@@ -58,3 +58,30 @@ exports.getABTestComment = async (req, res) => {
 
   return res.send(getABTestComment);
 }
+
+/*
+  API No. 5.31
+  API Name: AB Test 댓글 신고 API
+  [POST] /with/ab-test/comments/:commentIdx/reported
+  body: reportedReasonIdx, etcReason
+*/
+exports.reportABTestComment = async (req, res) => {
+  const {commentIdx: abTestCommentIdx} = req.params;
+  const {userIdx} = req.verifiedToken;
+  const {reportedReasonIdx: reportedCommentReasonIdx, etcReason} = req.body;
+
+  if (!reportedCommentReasonIdx) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (reportedCommentReasonIdx < 1 || reportedCommentReasonIdx > 7) return res.send(errResponse(baseResponse.INVALID_REPORTED_REASON_IDX));
+
+  //직접입력 시 사유가 없을 때
+  if (reportedCommentReasonIdx == 7 && !etcReason) return res.send(errResponse(baseResponse.IS_EMPTY));
+
+  //직접입력 아닐 시 사유가 있을 때
+  if (reportedCommentReasonIdx != 7 && etcReason) return res.send(errResponse(baseResponse.SELECT_ANOTHER_ETC_REASON_IDX));
+
+  //직접입력 시 글자수 초과
+  if (etcReason && etcReason.length > 150) return res.send(errResponse(baseResponse.EXCEED_REPORTED_REASON));
+
+  const reportABTestComment = await abTestCommentService.reportABTestComment(abTestCommentIdx, userIdx, reportedCommentReasonIdx, etcReason);
+  return res.send(reportABTestComment);
+}

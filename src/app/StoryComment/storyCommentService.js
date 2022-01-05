@@ -103,7 +103,7 @@ exports.reportStoryComment = async (storyCommentIdx, userIdx, reportedCommentRea
       const isExistUserReportedCommentIdx = await storyCommentDao.isExistUserReportedCommentIdx(connection, userIdx, storyCommentIdx);
       if (isExistUserReportedCommentIdx){
         connection.release();
-        return errResponse(baseResponse.ALREADY_REPORTED_STORY_COMMENT_IDX);
+        return errResponse(baseResponse.ALREADY_REPORTED_COMMENT_IDX);
       }
 
       //자기 댓글인지

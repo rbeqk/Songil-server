@@ -105,7 +105,7 @@ exports.reportQnAComment = async (qnaCommentIdx, userIdx, reportedCommentReasonI
       const isExistUserReportedCommentIdx = await qnaCommentDao.isExistUserReportedCommentIdx(connection, userIdx, qnaCommentIdx);
       if (isExistUserReportedCommentIdx){
         connection.release();
-        return errResponse(baseResponse.ALREADY_REPORTED_STORY_COMMENT_IDX);
+        return errResponse(baseResponse.ALREADY_REPORTED_COMMENT_IDX);
       }
 
       await connection.beginTransaction();
