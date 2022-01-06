@@ -71,3 +71,16 @@ exports.getLikedPost = async (req, res) => {
 
   return res.send(getLikedPost);
 }
+
+/*
+  API No. 8.14
+  API Name: 내가 쓴 글 페이지 개수 조회 API
+  [GET] /my-page/with/page
+*/
+exports.getUserWrittenWith = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  
+  const getUserWrittenWith = await myPageProvider.getUserWrittenWith(userIdx);
+
+  return res.send(getUserWrittenWith);
+}

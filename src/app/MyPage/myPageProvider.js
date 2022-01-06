@@ -4,6 +4,9 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
+const {getTotalPage} = require('../../../modules/pageUtil');
+
+const MY_PAGE_WRITTEN_POST_PER_PAGE = 5;
 
 exports.getMyCommentTotalPage = async (userIdx, type) => {
   try{
@@ -183,6 +186,33 @@ exports.getLikedPost = async (userIdx, page) => {
     }
   }catch(err){
     logger.error(`getLikedPost DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}
+
+//내가 쓴 글 페이지 개수
+exports.getUserWrittenWith = async (userIdx) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+      const artistIdx = await myPageDao.getArtistIdx(connection, userIdx);
+      const totalCnt = await myPageDao.getWrittenWithCnt(connection, userIdx, artistIdx);
+      const totalPages = getTotalPage(totalCnt, MY_PAGE_WRITTEN_POST_PER_PAGE);
+
+      const result = {
+        'totalPages': totalPages
+      };
+
+      connection.release();
+      return response(baseResponse.SUCCESS, result);
+
+    }catch(err){
+      connection.release();
+      logger.error(`getUserWrittenWith DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`getUserWrittenWith DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }
