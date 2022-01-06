@@ -3,10 +3,10 @@ module.exports  = function(app){
   const myPageController = require('./myPageController');
 
   //내 코멘트 페이지 개수 조회 API
-  app.get('/my-page/comments/page', jwtMiddleware, myPageController.getMyCommentTotalPage);
+  app.get('/my-page/crafts/comments/page', jwtMiddleware, myPageController.getMyCommentTotalPage);
 
   //내 코멘트 조회 API
-  app.get('/my-page/comments', jwtMiddleware, myPageController.getMyComment);
+  app.get('/my-page/crafts/comments', jwtMiddleware, myPageController.getMyComment);
 
   //좋아요한 게시글 페이지 개수 조회 API
   app.get('/my-page/with/liked/page', jwtMiddleware, myPageController.getLikePostCnt);
