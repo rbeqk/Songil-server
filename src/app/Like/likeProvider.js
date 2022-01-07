@@ -3,16 +3,21 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
+const {getTotalPage} = require("../../../modules/pageUtil");
+
+const LIKED_ARTICLE_PER_PAGE = 5;
+const LIKED_CRAFT_PER_PAGE = 5;
 
 exports.getLikedArticleTotalPage = async (userIdx) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
-      const articleCnt = await likeDao.getLikedArticleTotalCnt(connection, [userIdx]);
-      const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
-      const totalPages = (articleCnt % pageItemCnt == 0) ? articleCnt / pageItemCnt : parseInt(articleCnt / pageItemCnt) + 1;  //총 페이지 수
+      const totalCnt = await likeDao.getLikedArticleTotalCnt(connection, [userIdx]);
+      const totalPages = getTotalPage(totalCnt, LIKED_ARTICLE_PER_PAGE);
 
-      const result = {'totalPages': totalPages};
+      const result = {
+        'totalPages': totalPages
+      };
 
       connection.release();
       return response(baseResponse.SUCCESS, result);
@@ -32,20 +37,12 @@ exports.getLikedArticle = async (userIdx, page) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
-      const articleCnt = await likeDao.getLikedArticleTotalCnt(connection, [userIdx]);
-      const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
-      const totalPages = (articleCnt % pageItemCnt == 0) ? articleCnt / pageItemCnt : parseInt(articleCnt / pageItemCnt) + 1;  //총 페이지 수
-      if (page <= 0 || page > totalPages){
-        connection.release();
-        return errResponse(baseResponse.INVALID_PAGE);  //존재하는 page인지
-      }
-
-      const startItemIdx = (page - 1) * pageItemCnt;
+      const startItemIdx = (page - 1) * LIKED_ARTICLE_PER_PAGE;
 
       const likedArticleIdx = await likeDao.getLikedArticleIdx(connection, [userIdx]);
       const articleList = likedArticleIdx.map(x => x.articleIdx);
 
-      const articleInfo = await likeDao.getLikedArticleInfo(connection, [userIdx, articleList, startItemIdx, pageItemCnt]);
+      const articleInfo = await likeDao.getLikedArticleInfo(connection, [userIdx, articleList, startItemIdx, LIKED_ARTICLE_PER_PAGE]);
 
       let result = [];
       
@@ -81,11 +78,12 @@ exports.getLikedCraftTotalPage = async (userIdx) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
-      const craftCnt = await likeDao.getLikedCraftTotalCnt(connection, [userIdx]);
-      const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
-      const totalPages = (craftCnt % pageItemCnt == 0) ? craftCnt / pageItemCnt : parseInt(craftCnt / pageItemCnt) + 1;  //총 페이지 수
+      const totalCnt = await likeDao.getLikedCraftTotalCnt(connection, [userIdx]);
+      const totalPages = getTotalPage(totalCnt, LIKED_CRAFT_PER_PAGE)
 
-      const result = {'totalPages': totalPages};
+      const result = {
+        'totalPages': totalPages
+      };
 
       connection.release();
       return response(baseResponse.SUCCESS, result);
@@ -105,18 +103,10 @@ exports.getLikedCraft = async (userIdx, page) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
-      const craftCnt = await likeDao.getLikedCraftTotalCnt(connection, [userIdx]);
-      const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
-      const totalPages = (craftCnt % pageItemCnt == 0) ? craftCnt / pageItemCnt : parseInt(craftCnt / pageItemCnt) + 1;  //총 페이지 수
-      if (page <= 0 || page > totalPages){
-        connection.release();
-        return errResponse(baseResponse.INVALID_PAGE);  //존재하는 page인지
-      }
-
-      const startItemIdx = (page - 1) * pageItemCnt;
+      const startItemIdx = (page - 1) * LIKED_CRAFT_PER_PAGE;
       
       const result = [];
-      const likedCraftInfo = await likeDao.getLikedCraftInfo(connection, [userIdx, userIdx, startItemIdx, pageItemCnt]);
+      const likedCraftInfo = await likeDao.getLikedCraftInfo(connection, [userIdx, userIdx, startItemIdx, LIKED_CRAFT_PER_PAGE]);
 
       likedCraftInfo.forEach(item => {
         result.push({

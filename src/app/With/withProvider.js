@@ -4,6 +4,9 @@ const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 const {getABTestFinalInfo, getUserVoteInfo} = require('../../../modules/abTestUtil');
+const {getTotalPage} = require("../../../modules/pageUtil");
+
+const WITH_BY_CATEGORY_PER_PAGE = 5;
 
 exports.getHotTalk = async () => {
   try{
@@ -57,8 +60,7 @@ exports.getTotalWithPage = async (category) => {
         totalCnt = await withDao.getABTestTotalCnt(connection);
       }
 
-      const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
-      const totalPages = (totalCnt % pageItemCnt == 0) ? totalCnt / pageItemCnt : parseInt(totalCnt / pageItemCnt) + 1;  //총 페이지 수
+      const totalPages = getTotalPage(totalCnt, WITH_BY_CATEGORY_PER_PAGE);
 
       const result = {
         'totalPages': totalPages
@@ -85,15 +87,14 @@ exports.getWith = async (category, sort, page, userIdx) => {
     try{
 
       let result;
-      const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
-      const startItemIdx = (page - 1) * pageItemCnt;
+      const startItemIdx = (page - 1) * WITH_BY_CATEGORY_PER_PAGE;
 
       if (category === 'story'){
         result = {};
         result.totalCnt = await withDao.getStoryTotalCnt(connection);
         
         result.story = [];
-        const story = await withDao.getStory(connection, userIdx, sort, startItemIdx, pageItemCnt);
+        const story = await withDao.getStory(connection, userIdx, sort, startItemIdx, WITH_BY_CATEGORY_PER_PAGE);
 
         if (story.length > 0){
           story.forEach(item => {
@@ -114,7 +115,7 @@ exports.getWith = async (category, sort, page, userIdx) => {
       else if (category === 'qna'){
         result = [];
 
-        const qna = await withDao.getQnA(connection, userIdx, sort, startItemIdx, pageItemCnt);
+        const qna = await withDao.getQnA(connection, userIdx, sort, startItemIdx, WITH_BY_CATEGORY_PER_PAGE);
 
         if (qna.length > 0){
           qna.forEach(item => {
@@ -136,7 +137,7 @@ exports.getWith = async (category, sort, page, userIdx) => {
       }
       else if (category === 'ab-test'){
         result = [];
-        const abTest = await withDao.getABTest(connection, startItemIdx, pageItemCnt);
+        const abTest = await withDao.getABTest(connection, startItemIdx, WITH_BY_CATEGORY_PER_PAGE);
 
         for (let item of abTest){
 

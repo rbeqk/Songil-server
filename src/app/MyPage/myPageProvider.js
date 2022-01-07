@@ -6,28 +6,28 @@ const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 const {getTotalPage} = require('../../../modules/pageUtil');
 
+const MY_PAGE_WRITTEN_CRAFT_COMMENT_PER_PAGE = 5;
 const MY_PAGE_WRITTEN_POST_PER_PAGE = 5;
+const LIKED_WITH_PER_PAGE = 5;
 
 exports.getMyCommentTotalPage = async (userIdx, type) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
 
-      let totalCommentCnt;
+      let totalCnt;
 
       //작성 가능한 코멘트 페이지 수
       if (type === 'available'){
-        //totalCommentCnt = await myPageDao.getTotalAvailableCommentCnt(connection, userIdx); //TODO
-        totalCommentCnt = 0;  //임시
+        //totalCnt = await myPageDao.getTotalAvailableCommentCnt(connection, userIdx); //TODO
+        totalCnt = 0;  //임시
       }
       //작성한 코멘트 페이지 수
       else if (type === 'written'){
-        totalCommentCnt = await myPageDao.getTotalWrittenCommentCnt(connection, userIdx);
+        totalCnt = await myPageDao.getTotalWrittenCommentCnt(connection, userIdx);
       }
 
-      const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
-      const totalPages = (totalCommentCnt % pageItemCnt == 0) ? totalCommentCnt / pageItemCnt : parseInt(totalCommentCnt / pageItemCnt) + 1;  //총 페이지 수
-
+      const totalPages = getTotalPage(totalCnt, MY_PAGE_WRITTEN_CRAFT_COMMENT_PER_PAGE);
       const result = {
         'totalPages': totalPages
       };
@@ -53,8 +53,7 @@ exports.getMyComment = async (userIdx, type, page) => {
     try{
 
       let result = [];
-      const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
-      const startItemIdx = (page - 1) * pageItemCnt;
+      const startItemIdx = (page - 1) * MY_PAGE_WRITTEN_CRAFT_COMMENT_PER_PAGE;
 
       //작성 가능한 코멘트
       if (type === 'available'){
@@ -123,10 +122,8 @@ exports.getLikePostCnt = async (userIdx) => {
       const likedQnACnt = await myPageDao.getLikedQnACnt(connection, userIdx);
 
       //좋아요한 게시글 개수
-      const likedPostCnt = likedStoryCnt + likedQnACnt;
-
-      const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
-      const totalPages = (likedPostCnt % pageItemCnt == 0) ? likedPostCnt / pageItemCnt : parseInt(likedPostCnt / pageItemCnt) + 1;  //총 페이지 수
+      const totalCnt = likedStoryCnt + likedQnACnt;
+      const totalPages = getTotalPage(totalCnt, LIKED_WITH_PER_PAGE);
 
       const result = {
         'totalPages': totalPages
@@ -151,11 +148,9 @@ exports.getLikedPost = async (userIdx, page) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
+      const startItemIdx = (page - 1) * LIKED_WITH_PER_PAGE;
 
-      const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
-      const startItemIdx = (page - 1) * pageItemCnt;
-
-      const likedPost = await myPageDao.getLikedPost(connection, userIdx, startItemIdx, pageItemCnt);
+      const likedPost = await myPageDao.getLikedPost(connection, userIdx, startItemIdx, LIKED_WITH_PER_PAGE);
 
       let result = [];
 

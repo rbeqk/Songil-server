@@ -3,6 +3,9 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
+const {getTotalPage} = require("../../../modules/pageUtil");
+
+const CRAFT_BY_CATEGPRY_PER_PAGE = 5;
 
 exports.getShop = async () => {
   try{
@@ -64,19 +67,18 @@ exports.getCraftByCategoryTotalPage = async (craftCategoryIdx) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
-      let craftCnt = 0;
+      let totalCnt = 0;
 
       //카테고리 별 상품 개수 가져오기
       if (craftCategoryIdx != 8){
-        craftCnt = await shopDao.getCraftByCategoryCnt(connection, craftCategoryIdx);
+        totalCnt = await shopDao.getCraftByCategoryCnt(connection, craftCategoryIdx);
       }
       //전체 상품 개수 가져오기
       else if (craftCategoryIdx == 8){
-        craftCnt = await shopDao.getTotalCraftCnt(connection);
+        totalCnt = await shopDao.getTotalCraftCnt(connection);
       }
 
-      const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
-      const totalPages = (craftCnt % pageItemCnt == 0) ? craftCnt / pageItemCnt : parseInt(craftCnt / pageItemCnt) + 1;  //총 페이지 수
+      const totalPages = getTotalPage(totalCnt, CRAFT_BY_CATEGPRY_PER_PAGE);
       const result = {
         'totalPages': totalPages
       }

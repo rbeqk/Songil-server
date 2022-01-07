@@ -3,17 +3,20 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
+const {getTotalPage} = require("../../../modules/pageUtil");
+
+const USER_ASK_PER_PAGE = 5;
 
 exports.getAskTotalPage = async (params) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
-      const askCnt = await askDao.getAskCnt(connection, params);
+      const totalCnt = await askDao.getAskCnt(connection, params);
+      const totalPages = getTotalPage(totalCnt, USER_ASK_PER_PAGE);
       
-      const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
-      const totalPages = (askCnt % pageItemCnt == 0) ? askCnt / pageItemCnt : parseInt(askCnt / pageItemCnt) + 1;  //총 페이지 수
-      
-      const result = {'totalPages': totalPages};
+      const result = {
+        'totalPages': totalPages
+      };
 
       connection.release();
       return response(baseResponse.SUCCESS, result);
@@ -35,20 +38,10 @@ exports.getAsk = async (params) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
-
-      const askCnt = await askDao.getAskCnt(connection, userIdx);
-      
-      const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
-      const totalPages = (askCnt % pageItemCnt == 0) ? askCnt / pageItemCnt : parseInt(askCnt / pageItemCnt) + 1;  //총 페이지 수
-      if (page <= 0 || page > totalPages){
-        connection.release();
-        return errResponse(baseResponse.INVALID_PAGE);  //존재하는 page인지
-      }
-
       let result = [];
-      const startItemIdx = (page - 1) * pageItemCnt;
+      const startItemIdx = (page - 1) * USER_ASK_PER_PAGE;
 
-      const ask = await askDao.getAsk(connection, [userIdx, startItemIdx, pageItemCnt]);
+      const ask = await askDao.getAsk(connection, [userIdx, startItemIdx, USER_ASK_PER_PAGE]);
 
       ask.forEach(item => {
         result.push({

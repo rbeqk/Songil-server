@@ -3,6 +3,9 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
+const {getTotalPage} = require("../../../modules/pageUtil");
+
+const ARTIST_ASK_ASK_PER_PAGE = 5;
 
 exports.getAskTotalPage = async (userIdx) => {
   try{
@@ -19,12 +22,12 @@ exports.getAskTotalPage = async (userIdx) => {
       //작가idx 가져오기
       const artistIdx = await artistAskDao.getArtistIdx(connection, userIdx);
 
-      const askCnt = await artistAskDao.getAskCnt(connection, artistIdx);
+      const totalCnt = await artistAskDao.getAskCnt(connection, artistIdx);
+      const totalPages = getTotalPage(totalCnt, ARTIST_ASK_ASK_PER_PAGE);
       
-      const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
-      const totalPages = (askCnt % pageItemCnt == 0) ? askCnt / pageItemCnt : parseInt(askCnt / pageItemCnt) + 1;  //총 페이지 수
-      
-      const result = {'totalPages': totalPages};
+      const result = {
+        'totalPages': totalPages
+      };
 
       connection.release();
       return response(baseResponse.SUCCESS, result);
@@ -55,8 +58,7 @@ exports.getAsk = async (userIdx, page) => {
       //작가idx 가져오기
       const artistIdx = await artistAskDao.getArtistIdx(connection, userIdx);
       
-      const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
-      const startItemIdx = (page - 1) * pageItemCnt;
+      const startItemIdx = (page - 1) * ARTIST_ASK_ASK_PER_PAGE;
 
       //작가의 문의 목록 가져오기
       const askList = await artistAskDao.getAskList(connection, artistIdx);
@@ -66,7 +68,7 @@ exports.getAsk = async (userIdx, page) => {
       askIdxList = askList.length > 0 ? askList.map(item => item.askIdx) : -1;
 
       //문의 목록 상세 정보 가져오기
-      const askInfo = await artistAskDao.getAskInfo(connection, askIdxList, startItemIdx, pageItemCnt);
+      const askInfo = await artistAskDao.getAskInfo(connection, askIdxList, startItemIdx, ARTIST_ASK_ASK_PER_PAGE);
 
       let result = [];
       

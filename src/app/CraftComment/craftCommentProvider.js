@@ -4,6 +4,9 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
+const {getTotalPage} = require("../../../modules/pageUtil");
+
+const CRAFT_COMMENT_PER_PAGE = 5;
 
 exports.getCommentTotalPage = async (craftIdx, type) => {
   try{
@@ -17,21 +20,21 @@ exports.getCommentTotalPage = async (craftIdx, type) => {
         return errResponse(baseResponse.INVALID_CRAFT_IDX);
       }
 
-      let commentCnt;
+      let totalCnt;
       
       //포토 댓글만
       if (type === 'photo'){
-        commentCnt = await craftCommentDao.getOnlyPhotoCommentCnt(connection, craftIdx);
+        totalCnt = await craftCommentDao.getOnlyPhotoCommentCnt(connection, craftIdx);
       }
       //댓글 전체
       else if (type === 'all'){
-        commentCnt = await craftCommentDao.getCommentCnt(connection, craftIdx);
+        totalCnt = await craftCommentDao.getCommentCnt(connection, craftIdx);
       }
 
-      const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
-      const totalPages = (commentCnt % pageItemCnt == 0) ? commentCnt / pageItemCnt : parseInt(commentCnt / pageItemCnt) + 1;  //총 페이지 수
-
-      const result = {'totalPages': totalPages};
+      const totalPages = getTotalPage(totalCnt, CRAFT_COMMENT_PER_PAGE);
+      const result = {
+        'totalPages': totalPages
+      };
 
       connection.release();
       return response(baseResponse.SUCCESS, result);
@@ -71,24 +74,22 @@ exports.getComment = async (craftIdx, page, type) => {
         commentCnt = await craftCommentDao.getCommentCnt(connection, craftIdx);
       }
 
-      const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
-
       let result = {};
       result.totalCommentCnt = commentCnt;
       result.comments = [];
 
       let commentInfo;
-      const startItemIdx = (page - 1) * pageItemCnt;
+      const startItemIdx = (page - 1) * CRAFT_COMMENT_PER_PAGE;
 
       if (commentCnt > 0){
 
         //포토댓글만
         if (type === 'photo'){
-          commentInfo = await craftCommentDao.getCommentInfoOnlyPhoto(connection, craftIdx, startItemIdx, pageItemCnt);
+          commentInfo = await craftCommentDao.getCommentInfoOnlyPhoto(connection, craftIdx, startItemIdx, CRAFT_COMMENT_PER_PAGE);
         }
         //댓글 전체
         else if (type === 'all'){
-          commentInfo = await craftCommentDao.getCommentInfo(connection, craftIdx, startItemIdx, pageItemCnt);
+          commentInfo = await craftCommentDao.getCommentInfo(connection, craftIdx, startItemIdx, CRAFT_COMMENT_PER_PAGE);
         }
 
         let commentIdx;
