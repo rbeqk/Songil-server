@@ -41,6 +41,7 @@ exports.getArtistCraft = async (req, res) => {
 
   if (!(page && sort)) return res.send(errResponse(baseResponse.IS_EMPTY));
   if (!['popular', 'new', 'comment', 'price'].includes(sort)) return res.send(errResponse(baseResponse.INVALID_SORT_NAME));
+  if (page < 1) return res.send(errResponse(baseResponse.INVALID_PAGE));
 
   const token = req.headers['x-access-token'];
 
@@ -77,6 +78,7 @@ exports.getArtistArticle = async (req, res) => {
   const {page, sort} = req.query;
   if (!(page && sort)) return res.send(errResponse(baseResponse.IS_EMPTY));
   if (!['popular', 'new'].includes(sort)) return res.send(errResponse(baseResponse.INVALID_SORT_NAME));
+  if (page < 1) return res.send(errResponse(baseResponse.INVALID_PAGE));
 
   const {artistIdx} = req.params;
 

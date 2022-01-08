@@ -45,6 +45,8 @@ exports.getWith = async (req, res) => {
   if (['story', 'qna'].includes(category) && !sort) return res.send(errResponse(baseResponseStatus.IS_EMPTY));
   if (sort && !['popular', 'new'].includes(sort)) return res.send(errResponse(baseResponseStatus.INVALID_SORT_NAME));
 
+  if (page < 1) return res.send(errResponse(baseResponse.INVALID_PAGE));
+
   const userIdx = getUserIdx(token);
   if (userIdx === false) return res.send(errResponse(baseResponseStatus.TOKEN_VERIFICATION_FAILURE));
 

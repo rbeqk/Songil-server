@@ -56,6 +56,7 @@ exports.getLikedArticle = async (req, res) => {
   const {page} = req.query;
 
   if (!page) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (page < 1) return res.send(errResponse(baseResponse.INVALID_PAGE));
 
   const getLikedArticle = await likeProvider.getLikedArticle(userIdx, page);
 
@@ -84,6 +85,7 @@ exports.getLikedCraftTotalPage = async (req, res) => {
 exports.getLikedCraft = async (req, res) => {
   const {page} = req.query;
   if (!page) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (page < 1) return res.send(errResponse(baseResponse.INVALID_PAGE));
 
   const {userIdx} = req.verifiedToken;
 

@@ -37,13 +37,15 @@ exports.getAskTotalPage = async (req, res) => {
 
 /*
   API No. 8.1
-  API Name: 1:1 문의 내역 페이지 조회 API
+  API Name: 1:1 문의 내역 목록 조회 API
   [GET] /mypage/ask
   query: page
 */
 exports.getAsk = async (req, res) => {
   const {userIdx} = req.verifiedToken;
   const {page} = req.query;
+
+  if (page < 1) return res.send(errResponse(baseResponse.INVALID_PAGE));
 
   const getAsk = await askProvider.getAsk(userIdx, page);
 
