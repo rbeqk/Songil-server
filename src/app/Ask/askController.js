@@ -45,6 +45,7 @@ exports.getAsk = async (req, res) => {
   const {userIdx} = req.verifiedToken;
   const {page} = req.query;
 
+  if (!page) return res.send(errResponse(baseResponse.IS_EMPTY));
   if (page < 1) return res.send(errResponse(baseResponse.INVALID_PAGE));
 
   const getAsk = await askProvider.getAsk(userIdx, page);
