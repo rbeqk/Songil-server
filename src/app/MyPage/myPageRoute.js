@@ -8,12 +8,6 @@ module.exports  = function(app){
   //내 코멘트 조회 API
   app.get('/my-page/crafts/comments', jwtMiddleware, myPageController.getMyComment);
 
-  //좋아요한 게시글 페이지 개수 조회 API
-  app.get('/my-page/with/liked/page', jwtMiddleware, myPageController.getLikePostCnt);
-
-  //좋아요한 게시글 조회 API
-  app.get('/my-page/with/liked', jwtMiddleware, myPageController.getLikedPost);
-
   //내가 쓴 글 페이지 개수 조회 API
   app.get('/my-page/with/page', jwtMiddleware, myPageController.getUserWrittenWith);
 }

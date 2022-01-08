@@ -8,7 +8,6 @@ const {getTotalPage} = require('../../../modules/pageUtil');
 const {
   MY_PAGE_WRITTEN_CRAFT_COMMENT_PER_PAGE,
   MY_PAGE_WRITTEN_POST_PER_PAGE,
-  LIKED_WITH_PER_PAGE
 } = require("../../../modules/constants");
 
 exports.getMyCommentTotalPage = async (userIdx, type) => {
@@ -140,48 +139,6 @@ exports.getLikePostCnt = async (userIdx) => {
     }
   }catch(err){
     logger.error(`getLikePostCnt DB Connection Error: ${err}`);
-    return errResponse(baseResponse.DB_ERROR);
-  }
-}
-
-//좋아요한 게시글
-exports.getLikedPost = async (userIdx, page) => {
-  try{
-    const connection = await pool.getConnection(async conn => conn);
-    try{
-      const startItemIdx = (page - 1) * LIKED_WITH_PER_PAGE;
-
-      const likedPost = await myPageDao.getLikedPost(connection, userIdx, startItemIdx, LIKED_WITH_PER_PAGE);
-
-      let result = [];
-
-      likedPost.forEach(item => {
-        result.push({
-          'idx': item.idx,
-          'categoryIdx': item.categoryIdx,
-          'imageUrl': item.imageUrl,
-          'title': item.title,
-          'content': item.content,
-          'userIdx': item.userIdx,
-          'userName': item.userName,
-          'createdAt': item.createdAt,
-          'totalLikeCnt': item.totalLikeCnt,
-          'totalCommentCnt': item.totalCommentCnt
-        })
-      });
-
-      result.reverse();
-
-      connection.release();
-      return response(baseResponse.SUCCESS, result);
-
-    }catch(err){
-      connection.release();
-      logger.error(`getLikedPost DB Query Error: ${err}`);
-      return errResponse(baseResponse.DB_ERROR);
-    }
-  }catch(err){
-    logger.error(`getLikedPost DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }

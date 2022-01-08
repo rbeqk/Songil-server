@@ -29,76 +29,6 @@ async function getWrittenComment(connection, userIdx, startItemIdx, pageItemCnt)
   return rows;
 }
 
-//좋아요한 Story 개수
-async function getLikedStoryCnt(connection, userIdx){
-  const query = `
-  SELECT COUNT(*) as totalCnt FROM StoryLike
-  WHERE userIdx = ${userIdx};
-  `;
-  const [rows] = await connection.query(query);
-  return rows[0]['totalCnt'];
-}
-
-//좋아요한 QnA 개수
-async function getLikedQnACnt(connection, userIdx){
-  const query = `
-  SELECT COUNT(*) as totalCnt FROM QnALike
-  WHERE userIdx = ${userIdx};
-  `;
-  const [rows] = await connection.query(query);
-  return rows[0]['totalCnt'];
-}
-
-//좋아요한 게시물
-async function getLikedPost(connection, userIdx, startItemIdx, pageItemCnt){
-  const query = `
-  SELECT SL.storyIdx as idx,
-        1 as categoryIdx,
-        S.title,
-        S.content,
-        (SELECT imageUrl
-          FROM StoryImage SI
-          WHERE SI.isDeleted = 'N' && SI.storyIdx = SL.storyIdx
-          LIMIT 1)                                               as imageUrl,
-        S.userIdx,
-        U.nickname                                              as userName,
-        DATE_FORMAT(S.createdAt, '%Y.%m.%d')                    as createdAt,
-        SL.createdAt                                            as originalCreatedAt,
-        (SELECT COUNT(*)
-          FROM StoryLike
-          WHERE StoryLike.storyIdx = SL.storyIdx)                as totalLikeCnt,
-        (SELECT COUNT(storyCommentIdx)
-          FROM StoryComment SC
-          WHERE SC.storyIdx = SL.storyIdx && SC.isDeleted = 'N') as totalCommentCnt
-  FROM StoryLike SL
-          JOIN Story S ON S.storyIdx = SL.storyIdx && S.isDeleted = 'N'
-          JOIN User U ON U.userIdx = S.userIdx && U.isDeleted = 'N'
-  WHERE SL.userIdx = ${userIdx}
-  UNION ALL
-  SELECT QL.qnaIdx as idx,
-        2 as categoryIdx,
-        Q.title,
-        Q.content,
-        NULL                                                            as imageUrl,
-        Q.userIdx,
-        U.nickname                                                      as userName,
-        DATE_FORMAT(Q.createdAt, '%Y.%m.%d')                            as createdAt,
-        QL.createdAt                                                    as originalCreatedAt,
-        (SELECT COUNT(*) FROM QnALike WHERE QnALike.qnaIdx = QL.qnaIdx) as totalLikeCnt,
-        (SELECT COUNT(qnaCommentIdx)
-          FROM QnAComment QC
-          WHERE QC.qnaIdx = QL.qnaIdx && QC.isDeleted = 'N')             as totalCommentCnt
-  FROM QnALike QL
-          JOIN QnA Q ON Q.qnaIdx = QL.qnaIdx && Q.isDeleted = 'N'
-          JOIN User U ON U.userIdx = Q.userIdx && U.isDeleted = 'N'
-  WHERE QL.userIdx = ${userIdx}
-  ORDER BY originalCreatedAt
-  LIMIT ${startItemIdx}, ${pageItemCnt};
-  `;
-  const [rows] = await connection.query(query);
-  return rows;
-}
-
 //작가 idx
 async function getArtistIdx(connection, userIdx){
   const query = `
@@ -147,9 +77,6 @@ async function getWrittenWithCnt(connection, userIdx, artistIdx){
 module.exports = {
   getTotalWrittenCommentCnt,
   getWrittenComment,
-  getLikedStoryCnt,
-  getLikedQnACnt,
-  getLikedPost,
   getArtistIdx,
   getWrittenWithCnt,
 }

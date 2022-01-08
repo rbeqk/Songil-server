@@ -121,3 +121,34 @@ exports.changeUserStoryLikeStatus = async (req, res) => {
 
   return res.send(changeUserStoryLikeStatus);
 }
+
+/*
+  API No. 8.10
+  API Name: 좋아요한 게시글 페이지 개수 조회 API
+  [GET] /my-page/with/liked/page
+*/
+exports.getLikePostCnt = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+
+  const getLikePostCnt = await likeProvider.getLikePostCnt(userIdx);
+
+  return res.send(getLikePostCnt);
+}
+
+/*
+  API No. 8.11
+  API Name: 좋아요한 게시글 조회 API
+  [GET] /my-page/with/liked
+  query: page
+*/
+exports.getLikedPost = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {page} = req.query;
+
+  if (!page) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (page < 1) return res.send(errResponse(baseResponse.INVALID_PAGE));
+
+  const getLikedPost = await likeProvider.getLikedPost(userIdx, page);
+
+  return res.send(getLikedPost);
+}
