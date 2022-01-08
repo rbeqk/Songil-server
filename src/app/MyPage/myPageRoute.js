@@ -12,5 +12,8 @@ module.exports  = function(app){
   app.get('/my-page/with/page', jwtMiddleware, myPageController.getUserWrittenWithTotalPage);
 
   //내가 쓴 글 조회 API
-  app.get('/my-page/with', jwtMiddleware, myPageController.getUserWrittenWith)
+  app.get('/my-page/with', jwtMiddleware, myPageController.getUserWrittenWith);
+
+  //댓글 단 글 페이지 개수 조회 API
+  app.get('/my-page/with/comments/page', jwtMiddleware, myPageController.getUserWrittenWithCommentTotalPage);
 }

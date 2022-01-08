@@ -204,10 +204,34 @@ async function getUserWrittenWith(connection, userIdx, artistIdx, startItemIdx, 
   }
 }
 
+//댓글 단 글 페이지 개수(Story, QnA, ABTest)
+async function getUserWrittenWithCommentTotalCnt(connection, userIdx){
+  const storyQuery = `
+  SELECT COUNT(storyCommentIdx) as totalCnt FROM StoryComment
+  WHERE userIdx = ${userIdx} && isDeleted = 'N';
+  `;
+  const [storyRows] = await connection.query(storyQuery);
+  
+  const QnAQuery = `
+  SELECT COUNT(qnaCommentIdx) as totalCnt FROM QnAComment
+  WHERE userIdx = ${userIdx} && isDeleted = 'N';
+  `;
+  const [QnARows] = await connection.query(QnAQuery);
+
+  const ABTestQuery = `
+  SELECT COUNT(abTestCommentIdx) as totalCnt FROM ABTestComment
+  WHERE userIdx = ${userIdx} && isDeleted = 'N';
+  `;
+  const [ABTestRows] = await connection.query(ABTestQuery);
+
+  return storyRows[0]['totalCnt'] + QnARows[0]['totalCnt'] + ABTestRows[0]['totalCnt'];
+}
+
 module.exports = {
   getTotalWrittenCommentCnt,
   getWrittenComment,
   getArtistIdx,
   getWrittenWithCnt,
   getUserWrittenWith,
+  getUserWrittenWithCommentTotalCnt,
 }

@@ -8,6 +8,7 @@ const {getTotalPage} = require('../../../modules/pageUtil');
 const {
   MY_PAGE_WRITTEN_CRAFT_COMMENT_PER_PAGE,
   MY_PAGE_WRITTEN_POST_PER_PAGE,
+  MY_PAGE_WRITTEN_POST_COMMENT_PER_PAGE,
 } = require("../../../modules/constants");
 
 exports.getMyCommentTotalPage = async (userIdx, type) => {
@@ -209,6 +210,32 @@ exports.getUserWrittenWith = async (userIdx, page) => {
     }
   }catch(err){
     logger.error(`getUserWrittenWith DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}
+
+//댓글 단 글 페이지 개수 조회
+exports.getUserWrittenWithCommentTotalPage = async (userIdx) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+      const totalCnt = await myPageDao.getUserWrittenWithCommentTotalCnt(connection, userIdx);
+      const totalPages = getTotalPage(totalCnt, MY_PAGE_WRITTEN_POST_COMMENT_PER_PAGE);
+
+      const result = {
+        'totalPages': totalPages
+      }
+
+      connection.release();
+      return response(baseResponse.SUCCESS, result);
+
+    }catch(err){
+      connection.release();
+      logger.error(`getUserWrittenWithCommentTotalPage DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`getUserWrittenWithCommentTotalPage DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }
