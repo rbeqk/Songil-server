@@ -144,7 +144,7 @@ exports.getLikePostCnt = async (userIdx) => {
 }
 
 //내가 쓴 글 페이지 개수
-exports.getUserWrittenWith = async (userIdx) => {
+exports.getUserWrittenWithTotalPage = async (userIdx) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
@@ -155,6 +155,49 @@ exports.getUserWrittenWith = async (userIdx) => {
       const result = {
         'totalPages': totalPages
       };
+
+      connection.release();
+      return response(baseResponse.SUCCESS, result);
+
+    }catch(err){
+      connection.release();
+      logger.error(`getUserWrittenWithTotalPage DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`getUserWrittenWithTotalPage DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}
+
+//내가 쓴 글 조회
+exports.getUserWrittenWith = async (userIdx, page) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+
+      const artistIdx = await myPageDao.getArtistIdx(connection, userIdx);
+      const startItemIdx = (page - 1) * MY_PAGE_WRITTEN_POST_PER_PAGE;
+      const userWrittenWith = await myPageDao.getUserWrittenWith(connection, userIdx, artistIdx, startItemIdx, MY_PAGE_WRITTEN_POST_PER_PAGE);
+
+      let result = [];
+
+      userWrittenWith.forEach(item => {
+        result.push({
+          'idx': item.idx,
+          'categoryIdx': item.categoryIdx,
+          'imageUrl': item.imageUrl,
+          'title': item.title,
+          'content': item.content,
+          'name': item.name,
+          'createdAt': item.createdAt,
+          'totalLikeCnt': item.totalLikeCnt,
+          'isLike': item.isLike,
+          'totalCommentCnt': item.totalCommentCnt
+        })
+      });
+
+      result.reverse();
 
       connection.release();
       return response(baseResponse.SUCCESS, result);

@@ -46,10 +46,28 @@ exports.getMyComment = async (req, res) => {
   API Name: 내가 쓴 글 페이지 개수 조회 API
   [GET] /my-page/with/page
 */
-exports.getUserWrittenWith = async (req, res) => {
+exports.getUserWrittenWithTotalPage = async (req, res) => {
   const {userIdx} = req.verifiedToken;
   
-  const getUserWrittenWith = await myPageProvider.getUserWrittenWith(userIdx);
+  const getUserWrittenWithTotalPage = await myPageProvider.getUserWrittenWithTotalPage(userIdx);
+
+  return res.send(getUserWrittenWithTotalPage);
+}
+
+/*
+  API No. 8.15
+  API Name: 내가 쓴 글 조회 API
+  [GET] /my-page/with
+  query: page
+*/
+exports.getUserWrittenWith = async (req, res) => {
+  const {page} = req.query;
+  const {userIdx} = req.verifiedToken;
+
+  if (!page) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (page < 1) return res.send(errResponse(baseResponse.INVALID_PAGE));
+
+  const getUserWrittenWith = await myPageProvider.getUserWrittenWith(userIdx, page);
 
   return res.send(getUserWrittenWith);
 }

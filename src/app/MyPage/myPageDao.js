@@ -74,9 +74,140 @@ async function getWrittenWithCnt(connection, userIdx, artistIdx){
   }
 }
 
+//내가 쓴 글
+async function getUserWrittenWith(connection, userIdx, artistIdx, startItemIdx, itemPerPage){
+  //일반 사용자인 경우 -> Story && QnA
+  if (artistIdx === -1){
+    const userQuery = `
+    SELECT S.storyIdx                                                                   as idx,
+          1                                                                            as categoryIdx,
+          S.title,
+          S.content,
+          (SELECT imageUrl
+            FROM StoryImage SI
+            WHERE SI.storyIdx = S.storyIdx && SI.isDeleted = 'N'
+            LIMIT 1) as imageUrl,
+          U.nickname                                                                   as name,
+          DATE_FORMAT(S.createdAt, '%Y.%m.%d')                                         as createdAt,
+          S.createdAt                                                                  as originalCreatedAt,
+          (SELECT COUNT(*)
+            FROM StoryLike SL
+            WHERE SL.storyIdx = S.storyIdx)                                             as totalLikeCnt,
+          (SELECT EXISTS(SELECT *
+                          FROM StoryLike SL2
+                          WHERE SL2.userIdx = ${userIdx} && SL2.storyIdx = S.storyIdx)) as isLike,
+          (SELECT COUNT(*)
+            FROM StoryComment SC
+            WHERE SC.storyIdx = S.storyIdx && SC.isDeleted = 'N')                       as totalCommentCnt
+    FROM Story S
+            JOIN User U ON U.userIdx = S.userIdx && U.isDeleted = 'N'
+    WHERE S.isDeleted = 'N' && S.userIdx = ${userIdx}
+    UNION
+    SELECT Q.qnaIdx                                                                 as idx,
+          2                                                                        as categoryIdx,
+          Q.title,
+          Q.content,
+          NULL as imageUrl,
+          U.nickname                                                               as name,
+          DATE_FORMAT(Q.createdAt, '%Y.%m.%d')                                     as createdAt,
+          Q.createdAt                                                              as originalCreatedAt,
+          (SELECT COUNT(*)
+            FROM QnALike QL
+            WHERE QL.qnaIdx = Q.qnaIdx)                                             as totalLikeCnt,
+          (SELECT EXISTS(SELECT *
+                          FROM QnALike QL2
+                          WHERE QL2.qnaIdx = Q.qnaIdx && QL2.userIdx = ${userIdx})) as isLike,
+          (SELECT COUNT(*)
+            FROM QnAComment QC
+            WHERE QC.qnaIdx = Q.qnaIdx && QC.isDeleted = 'N')                       as totalCommentCnt
+    FROM QnA Q
+            JOIN User U ON U.userIdx = Q.userIdx && U.isDeleted = 'N'
+    WHERE Q.isDeleted = 'N' && Q.userIdx = ${userIdx}
+    ORDER BY originalCreatedAt
+    LIMIT ${startItemIdx}, ${itemPerPage};
+    `;
+
+    const [userRows] = await connection.query(userQuery);
+    return userRows;
+  }
+  //작가인 경우 -> Story && QnA && ABTest
+  else{
+    const artistQuery = `
+    SELECT S.storyIdx                                                                   as idx,
+          1                                                                            as categoryIdx,
+          S.title,
+          S.content,
+          (SELECT imageUrl
+            FROM StoryImage SI
+            WHERE SI.storyIdx = S.storyIdx && SI.isDeleted = 'N'
+            LIMIT 1)                                                                    as imageUrl,
+          U.nickname                                                                   as name,
+          DATE_FORMAT(S.createdAt, '%Y.%m.%d')                                         as createdAt,
+          S.createdAt                                                                  as originalCreatedAt,
+          (SELECT COUNT(*)
+            FROM StoryLike SL
+            WHERE SL.storyIdx = S.storyIdx)                                             as totalLikeCnt,
+          (SELECT EXISTS(SELECT *
+                          FROM StoryLike SL2
+                          WHERE SL2.userIdx = ${userIdx} && SL2.storyIdx = S.storyIdx)) as isLike,
+          (SELECT COUNT(*)
+            FROM StoryComment SC
+            WHERE SC.storyIdx = S.storyIdx && SC.isDeleted = 'N')                       as totalCommentCnt
+    FROM Story S
+            JOIN User U ON U.userIdx = S.userIdx && U.isDeleted = 'N'
+    WHERE S.isDeleted = 'N' && S.userIdx = ${userIdx}
+    UNION
+    SELECT Q.qnaIdx                                                                 as idx,
+          2                                                                        as categoryIdx,
+          Q.title,
+          Q.content,
+          NULL                                                                     as imageUrl,
+          U.nickname                                                               as name,
+          DATE_FORMAT(Q.createdAt, '%Y.%m.%d')                                     as createdAt,
+          Q.createdAt                                                              as originalCreatedAt,
+          (SELECT COUNT(*)
+            FROM QnALike QL
+            WHERE QL.qnaIdx = Q.qnaIdx)                                             as totalLikeCnt,
+          (SELECT EXISTS(SELECT *
+                          FROM QnALike QL2
+                          WHERE QL2.qnaIdx = Q.qnaIdx && QL2.userIdx = ${userIdx})) as isLike,
+          (SELECT COUNT(*)
+            FROM QnAComment QC
+            WHERE QC.qnaIdx = Q.qnaIdx && QC.isDeleted = 'N')                       as totalCommentCnt
+    FROM QnA Q
+            JOIN User U ON U.userIdx = Q.userIdx && U.isDeleted = 'N'
+    WHERE Q.isDeleted = 'N' && Q.userIdx = ${userIdx}
+    UNION
+    SELECT AB.abTestIdx                                                as idx,
+          3                                                           as categoryIdx,
+          NULL                                                        as title,
+          AB.content,
+          NULL                                                        as imageUrl,
+          U.nickname                                                  as name,
+          DATE_FORMAT(AB.createdAt, '%Y.%m.%d')                       as createdAt,
+          AB.createdAt                                                as originalCreatedAt,
+          NULL                                                        as totalLikeCnt,
+          NULL                                                        as isLike,
+          (SELECT COUNT(*)
+            FROM ABTestComment ABC
+            WHERE ABC.isDeleted = 'N' && ABC.abTestIdx = AB.abTestIdx) as totalCommentCnt
+    FROM ABTest AB
+            JOIN Artist A ON A.artistIdx = AB.artistIdx && A.isDeleted = 'N'
+            JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
+    WHERE AB.isDeleted = 'N' && AB.artistIdx = ${artistIdx}
+    ORDER BY originalCreatedAt
+    LIMIT ${startItemIdx}, ${itemPerPage};
+    `;
+
+    const [artistRows] = await connection.query(artistQuery);
+    return artistRows;
+  }
+}
+
 module.exports = {
   getTotalWrittenCommentCnt,
   getWrittenComment,
   getArtistIdx,
   getWrittenWithCnt,
+  getUserWrittenWith,
 }
