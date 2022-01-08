@@ -30,8 +30,7 @@ exports.createCraftAsk = async (req, res) => {
 exports.getAskTotalPage = async (req, res) => {
   const {userIdx} = req.verifiedToken;
 
-  let params = [userIdx];
-  const getAskTotalPage = await askProvider.getAskTotalPage(params);
+  const getAskTotalPage = await askProvider.getAskTotalPage(userIdx);
 
   return res.send(getAskTotalPage);
 }
@@ -46,8 +45,7 @@ exports.getAsk = async (req, res) => {
   const {userIdx} = req.verifiedToken;
   const {page} = req.query;
 
-  let params = [userIdx, page];
-  const getAsk = await askProvider.getAsk(params);
+  const getAsk = await askProvider.getAsk(userIdx, page);
 
   return res.send(getAsk);
 }

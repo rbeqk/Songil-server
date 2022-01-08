@@ -78,26 +78,26 @@ async function getTotalArticleLikeCnt(connection, articleIdx){
 }
 
 //사용자의 좋아요 아티클 개수
-async function getLikedArticleTotalCnt(connection, params){
+async function getLikedArticleTotalCnt(connection, userIdx){
   const query = `
   SELECT COUNT(*) as totalCnt FROM ArticleLike
-  WHERE userIdx = ?;
+  WHERE userIdx = ${userIdx};
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows[0]['totalCnt'];
 }
 //사용자의 좋아요 아티클 목록
-async function getLikedArticleIdx(connection, params){
+async function getLikedArticleIdx(connection, userIdx){
   const query = `
   SELECT articleIdx FROM ArticleLike
-  WHERE userIdx = ?;
+  WHERE userIdx = ${userIdx};
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows;
 }
 
 //사용자의 좋아요 아티클 목록 정보
-async function getLikedArticleInfo(connection, params){
+async function getLikedArticleInfo(connection, userIdx, articleList, startItemIdx, itemPerPage){
   const query = `
   SELECT A.articleIdx,
         A.mainImageUrl,
@@ -106,32 +106,33 @@ async function getLikedArticleInfo(connection, params){
         E.nickname                                  as editorName,
         DATE_FORMAT(A.createdAt, '%Y.%m.%d') as createdAt,
         IFNULL(AL.totalLikeCnt, 0)                  as totalLikeCnt,
-        (SELECT createdAt FROM ArticleLike WHERE userIdx = ? && articleIdx = A.articleIdx) likeCreatedAt
+        (SELECT createdAt FROM ArticleLike WHERE userIdx = ${userIdx} && articleIdx = A.articleIdx) likeCreatedAt
   FROM Article A
           JOIN Editor E on A.editorIdx = E.editorIdx && E.isDeleted = 'N'
           LEFT JOIN (SELECT articleIdx, COUNT(*) as totalLikeCnt
                       FROM ArticleLike
                       GROUP BY articleIdx) as AL ON AL.articleIdx = A.articleIdx
-  WHERE A.isDeleted = 'N' && A.articleIdx IN (?)
+  WHERE A.isDeleted = 'N' && A.articleIdx IN (${articleList})
   ORDER BY likeCreatedAt
-  LIMIT ?, ?
+  LIMIT ${startItemIdx}, ${itemPerPage}
   `;
-  const [rows] = await connection.query(query, params);
+  console.log(query)
+  const [rows] = await connection.query(query);
   return rows;
 }
 
 //사용자의 찜한 상품 개수
-async function getLikedCraftTotalCnt(connection, params){
+async function getLikedCraftTotalCnt(connection, userIdx){
   const query = `
   SELECT COUNT(*) as totalCnt FROM CraftLike
-  WHERE userIdx = ?;
+  WHERE userIdx = ${userIdx};
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows[0]['totalCnt'];
 }
 
 //사용자의 찜한 상품 정보
-async function getLikedCraftInfo(connection, params){
+async function getLikedCraftInfo(connection, userIdx, startItemIdx, LIKED_CRAFT_PER_PAGE){
   const query = `
   SELECT C.craftIdx,
         C.name,
@@ -151,18 +152,18 @@ async function getLikedCraftInfo(connection, params){
           WHERE TCL.craftIdx = C.craftIdx)                        as totalLikeCnt,
         (SELECT CL.createdAt
           FROM CraftLike CL
-          WHERE CL.craftIdx = C.craftIdx && CL.userIdx = ?)       as likedCreatedAt
+          WHERE CL.craftIdx = C.craftIdx && CL.userIdx = ${userIdx})       as likedCreatedAt
   FROM Craft C
           JOIN Artist A ON A.artistIdx = C.artistIdx && A.isDeleted = 'N'
           JOIN User U ON A.userIdx = U.userIdx && U.isDeleted = 'N'
   WHERE C.craftIdx IN (SELECT craftIdx
                       FROM CraftLike
-                      WHERE userIdx = ?
+                      WHERE userIdx = ${userIdx}
   ) && C.isDeleted = 'N'
   ORDER BY likedCreatedAt
-  LIMIT ?, ?;
+  LIMIT ${startItemIdx}, ${LIKED_CRAFT_PER_PAGE};
   `;
-  const [rows] = await connection.query(query, params);
+  const [rows] = await connection.query(query);
   return rows;
 }
 

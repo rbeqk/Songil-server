@@ -13,7 +13,7 @@ exports.getLikedArticleTotalPage = async (userIdx) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
-      const totalCnt = await likeDao.getLikedArticleTotalCnt(connection, [userIdx]);
+      const totalCnt = await likeDao.getLikedArticleTotalCnt(connection, userIdx);
       const totalPages = getTotalPage(totalCnt, LIKED_ARTICLE_PER_PAGE);
 
       const result = {
@@ -40,10 +40,10 @@ exports.getLikedArticle = async (userIdx, page) => {
     try{
       const startItemIdx = (page - 1) * LIKED_ARTICLE_PER_PAGE;
 
-      const likedArticleIdx = await likeDao.getLikedArticleIdx(connection, [userIdx]);
+      const likedArticleIdx = await likeDao.getLikedArticleIdx(connection, userIdx);
       const articleList = likedArticleIdx.map(x => x.articleIdx);
 
-      const articleInfo = await likeDao.getLikedArticleInfo(connection, [userIdx, articleList, startItemIdx, LIKED_ARTICLE_PER_PAGE]);
+      const articleInfo = await likeDao.getLikedArticleInfo(connection, userIdx, articleList, startItemIdx, LIKED_ARTICLE_PER_PAGE);
 
       let result = [];
       
@@ -79,7 +79,7 @@ exports.getLikedCraftTotalPage = async (userIdx) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
-      const totalCnt = await likeDao.getLikedCraftTotalCnt(connection, [userIdx]);
+      const totalCnt = await likeDao.getLikedCraftTotalCnt(connection, userIdx);
       const totalPages = getTotalPage(totalCnt, LIKED_CRAFT_PER_PAGE)
 
       const result = {
@@ -107,7 +107,7 @@ exports.getLikedCraft = async (userIdx, page) => {
       const startItemIdx = (page - 1) * LIKED_CRAFT_PER_PAGE;
       
       const result = [];
-      const likedCraftInfo = await likeDao.getLikedCraftInfo(connection, [userIdx, userIdx, startItemIdx, LIKED_CRAFT_PER_PAGE]);
+      const likedCraftInfo = await likeDao.getLikedCraftInfo(connection, userIdx, startItemIdx, LIKED_CRAFT_PER_PAGE);
 
       likedCraftInfo.forEach(item => {
         result.push({

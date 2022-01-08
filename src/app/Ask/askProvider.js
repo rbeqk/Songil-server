@@ -6,11 +6,11 @@ const baseResponse = require('../../../config/baseResponseStatus');
 const {getTotalPage} = require("../../../modules/pageUtil");
 const {USER_ASK_PER_PAGE} = require("../../../modules/constants");
 
-exports.getAskTotalPage = async (params) => {
+exports.getAskTotalPage = async (userIdx) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
-      const totalCnt = await askDao.getAskCnt(connection, params);
+      const totalCnt = await askDao.getAskCnt(connection, userIdx);
       const totalPages = getTotalPage(totalCnt, USER_ASK_PER_PAGE);
       
       const result = {
@@ -31,16 +31,14 @@ exports.getAskTotalPage = async (params) => {
   }
 }
 
-exports.getAsk = async (params) => {
-  const userIdx = params[0];
-  const page = params[1];
+exports.getAsk = async (userIdx, page) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
       let result = [];
       const startItemIdx = (page - 1) * USER_ASK_PER_PAGE;
 
-      const ask = await askDao.getAsk(connection, [userIdx, startItemIdx, USER_ASK_PER_PAGE]);
+      const ask = await askDao.getAsk(connection, userIdx, startItemIdx, USER_ASK_PER_PAGE);
 
       ask.forEach(item => {
         result.push({
