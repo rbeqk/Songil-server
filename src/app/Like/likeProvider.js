@@ -40,10 +40,7 @@ exports.getLikedArticle = async (userIdx, page) => {
     try{
       const startItemIdx = (page - 1) * LIKED_ARTICLE_PER_PAGE;
 
-      const likedArticleIdx = await likeDao.getLikedArticleIdx(connection, userIdx);
-      const articleList = likedArticleIdx.map(x => x.articleIdx);
-
-      const articleInfo = await likeDao.getLikedArticleInfo(connection, userIdx, articleList, startItemIdx, LIKED_ARTICLE_PER_PAGE);
+      const articleInfo = await likeDao.getLikedArticleInfo(connection, userIdx, startItemIdx, LIKED_ARTICLE_PER_PAGE);
 
       let result = [];
       
