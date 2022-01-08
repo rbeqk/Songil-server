@@ -4,6 +4,7 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
+const {QNA_COMMENT_PER_PAGE} = require("../../../modules/constants");
 
 exports.getQnAComment = async (qnaIdx, userIdx, page) => {
   try{
@@ -17,11 +18,10 @@ exports.getQnAComment = async (qnaIdx, userIdx, page) => {
         return errResponse(baseResponse.INVALID_QNA_IDX);
       }
 
-      const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
-      const startItemIdx = (page - 1) * pageItemCnt;
+      const startItemIdx = (page - 1) * QNA_COMMENT_PER_PAGE;
 
       //부모 댓글 가져오기
-      const parentComment = await qnaCommentDao.getQnAParentComment(connection, qnaIdx, userIdx, pageItemCnt, startItemIdx);
+      const parentComment = await qnaCommentDao.getQnAParentComment(connection, qnaIdx, userIdx, QNA_COMMENT_PER_PAGE, startItemIdx);
 
       let result = [];
 

@@ -5,10 +5,11 @@ const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 const {getTotalPage} = require('../../../modules/pageUtil');
-
-const MY_PAGE_WRITTEN_CRAFT_COMMENT_PER_PAGE = 5;
-const MY_PAGE_WRITTEN_POST_PER_PAGE = 5;
-const LIKED_WITH_PER_PAGE = 5;
+const {
+  MY_PAGE_WRITTEN_CRAFT_COMMENT_PER_PAGE,
+  MY_PAGE_WRITTEN_POST_PER_PAGE,
+  LIKED_WITH_PER_PAGE
+} = require("../../../modules/constants");
 
 exports.getMyCommentTotalPage = async (userIdx, type) => {
   try{
@@ -75,7 +76,7 @@ exports.getMyComment = async (userIdx, type, page) => {
       }
       //작성한 코멘트
       else if (type === 'written'){
-        const writtenComment = await myPageDao.getWrittenComment(connection, userIdx, startItemIdx, pageItemCnt);
+        const writtenComment = await myPageDao.getWrittenComment(connection, userIdx, startItemIdx, MY_PAGE_WRITTEN_CRAFT_COMMENT_PER_PAGE);
         
         for (let item of writtenComment){
           const imageArr = await craftCommentDao.getCommentPhoto(connection, item.commentIdx);

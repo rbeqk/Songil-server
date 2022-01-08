@@ -5,8 +5,7 @@ const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 const {getABTestFinalInfo, getUserVoteInfo} = require('../../../modules/abTestUtil');
 const {getTotalPage} = require("../../../modules/pageUtil");
-
-const WITH_BY_CATEGORY_PER_PAGE = 5;
+const {WITH_BY_CATEGORY_PER_PAGE} = require("../../../modules/constants");
 
 exports.getHotTalk = async () => {
   try{

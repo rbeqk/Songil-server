@@ -4,8 +4,7 @@ const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 const {getTotalPage} = require("../../../modules/pageUtil");
-
-const USER_ASK_PER_PAGE = 5;
+const {USER_ASK_PER_PAGE} = require("../../../modules/constants");
 
 exports.getAskTotalPage = async (params) => {
   try{

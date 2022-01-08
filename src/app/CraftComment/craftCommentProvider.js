@@ -5,8 +5,7 @@ const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 const {getTotalPage} = require("../../../modules/pageUtil");
-
-const CRAFT_COMMENT_PER_PAGE = 5;
+const {CRAFT_COMMENT_PER_PAGE} = require("../../../modules/constants");
 
 exports.getCommentTotalPage = async (craftIdx, type) => {
   try{

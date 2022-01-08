@@ -4,8 +4,7 @@ const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 const {getTotalPage} = require("../../../modules/pageUtil");
-
-const CRAFT_BY_CATEGPRY_PER_PAGE = 5;
+const {CRAFT_BY_CATEGPRY_PER_PAGE} = require("../../../modules/constants");
 
 exports.getShop = async () => {
   try{

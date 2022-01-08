@@ -5,9 +5,10 @@ const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 const {getTotalPage} = require("../../../modules/pageUtil");
-
-const ARTIST_PLACE_ARTIST_CRAFT_PER_PAGE = 5;
-const ARTIST_PLACE_ARTIST_ARTICLE_PER_PAGE = 5;
+const {
+  ARTIST_PLACE_ARTIST_CRAFT_PER_PAGE,
+  ARTIST_PLACE_ARTIST_ARTICLE_PER_PAGE
+} = require("../../../modules/constants");
 
 //총 아티클 수 가져오기
 const getTotalArticleCnt = async (connection, artistIdx) => {

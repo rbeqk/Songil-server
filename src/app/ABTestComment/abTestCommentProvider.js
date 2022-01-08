@@ -4,6 +4,7 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
+const {AB_TEST_COMMENT_PER_PAGE} = require("../../../modules/constants");
 
 exports.getABTestComment = async (abTestIdx, userIdx, page) => {
   try{
@@ -17,11 +18,10 @@ exports.getABTestComment = async (abTestIdx, userIdx, page) => {
         return errResponse(baseResponse.INVALID_ABTEST_IDX);
       }
 
-      const pageItemCnt = 5;  //한 페이지당 보여줄 아이템 개수
-      const startItemIdx = (page - 1) * pageItemCnt;
+      const startItemIdx = (page - 1) * AB_TEST_COMMENT_PER_PAGE;
 
       //부모 댓글 가져오기
-      const parentComment = await abTestCommentDao.getABTestParentComment(connection, abTestIdx, userIdx, startItemIdx, pageItemCnt);
+      const parentComment = await abTestCommentDao.getABTestParentComment(connection, abTestIdx, userIdx, startItemIdx, AB_TEST_COMMENT_PER_PAGE);
 
       let result = [];
 
