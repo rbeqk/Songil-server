@@ -239,3 +239,43 @@ exports.getUserWrittenWithCommentTotalPage = async (userIdx) => {
     return errResponse(baseResponse.DB_ERROR);
   }
 }
+
+//댓글 단 글 조회
+exports.getUserWrittenWithComment = async (userIdx, page) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+      const startItemIdx = (page-1) * MY_PAGE_WRITTEN_POST_COMMENT_PER_PAGE;
+      const writtenWithCommentPost = await myPageDao.getUserWrittenWithComment(connection, userIdx, startItemIdx, MY_PAGE_WRITTEN_POST_COMMENT_PER_PAGE);
+
+      let result = [];
+      writtenWithCommentPost.forEach(item => {
+        result.push({
+          'idx': item.idx,
+          'categoryIdx': item.categoryIdx,
+          'imageUrl': item.imageUrl,
+          'title': item.title,
+          'content': item.content,
+          'name': item.name,
+          'createdAt': item.createdAt,
+          'totalLikeCnt': item.totalLikeCnt,
+          'isLike': item.isLike,
+          'totalCommentCnt': item.totalCommentCnt
+        })
+      })
+
+      result.reverse();
+
+      connection.release();
+      return response(baseResponse.SUCCESS, result);
+
+    }catch(err){
+      connection.release();
+      logger.error(`getUserWrittenWithComment DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`getUserWrittenWithComment DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}

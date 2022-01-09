@@ -84,3 +84,20 @@ exports.getUserWrittenWithCommentTotalPage = async (req, res) => {
 
   return res.send(getUserWrittenWithCommentTotalPage);
 }
+
+/*
+  API No. 8.13
+  API Name: 댓글 단 글 조회 API
+  [GET] /my-page/with/comments
+  query: page
+*/
+exports.getUserWrittenWithComment = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {page} = req.query;
+
+  if (!page) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (page < 1) return res.send(errResponse(baseResponse.INVALID_PAGE));
+
+  const getUserWrittenWithComment = await myPageProvider.getUserWrittenWithComment(userIdx, page);
+  return res.send(getUserWrittenWithComment);
+}

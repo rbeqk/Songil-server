@@ -16,4 +16,7 @@ module.exports  = function(app){
 
   //댓글 단 글 페이지 개수 조회 API
   app.get('/my-page/with/comments/page', jwtMiddleware, myPageController.getUserWrittenWithCommentTotalPage);
+
+  //댓글 단 글 조회 API
+  app.get('/my-page/with/comments', jwtMiddleware, myPageController.getUserWrittenWithComment);
 }
