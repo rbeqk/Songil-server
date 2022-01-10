@@ -25,7 +25,8 @@ exports.getAskTotalPage = async (userIdx) => {
       const totalPages = getTotalPage(totalCnt, ARTIST_ASK_ASK_PER_PAGE);
       
       const result = {
-        'totalPages': totalPages
+        'totalPages': totalPages,
+        'itemsPerPage': ARTIST_ASK_ASK_PER_PAGE
       };
 
       connection.release();

@@ -32,7 +32,8 @@ exports.getCommentTotalPage = async (craftIdx, type) => {
 
       const totalPages = getTotalPage(totalCnt, CRAFT_COMMENT_PER_PAGE);
       const result = {
-        'totalPages': totalPages
+        'totalPages': totalPages,
+        'itemsPerPage': CRAFT_COMMENT_PER_PAGE
       };
 
       connection.release();

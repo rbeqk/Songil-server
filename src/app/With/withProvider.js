@@ -62,7 +62,8 @@ exports.getTotalWithPage = async (category) => {
       const totalPages = getTotalPage(totalCnt, WITH_BY_CATEGORY_PER_PAGE);
 
       const result = {
-        'totalPages': totalPages
+        'totalPages': totalPages,
+        'itemsPerPage': WITH_BY_CATEGORY_PER_PAGE
       }
 
       connection.release();

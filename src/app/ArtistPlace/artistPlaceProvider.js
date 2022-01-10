@@ -120,7 +120,8 @@ exports.getArtistCraftTotalPage = async (artistIdx) => {
       const totalPages = getTotalPage(totalCnt, ARTIST_PLACE_ARTIST_CRAFT_PER_PAGE);
       
       const result = {
-        'totalPages': totalPages
+        'totalPages': totalPages,
+        'itemsPerPage': ARTIST_PLACE_ARTIST_CRAFT_PER_PAGE
       };
       
       connection.release();
@@ -216,7 +217,8 @@ exports.getArtistArticleTotalPage = async (artistIdx) => {
 
       const totalPages = getTotalPage(totalCnt, ARTIST_PLACE_ARTIST_ARTICLE_PER_PAGE);
       const result = {
-        'totalPages': totalPages
+        'totalPages': totalPages,
+        'itemPerPage': ARTIST_PLACE_ARTIST_ARTICLE_PER_PAGE
       };
 
       connection.release();

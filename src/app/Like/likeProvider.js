@@ -18,7 +18,8 @@ exports.getLikedArticleTotalPage = async (userIdx) => {
       const totalPages = getTotalPage(totalCnt, LIKED_ARTICLE_PER_PAGE);
 
       const result = {
-        'totalPages': totalPages
+        'totalPages': totalPages,
+        'itemsPerPage': LIKED_ARTICLE_PER_PAGE
       };
 
       connection.release();
@@ -78,10 +79,11 @@ exports.getLikedCraftTotalPage = async (userIdx) => {
     const connection = await pool.getConnection(async conn => conn);
     try{
       const totalCnt = await likeDao.getLikedCraftTotalCnt(connection, userIdx);
-      const totalPages = getTotalPage(totalCnt, LIKED_CRAFT_PER_PAGE)
+      const totalPages = getTotalPage(totalCnt, LIKED_CRAFT_PER_PAGE);
 
       const result = {
-        'totalPages': totalPages
+        'totalPages': totalPages,
+        'itemPerPage': LIKED_CRAFT_PER_PAGE
       };
 
       connection.release();
@@ -155,7 +157,8 @@ exports.getLikePostCnt = async (userIdx) => {
       const totalPages = getTotalPage(totalCnt, LIKED_WITH_PER_PAGE);
 
       const result = {
-        'totalPages': totalPages
+        'totalPages': totalPages,
+        'itemPerPage': LIKED_WITH_PER_PAGE
       }
 
       connection.release();

@@ -79,7 +79,8 @@ exports.getCraftByCategoryTotalPage = async (craftCategoryIdx) => {
 
       const totalPages = getTotalPage(totalCnt, CRAFT_BY_CATEGPRY_PER_PAGE);
       const result = {
-        'totalPages': totalPages
+        'totalPages': totalPages,
+        'itemsPerPage': CRAFT_BY_CATEGPRY_PER_PAGE
       }
 
       connection.release();

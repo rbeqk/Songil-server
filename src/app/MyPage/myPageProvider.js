@@ -30,7 +30,8 @@ exports.getMyCommentTotalPage = async (userIdx, type) => {
 
       const totalPages = getTotalPage(totalCnt, MY_PAGE_WRITTEN_CRAFT_COMMENT_PER_PAGE);
       const result = {
-        'totalPages': totalPages
+        'totalPages': totalPages,
+        'itemsPerPage': MY_PAGE_WRITTEN_CRAFT_COMMENT_PER_PAGE
       };
 
       connection.release();
@@ -154,7 +155,8 @@ exports.getUserWrittenWithTotalPage = async (userIdx) => {
       const totalPages = getTotalPage(totalCnt, MY_PAGE_WRITTEN_POST_PER_PAGE);
 
       const result = {
-        'totalPages': totalPages
+        'totalPages': totalPages,
+        'itemPerPage': MY_PAGE_WRITTEN_POST_PER_PAGE
       };
 
       connection.release();
@@ -223,7 +225,8 @@ exports.getUserWrittenWithCommentTotalPage = async (userIdx) => {
       const totalPages = getTotalPage(totalCnt, MY_PAGE_WRITTEN_POST_COMMENT_PER_PAGE);
 
       const result = {
-        'totalPages': totalPages
+        'totalPages': totalPages,
+        'itemPerPage': MY_PAGE_WRITTEN_POST_COMMENT_PER_PAGE
       }
 
       connection.release();
