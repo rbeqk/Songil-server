@@ -35,14 +35,15 @@ async function getArticleDetail(connection, articleIdx, userIdx){
         A.mainImageUrl,
         A.title,
         A.editorIdx,
-        E.nickname                                                                   as editorName,
-        DATE_FORMAT(A.createdAt, '%Y.%m.%d. %k:%i')                                  as createdAt,
+        E.nickname                                                                                 as editorName,
+        DATE_FORMAT(A.createdAt, '%Y.%m.%d. %k:%i')                                                as createdAt,
         (SELECT COUNT(*)
-          FROM ArticleLike
-          WHERE articleIdx = ${articleIdx})                                           as totalLikeCnt,
-        EXISTS(SELECT *
-                FROM ArticleLike
-                WHERE articleIdx = ${articleIdx} && ArticleLike.userIdx = ${userIdx}) as isLike
+          FROM ArticleLike AL
+          WHERE AL.articleIdx = ${articleIdx})                                                      as totalLikeCnt,
+        IF(${userIdx} = -1, 'N',
+            IF(EXISTS(SELECT *
+                      FROM ArticleLike AL2
+                      WHERE AL2.articleIdx = ${articleIdx} && AL2.userIdx = ${userIdx}), 'Y', 'N')) as isLike
   FROM Article A
           JOIN Editor E on A.editorIdx = E.editorIdx && E.isDeleted = 'N'
   WHERE A.isDeleted = 'N' && A.articleIdx = ${articleIdx};

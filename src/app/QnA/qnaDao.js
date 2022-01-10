@@ -14,21 +14,22 @@ async function getQnADetail(connection, qnaIdx, userIdx){
   const query = `
   SELECT Q.qnaIdx,
         Q.userIdx,
-        U.imageUrl                                                                  as userProfile,
-        U.nickname                                                                  as userName,
+        U.imageUrl                                                                 as userProfile,
+        U.nickname                                                                 as userName,
         Q.title,
         Q.content,
-        DATE_FORMAT(Q.createdAt, '%Y.%m.%d.')                                       as createdAt,
+        DATE_FORMAT(Q.createdAt, '%Y.%m.%d.')                                      as createdAt,
         (SELECT COUNT(*) as totalLikeCnt
           FROM QnALike
-          WHERE qnaIdx = ${qnaIdx})                                                  as totalLikeCnt,
-        (SELECT EXISTS(SELECT *
-                        FROM QnALike
-                        WHERE qnaIdx = ${qnaIdx} && userIdx = ${userIdx}) as isLike) as isLike,
+          WHERE qnaIdx = ${qnaIdx})                                                 as totalLikeCnt,
+        IF(${userIdx} = -1, 'N',
+            IF(EXISTS(SELECT *
+                      FROM QnALike
+                      WHERE qnaIdx = ${qnaIdx} && userIdx = ${userIdx}), 'Y', 'N')) as isLike,
         (SELECT COUNT(*) as totalCommentCnt
           FROM QnAComment QC
-          WHERE QC.qnaIdx = ${qnaIdx} && QC.isDeleted = 'N')                         as totalCommentCnt,
-        IF(Q.userIdx = ${userIdx}, 'Y', 'N') as isUserQnA
+          WHERE QC.qnaIdx = ${qnaIdx} && QC.isDeleted = 'N')                        as totalCommentCnt,
+        IF(Q.userIdx = ${userIdx}, 'Y', 'N')                                       as isUserQnA
   FROM QnA Q
           JOIN User U ON U.userIdx = Q.userIdx && U.isDeleted = 'N'
   WHERE Q.qnaIdx = ${qnaIdx} && Q.isDeleted = 'N';

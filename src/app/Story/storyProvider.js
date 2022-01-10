@@ -1,5 +1,4 @@
 const storyDao = require('./storyDao');
-const likeDao = require('../Like/likeDao');
 const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
@@ -36,7 +35,7 @@ exports.getStoryDetail = async (storyIdx, userIdx) => {
         'createdAt': storyInfo.createdAt,
         'isUserStory': storyInfo.isUserStory,
         'totalLikeCnt': storyInfo.totalLikeCnt,
-        'isLike': userIdx != -1 ? await likeDao.getStoryLikeStatus(connection, storyIdx, userIdx): 'N',
+        'isLike': storyInfo.isLike,
         'totalCommentCnt': storyInfo.totalCommentCnt,
         'tag': storyTagArr
       };

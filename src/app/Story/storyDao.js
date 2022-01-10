@@ -15,15 +15,19 @@ async function getStoryDetail(connection, storyIdx, userIdx){
   SELECT S.storyIdx,
         S.title,
         S.userIdx,
-        U.nickname                                                          as userName,
-        U.imageUrl                                                          as userProfile,
+        U.nickname                                                                          as userName,
+        U.imageUrl                                                                          as userProfile,
         S.content,
-        DATE_FORMAT(S.createdAt, '%Y.%m.%d.')                               as createdAt,
-        (SELECT COUNT(*) FROM StoryLike SL WHERE SL.storyIdx = ${storyIdx}) as totalLikeCnt,
+        DATE_FORMAT(S.createdAt, '%Y.%m.%d.')                                               as createdAt,
+        (SELECT COUNT(*) FROM StoryLike SL WHERE SL.storyIdx = ${storyIdx})                 as totalLikeCnt,
         (SELECT COUNT(storyCommentIdx)
           FROM StoryComment SC
-          WHERE SC.storyIdx = ${storyIdx} && SC.isDeleted = 'N')             as totalCommentCnt,
-        IF(S.userIdx = ${userIdx}, 'Y', 'N') as isUserStory
+          WHERE SC.storyIdx = ${storyIdx} && SC.isDeleted = 'N')                             as totalCommentCnt,
+        IF(S.userIdx = ${userIdx}, 'Y', 'N')                                                as isUserStory,
+        IF(${userIdx} = -1, 'N',
+            IF(EXISTS(SELECT *
+                      FROM StoryLike SL
+                      WHERE SL.userIdx = ${userIdx} && SL.storyIdx = S.storyIdx), 'Y', 'N')) as isLike
   FROM Story S
           JOIN User U ON U.userIdx = S.userIdx && U.isDeleted = 'N'
   WHERE S.storyIdx = ${storyIdx} && S.isDeleted = 'N';

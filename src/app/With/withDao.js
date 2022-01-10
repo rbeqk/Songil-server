@@ -68,17 +68,18 @@ async function getStory(connection, userIdx, sort, startItemIdx, pageItemCnt){
         (SELECT SI.imageUrl
           FROM StoryImage SI
           WHERE SI.isDeleted = 'N' && SI.storyIdx = S.storyIdx
-          LIMIT 1)                                                                   as mainImageUrl,
+          LIMIT 1)                                                                            as mainImageUrl,
         S.title,
         S.userIdx,
-        U.nickname as userName,
+        U.nickname                                                                           as userName,
         (SELECT COUNT(*)
           FROM StoryLike SL
-          WHERE SL.storyIdx = S.storyIdx)                                            as totalLikeCnt,
-        IF((SELECT EXISTS(
-                        SELECT *
-                        FROM StoryLike SL
-                        WHERE SL.storyIdx = S.storyIdx && SL.userIdx = ${userIdx})), 'Y', 'N') as isLike
+          WHERE SL.storyIdx = S.storyIdx)                                                     as totalLikeCnt,
+        IF(${userIdx} = -1, 'N',
+            IF(EXISTS(
+                      SELECT *
+                      FROM StoryLike SL
+                      WHERE SL.storyIdx = S.storyIdx && SL.userIdx = ${userIdx}), 'Y', 'N')) as isLike
   FROM Story S
           JOIN User U on S.userIdx = U.useridx && U.isDeleted = 'N'
   WHERE S.isDeleted = 'N'
@@ -96,14 +97,15 @@ async function getQnA(connection, userIdx, sort, startItemIdx, pageItemCnt){
   SELECT Q.qnaIdx,
         Q.title,
         Q.content,
-        DATE_FORMAT(Q.createdAt, '%Y.%m.%d.')                                                  as createdAt,
+        DATE_FORMAT(Q.createdAt, '%Y.%m.%d.')                                            as createdAt,
         Q.userIdx,
-        U.nickname                                                                            as userName,
-        (SELECT COUNT(QL.userIdx) FROM QnALike QL WHERE QL.qnaIdx = Q.qnaIdx)                 as totalLikeCnt,
-        IF((SELECT EXISTS(
-                            SELECT *
-                            FROM QnALike QL
-                            WHERE QL.qnaIdx = Q.qnaIdx && QL.userIdx = ${userIdx})), 'Y', 'N') as isLike
+        U.nickname                                                                       as userName,
+        (SELECT COUNT(QL.userIdx) FROM QnALike QL WHERE QL.qnaIdx = Q.qnaIdx)            as totalLikeCnt,
+        IF(${userIdx} = -1, 'N',
+            IF(EXISTS(
+                      SELECT *
+                      FROM QnALike QL
+                      WHERE QL.qnaIdx = Q.qnaIdx && QL.userIdx = ${userIdx}), 'Y', 'N')) as isLike
   FROM QnA Q
           JOIN User U on U.userIdx = Q.userIdx && U.isDeleted = 'N'
   WHERE Q.isDeleted = 'N'

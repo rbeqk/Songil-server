@@ -28,7 +28,7 @@ exports.getQnADetail = async (qnaIdx, userIdx) => {
         'createdAt': qnaDetail.createdAt,
         'isUserQnA': qnaDetail.isUserQnA,
         'totalLikeCnt': qnaDetail.totalLikeCnt,
-        'isLike': qnaDetail.isLike ? 'Y' : 'N',
+        'isLike': qnaDetail.isLike,
         'totalCommentCnt': qnaDetail.totalCommentCnt
       }
       

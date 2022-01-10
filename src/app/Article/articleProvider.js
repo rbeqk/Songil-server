@@ -63,7 +63,7 @@ exports.getArticleDetail = async (articleIdx, userIdx) => {
       result.editorIdx = articleDetailInfo.editorIdx;
       result.editorName = articleDetailInfo.editorName;
       result.createdAt = articleDetailInfo.createdAt;
-      result.isLike = articleDetailInfo.isLike === 0 ? 'N' : 'Y';
+      result.isLike = articleDetailInfo.isLike;
       result.totalLikeCnt = articleDetailInfo.totalLikeCnt;
 
       //아티클 전체 내용 가져오기
