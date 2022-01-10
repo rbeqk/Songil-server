@@ -18,7 +18,7 @@ exports.getABTestDetail = async (abTestIdx, userIdx) => {
       }
 
       //abTest 기본 정보
-      const abTestInfo = await abTestDao.getABTestInfo(connection, abTestIdx);
+      const abTestInfo = await abTestDao.getABTestInfo(connection, abTestIdx, userIdx);
 
       let result = {
         'abTestIdx': abTestInfo.abTestIdx,
@@ -30,7 +30,8 @@ exports.getABTestDetail = async (abTestIdx, userIdx) => {
         'imageB': abTestInfo.imageB,
         'deadline': abTestInfo.deadline,
         'totalCommentCnt': abTestInfo.totalCommentCnt,
-        'isFinished': abTestInfo.isFinished
+        'isFinished': abTestInfo.isFinished,
+        'isUserABTest': abTestInfo.isUserABTest
       };
 
       //투표 결과 가져오기

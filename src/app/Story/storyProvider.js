@@ -17,7 +17,7 @@ exports.getStoryDetail = async (storyIdx, userIdx) => {
         return errResponse(baseResponse.INVALID_STORY_IDX);
       }
 
-      const storyInfo = await storyDao.getStoryDetail(connection, storyIdx);
+      const storyInfo = await storyDao.getStoryDetail(connection, storyIdx, userIdx);
       const storyImage = await storyDao.getStoryImage(connection, storyIdx);
       const storyImageArr = storyImage.map(item => item.imageUrl);
 
@@ -34,6 +34,7 @@ exports.getStoryDetail = async (storyIdx, userIdx) => {
         'userIdx': storyInfo.userIdx,
         'userProfile': storyInfo.userProfile,
         'createdAt': storyInfo.createdAt,
+        'isUserStory': storyInfo.isUserStory,
         'totalLikeCnt': storyInfo.totalLikeCnt,
         'isLike': userIdx != -1 ? await likeDao.getStoryLikeStatus(connection, storyIdx, userIdx): 'N',
         'totalCommentCnt': storyInfo.totalCommentCnt,

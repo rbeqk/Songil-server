@@ -10,7 +10,7 @@ async function isExistStoryIdx(connection, storyIdx){
 }
 
 //stroyIdx의 정보
-async function getStoryDetail(connection, storyIdx){
+async function getStoryDetail(connection, storyIdx, userIdx){
   const query = `
   SELECT S.storyIdx,
         S.title,
@@ -22,7 +22,8 @@ async function getStoryDetail(connection, storyIdx){
         (SELECT COUNT(*) FROM StoryLike SL WHERE SL.storyIdx = ${storyIdx}) as totalLikeCnt,
         (SELECT COUNT(storyCommentIdx)
           FROM StoryComment SC
-          WHERE SC.storyIdx = ${storyIdx} && SC.isDeleted = 'N')             as totalCommentCnt
+          WHERE SC.storyIdx = ${storyIdx} && SC.isDeleted = 'N')             as totalCommentCnt,
+        IF(S.userIdx = ${userIdx}, 'Y', 'N') as isUserStory
   FROM Story S
           JOIN User U ON U.userIdx = S.userIdx && U.isDeleted = 'N'
   WHERE S.storyIdx = ${storyIdx} && S.isDeleted = 'N';

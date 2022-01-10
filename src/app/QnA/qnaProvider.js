@@ -19,12 +19,14 @@ exports.getQnADetail = async (qnaIdx, userIdx) => {
       const qnaDetail = await qnaDao.getQnADetail(connection, qnaIdx, userIdx);
       
       const result = {
+        'qnaIdx': qnaDetail.qnaIdx,
         'userIdx': qnaDetail.userIdx,
         'userProfile': qnaDetail.userProfile,
         'userName': qnaDetail.userName,
         'title': qnaDetail.title,
         'content': qnaDetail.content,
         'createdAt': qnaDetail.createdAt,
+        'isUserQnA': qnaDetail.isUserQnA,
         'totalLikeCnt': qnaDetail.totalLikeCnt,
         'isLike': qnaDetail.isLike ? 'Y' : 'N',
         'totalCommentCnt': qnaDetail.totalCommentCnt

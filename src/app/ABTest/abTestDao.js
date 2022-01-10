@@ -10,23 +10,24 @@ async function isExistABTestIdx(connection, abTestIdx){
 }
 
 //ABTest 정보
-async function getABTestInfo(connection, abTestIdx){
+async function getABTestInfo(connection, abTestIdx, userIdx){
   const query = `
   SELECT AB.abTestIdx,
-    AB.artistIdx,
-    U.imageUrl                                       as artistImageUrl,
-    U.nickname                                       as artistName,
-    AB.content,
-    AB.imageA,
-    AB.imageB,
-    DATE_FORMAT(AB.deadline, '%Y.%m.%d')             as deadline,
-    (SELECT COUNT(*) as totalCommentCnt
-    FROM ABTestComment ABC
-    WHERE ABC.abTestIdx = ${abTestIdx} && ABC.isDeleted = 'N') as totalCommentCnt,
-    IF(TIMESTAMPDIFF(SECOND, NOW(), deadline) < 0, 'Y', 'N') as isFinished
+        AB.artistIdx,
+        U.imageUrl                                                  as artistImageUrl,
+        U.nickname                                                  as artistName,
+        AB.content,
+        AB.imageA,
+        AB.imageB,
+        DATE_FORMAT(AB.deadline, '%Y.%m.%d')                        as deadline,
+        (SELECT COUNT(*) as totalCommentCnt
+          FROM ABTestComment ABC
+          WHERE ABC.abTestIdx = ${abTestIdx} && ABC.isDeleted = 'N') as totalCommentCnt,
+        IF(TIMESTAMPDIFF(SECOND, NOW(), deadline) < 0, 'Y', 'N')    as isFinished,
+        IF(${userIdx} = U.userIdx, 'Y', 'N') as isUserABTest
   FROM ABTest AB
-      JOIN Artist A ON A.artistIdx = AB.artistIdx && A.isDeleted = 'N'
-      JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
+          JOIN Artist A ON A.artistIdx = AB.artistIdx && A.isDeleted = 'N'
+          JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
   WHERE AB.abTestIdx = ${abTestIdx} && AB.isDeleted = 'N';
   `;
   const [rows] = await connection.query(query);
