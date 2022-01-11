@@ -14,7 +14,7 @@ exports.getShop = async () => {
       let result = {};
 
       const banner = await shopDao.getBanner(connection);
-      result.banner = banner.map(item => item.imageUrl);
+      result.banner = banner;
 
       const todayCraft = await shopDao.getTodayCraft(connection);
       result.todayCraft = [];

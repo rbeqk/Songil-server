@@ -23,8 +23,10 @@ async function getTodayCraft(connection){
 //banner 가져오기
 async function getBanner(connection){
   const query = `
-  SELECT imageUrl FROM ShopBanner
-  WHERE isDeleted = 'N';
+  SELECT shopBannerIdx as bannerIdx, imageUrl
+  FROM ShopBanner
+  WHERE isDeleted = 'N'
+  ORDER BY bannerIdx DESC;
   `;
   const [rows] = await connection.query(query);
   return rows;
