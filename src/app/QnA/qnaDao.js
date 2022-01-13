@@ -69,6 +69,28 @@ async function deleteQnA(connection, qnaIdx){
   return rows;
 }
 
+//qna 좋아요 삭제
+async function deleteQnALike(connection, qnaIdx){
+  const query = `
+  DELETE
+  FROM QnALike
+  WHERE qnaIdx = ${qnaIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
+//qna 댓글 삭제
+async function deleteQnAComment(connection, qnaIdx){
+  const query = `
+  UPDATE QnAComment
+  SET isDeleted = 'Y'
+  WHERE qnaIdx = ${qnaIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 //qna 수정
 async function updateQnA(connection, qnaIdx, title, content){
   const query = `
@@ -87,5 +109,7 @@ module.exports = {
   createQnA,
   getStoryUserIdx,
   deleteQnA,
+  deleteQnALike,
+  deleteQnAComment,
   updateQnA,
 }

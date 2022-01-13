@@ -58,6 +58,8 @@ exports.deleteQnA = async (userIdx, qnaIdx) => {
       
       await connection.beginTransaction();
       await qnaDao.deleteQnA(connection, qnaIdx);
+      await qnaDao.deleteQnALike(connection, qnaIdx);
+      await qnaDao.deleteQnAComment(connection, qnaIdx);
       await connection.commit();
       
       connection.release();
