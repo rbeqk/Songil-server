@@ -140,6 +140,28 @@ async function deleteStoryImage(connection, storyIdx){
   return rows;
 }
 
+//스토리 좋아요 삭제
+async function deleteStoryLike(connection, storyIdx){
+  const query = `
+  DELETE
+  FROM StoryLike
+  WHERE storyIdx = ${storyIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
+//스토리 댓글 삭제
+async function deleteStoryComment(connection, storyIdx){
+  const query = `
+  UPDATE StoryComment
+  SET isDeleted = 'Y'
+  WHERE storyIdx = ${storyIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   isExistStoryIdx,
   getStoryDetail,
@@ -153,4 +175,6 @@ module.exports = {
   updateStoryInfo,
   deleteStoryTag,
   deleteStoryImage,
+  deleteStoryLike,
+  deleteStoryComment,
 }

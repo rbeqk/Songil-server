@@ -66,6 +66,10 @@ exports.deleteStory = async (userIdx, storyIdx) => {
       
       await connection.beginTransaction();
       await storyDao.deleteStory(connection, storyIdx);
+      await storyDao.deleteStoryTag(connection, storyIdx);
+      await storyDao.deleteStoryImage(connection, storyIdx);
+      await storyDao.deleteStoryLike(connection, storyIdx);
+      await storyDao.deleteStoryComment(connection, storyIdx);
       await connection.commit();
       
       connection.release();
