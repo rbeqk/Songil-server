@@ -19,16 +19,14 @@ exports.createQnAComment = async (userIdx, qnaIdx, parentIdx, comment) => {
 
       //존재하는 parentIdx인지(= 존재하는 qnaCommentIdx인지 && parentIdx IS NULL)
       if (parentIdx){
-        const isExistQnACommentParentIdx = await qnaCommentDao.isExistQnACommentParentIdx(connection, parentIdx);
+        const isExistQnACommentParentIdx = await qnaCommentDao.isExistQnACommentParentIdx(connection, qnaIdx, parentIdx);
         if (!isExistQnACommentParentIdx){
           connection.release();
           return errResponse(baseResponse.INVALID_PARENT_IDX);
         }
       }
       
-      if (!parentIdx){
-        parentIdx = null; //없을 경우 null로 변경
-      }
+      if (!parentIdx) parentIdx = null;
 
       await connection.beginTransaction();
       await qnaCommentDao.createQnAComment(connection, qnaIdx, userIdx, parentIdx, comment);

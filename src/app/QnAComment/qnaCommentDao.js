@@ -1,9 +1,9 @@
 //존재하는 parentIdx인지
-async function isExistQnACommentParentIdx(connection, parentIdx){
+async function isExistQnACommentParentIdx(connection, qnaIdx, parentIdx){
   const query = `
   SELECT EXISTS(SELECT qnaCommentIdx
     FROM QnAComment
-    WHERE qnaCommentIdx = ${parentIdx} && isDeleted = 'N' && parentIdx IS NULL) as isExist;
+    WHERE qnaCommentIdx = ${parentIdx} && qnaIdx = ${qnaIdx} && isDeleted = 'N' && parentIdx IS NULL) as isExist;
   `;
   const [rows] = await connection.query(query);
   return rows[0]['isExist'];
@@ -13,9 +13,9 @@ async function isExistQnACommentParentIdx(connection, parentIdx){
 async function createQnAComment(connection, qnaIdx, userIdx, parentIdx, comment){
   const query = `
   INSERT INTO QnAComment(qnaIdx, userIdx, parentIdx, comment)
-  VALUES (${qnaIdx}, ${userIdx}, ${parentIdx}, '${comment}');
+  VALUES (${qnaIdx}, ${userIdx}, ${parentIdx}, ?);
   `;
-  const [rows] = await connection.query(query);
+  const [rows] = await connection.query(query, [comment]);
   return rows;
 }
 
@@ -65,7 +65,7 @@ async function getQnAParentComment(connection, qnaIdx, userIdx, pageItemCnt, sta
         QC.isDeleted
   FROM QnAComment QC
           JOIN User U ON U.userIdx = QC.userIdx && U.isDeleted = 'N'
-  JOIN QnA Q ON Q.qnaIdx = QC.qnaIdx && Q.isDeleted = 'N'
+          JOIN QnA Q ON Q.qnaIdx = QC.qnaIdx && Q.isDeleted = 'N'
   WHERE QC.parentIdx IS NULL && QC.qnaIdx = ${qnaIdx}
   LIMIT ${startItemIdx}, ${pageItemCnt};
   `;

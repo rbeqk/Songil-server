@@ -42,9 +42,9 @@ async function getQnADetail(connection, qnaIdx, userIdx){
 async function createQnA(connection, userIdx, title, content){
   const query = `
   INSERT INTO QnA(userIdx, title, content)
-  VALUES (${userIdx}, '${title}', '${content}');
+  VALUES (${userIdx}, ?, ?);
   `;
-  const [rows] = await connection.query(query);
+  const [rows] = await connection.query(query, [title, content]);
   return rows;
 }
 
