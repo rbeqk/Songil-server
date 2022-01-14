@@ -19,16 +19,14 @@ exports.createABTestComment = async (userIdx, abTestIdx, parentIdx, comment) => 
 
       //존재하는 parentIdx인지(= 존재하는 abTestCommentIdx인지 && parentIdx IS NULL)
       if (parentIdx){
-        const isExistABTestCommentParentIdx = await abTestCommentDao.isExistABTestCommentParentIdx(connection, parentIdx);
+        const isExistABTestCommentParentIdx = await abTestCommentDao.isExistABTestCommentParentIdx(connection, abTestIdx, parentIdx);
         if (!isExistABTestCommentParentIdx){
           connection.release();
           return errResponse(baseResponse.INVALID_PARENT_IDX);
         }
       }
       
-      if (!parentIdx){
-        parentIdx = null; //없을 경우 null로 변경
-      }
+      if (!parentIdx) parentIdx = null;
 
       await connection.beginTransaction();
       await abTestCommentDao.createABTestComment(connection, abTestIdx, userIdx, parentIdx, comment);

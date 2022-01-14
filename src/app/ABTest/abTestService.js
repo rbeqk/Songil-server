@@ -51,13 +51,6 @@ exports.deleteABTest = async (userIdx, abTestIdx) => {
         return errResponse(baseResponse.INVALID_ABTEST_IDX);
       }
 
-      //작가의 userIdx인지
-      const isArtistUserIdx = await abTestDao.isArtistUserIdx(connection, userIdx);
-      if (!isArtistUserIdx){
-        connection.release();
-        return errResponse(baseResponse.NO_PERMISSION);
-      }
-
       //abTest 작가의 userIdx 가져오기
       const abTestUserIdx = await abTestDao.getAbTestUserIdx(connection, abTestIdx);
       if (abTestUserIdx !== userIdx){
@@ -67,6 +60,7 @@ exports.deleteABTest = async (userIdx, abTestIdx) => {
       
       await connection.beginTransaction();
       await abTestDao.deleteABTest(connection, abTestIdx);
+      await abTestDao.deleteABTestComment(connection, abTestIdx);
       await connection.commit();
       
       connection.release();
@@ -187,13 +181,6 @@ exports.updateABTest = async (userIdx, abTestIdx, content) => {
       if (!isExistABTestIdx){
         connection.release();
         return errResponse(baseResponse.INVALID_ABTEST_IDX);
-      }
-
-      //작가의 userIdx인지
-      const isArtistUserIdx = await abTestDao.isArtistUserIdx(connection, userIdx);
-      if (!isArtistUserIdx){
-        connection.release();
-        return errResponse(baseResponse.NO_PERMISSION);
       }
 
       //abTest 작가의 userIdx 가져오기

@@ -58,9 +58,9 @@ async function getCurrentVoteTotalCnt(connection, abTestIdx){
 async function getCurrentUserVoteTotalCnt(connection, abTestIdx, userVote){
   const query = `
   SELECT COUNT(*) as totalVoteCnt FROM ABTestVote
-  WHERE abTestIdx = ${abTestIdx} && vote = '${userVote}';
+  WHERE abTestIdx = ${abTestIdx} && vote = ?;
   `;
-  const [rows] = await connection.query(query);
+  const [rows] = await connection.query(query, [userVote]);
   return rows[0]['totalVoteCnt'];
 }
 
@@ -113,9 +113,9 @@ async function getArtistIdx(connection, userIdx){
 async function createABTest(connection, content, deadline, imageArr, artistIdx){
   const query = `
   INSERT INTO ABTest(artistIdx, content, imageA, imageB, deadline)
-  VALUES (${artistIdx}, '${content}', '${imageArr[0]}', '${imageArr[1]}', '${deadline}');
+  VALUES (${artistIdx}, ?, ?, ?, ?);
   `;
-  const [rows] = await connection.query(query);
+  const [rows] = await connection.query(query, [content, imageArr[0], imageArr[1], deadline]);
   return rows;
 }
 
@@ -167,9 +167,9 @@ async function isExistVoteResult(connection, userIdx, abTestIdx){
 async function voteABTest(connection, userIdx, abTestIdx, vote){
   const query = `
   INSERT INTO ABTestVote(abTestIdx, userIdx, vote)
-  VALUES (${abTestIdx}, ${userIdx}, '${vote}');
+  VALUES (${abTestIdx}, ${userIdx}, ?);
   `;
-  const [rows] = await connection.query(query);
+  const [rows] = await connection.query(query, [vote]);
   return rows;
 }
 
@@ -187,7 +187,18 @@ async function deleteVoteABTest(connection, userIdx, abTestIdx){
 async function updateABTest(connection, abTestIdx, content){
   const query = `
   UPDATE ABTest
-  SET content = '${content}'
+  SET content = ?
+  WHERE abTestIdx = ${abTestIdx};
+  `;
+  const [rows] = await connection.query(query, [content]);
+  return rows;
+}
+
+//ABTest 댓글 삭제
+async function deleteABTestComment(connection, abTestIdx){
+  const query = `
+  UPDATE ABTestComment
+  SET isDeleted = 'Y'
   WHERE abTestIdx = ${abTestIdx};
   `;
   const [rows] = await connection.query(query);
@@ -212,4 +223,5 @@ module.exports = {
   voteABTest,
   deleteVoteABTest,
   updateABTest,
+  deleteABTestComment,
 }
