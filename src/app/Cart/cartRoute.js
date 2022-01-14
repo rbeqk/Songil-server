@@ -10,4 +10,7 @@ module.exports = function(app){
 
   //장바구니 조회 API
   app.get('/cart', jwtMiddleware, cartController.getCart);
+
+  //장바구니 상품 삭제 API
+  app.delete('/cart/crafts/:craftIdx', jwtMiddleware, cartController.deleteCartCraft);
 }

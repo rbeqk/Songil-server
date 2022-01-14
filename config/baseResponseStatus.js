@@ -39,6 +39,7 @@ module.exports = {
   INVALID_CATEGORY_NAME: {"isSuccess": false, "code": 2321, "message": "존재하지 않는 category입니다"},
   INVALID_AMOUNT: {"isSuccess": false, "code": 2322, "message": "수량은 1 이상 입력해주세요"},
   SOLD_OUT_CRAFT_IDX: {"isSuccess": false, "code": 2323, "message": "품절된 craftIdx입니다"},
+  NOT_IN_CART_CRAFT_IDX: {"isSuccess": false, "code": 2324, "message": "장바구니에 담긴 craftIdx가 아닙니다"},
 
   EXCEED_ASK_CONTENT: {"isSuccess": false, "code": 2350, "message": "content는 300자 이하로 입력해주세요"},
   EXCEED_REPORTED_REASON: {"isSuccess": false, "code": 2351, "message": "신고 사유는 150자 이하로 입력해주세요"},

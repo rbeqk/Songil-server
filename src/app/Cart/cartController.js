@@ -48,3 +48,17 @@ exports.getCartCnt = async (req, res) => {
 
   return res.send(getCartCnt);
 }
+
+/*
+  API No. 11.4
+  API Name: 장바구니 상품 삭제 API
+  [DELETE] /cart/crafts/:craftIdx
+*/
+exports.deleteCartCraft = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {craftIdx} = req.params;
+
+  const deleteCartCraft = await cartService.deleteCartCraft(userIdx, craftIdx);
+
+  return res.send(deleteCartCraft);
+}

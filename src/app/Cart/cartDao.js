@@ -72,6 +72,28 @@ async function isSoldOutCraft(connection, craftIdx){
   return rows[0]['isSoldOut'];
 }
 
+//장바구니에 담긴 상품인지
+async function isCraftInCart(connection, userIdx, craftIdx){
+  const query = `
+  SELECT EXISTS(SELECT *
+    FROM Cart
+            JOIN Craft C on Cart.craftIdx = C.craftIdx && C.isSoldOut = 'N' && C.isDeleted = 'N'
+    WHERE Cart.userIdx = ${userIdx} && Cart.craftIdx = ${craftIdx}) as isExist;
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['isExist'];
+}
+
+//장바구니 상품 삭제
+async function deleteCartCraft(connection, userIdx, craftIdx){
+  const query = `
+  DELETE FROM Cart
+  WHERE userIdx = ${userIdx} && craftIdx = ${craftIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   getCartCraftAmount,
   updateCartCraftAmount,
@@ -79,4 +101,6 @@ module.exports = {
   getCart,
   getCartCnt,
   isSoldOutCraft,
+  isCraftInCart,
+  deleteCartCraft,
 }
