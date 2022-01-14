@@ -22,3 +22,16 @@ exports.addCartCraft = async (req, res) => {
 
   return res.send(addCartCraft);
 }
+
+/*
+  API No. 11.2
+  API Name: 장바구니 조회 API
+  [GET] /cart
+*/
+exports.getCart = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+
+  const getCart = await cartProvider.getCart(userIdx);
+
+  return res.send(getCart);
+}
