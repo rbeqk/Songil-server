@@ -18,6 +18,13 @@ exports.addCartCraft = async(craftIdx, amount, userIdx) => {
         return errResponse(baseResponse.INVALID_CRAFT_IDX);
       }
 
+      //품절된 상품인지
+      const isSoldOutCraft = await cartDao.isSoldOutCraft(connection, craftIdx);
+      if (isSoldOutCraft){
+        connection.release();
+        return errResponse(baseResponse.SOLD_OUT_CRAFT_IDX);
+      }
+
       await connection.beginTransaction();
 
       //해당 상품이 장바구니에 담겨있을 시 개수

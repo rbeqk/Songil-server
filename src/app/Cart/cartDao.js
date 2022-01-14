@@ -62,10 +62,21 @@ async function getCartCnt(connection, userIdx){
   return rows[0]['totalCnt'];
 }
 
+//품절된 상품인지
+async function isSoldOutCraft(connection, craftIdx){
+  const query = `
+  SELECT IF(isSoldOut = 'Y', 1, 0) as isSoldOut FROM Craft
+  WHERE craftIdx = ${craftIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['isSoldOut'];
+}
+
 module.exports = {
   getCartCraftAmount,
   updateCartCraftAmount,
   addCartCraft,
   getCart,
   getCartCnt,
+  isSoldOutCraft,
 }
