@@ -53,6 +53,7 @@ module.exports = function (){
   require('../src/app/Home/homeRoute')(app);
   require('../src/app/With/withRoute')(app);
   require('../src/app/Craft/craftRoute')(app);
+  require('../src/app/Cart/cartRoute')(app);
 
   return app;
 }
