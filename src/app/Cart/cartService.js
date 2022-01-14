@@ -11,6 +11,13 @@ exports.addCartCraft = async(craftIdx, amount, userIdx) => {
     const connection = await pool.getConnection(async conn => conn);
     try{
 
+      //현재 장바구니 상품 개수 확인
+      const currentCartCnt = await cartDao.getCurrentCartCnt(connection, userIdx);
+      if (currentCartCnt >= 100){
+        connection.release();
+        return errResponse(baseResponse.EXCEED_CART_CNT);
+      }
+
       //존재하는 craftIdx인지
       const isExistCraftIdx = await craftDao.isExistCraftIdx(connection, craftIdx);
       if (!isExistCraftIdx){

@@ -57,6 +57,7 @@ module.exports = {
   INVALID_IMAGE_QUANTITY: {"isSuccess": false, "code": 2362, "message": "이미지 개수를 확인해주세요"},
   EXCEED_IMAGE_QUANTITY: {"isSuccess": false, "code": 2363, "message": "이미지는 3개 이하로 입력해주세요"},
   EXCEED_CRAFT_COMMENT: {"isSuccess": false, "code": 2364, "message": "comment는 500자 이하로 입력해주세요"},
+  EXCEED_CART_CNT: {"isSuccess": false, "code": 2365, "message": "장바구니에는 최대 100개까지만 담을 수 있습니다"},
 
   NO_PERMISSION: {"isSuccess": false, "code": 2400, "message": "권한이 없습니다"},
   CAN_NOT_REPORT_SELF: {"isSuccess": false, "code": 2401, "message": "자신의 댓글은 신고할 수 없습니다"},

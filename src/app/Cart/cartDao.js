@@ -44,7 +44,7 @@ async function getCart(connection, userIdx){
           JOIN Artist A ON A.artistIdx = C.artistIdx && A.isDeleted = 'N'
           JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
   WHERE Cart.userIdx = ${userIdx}
-  ORDER BY Cart.createdAt DESC;
+  ORDER BY Cart.updatedAt DESC;
   `;
   const [rows] = await connection.query(query);
   return rows;
@@ -94,6 +94,18 @@ async function deleteCartCraft(connection, userIdx, craftIdx){
   return rows;
 }
 
+//현재 장바구니 개수 조회
+async function getCurrentCartCnt(connection, userIdx){
+  const query = `
+  SELECT COUNT(Cart.craftIdx) as totalCnt
+  FROM Cart
+          JOIN Craft C ON C.craftIdx = Cart.craftIdx && C.isDeleted = 'N' && C.isSoldOut = 'N'
+  WHERE Cart.userIdx = ${userIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['totalCnt'];
+}
+
 module.exports = {
   getCartCraftAmount,
   updateCartCraftAmount,
@@ -103,4 +115,5 @@ module.exports = {
   isSoldOutCraft,
   isCraftInCart,
   deleteCartCraft,
+  getCurrentCartCnt,
 }
