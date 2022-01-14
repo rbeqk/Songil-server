@@ -35,3 +35,16 @@ exports.getCart = async (req, res) => {
 
   return res.send(getCart);
 }
+
+/*
+  API No. 11.1
+  API Name: 장바구니 상품 개수 조회 API
+  [GET] /cart/count
+*/
+exports.getCartCnt = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+
+  const getCartCnt = await cartProvider.getCartCnt(userIdx);
+
+  return res.send(getCartCnt);
+}

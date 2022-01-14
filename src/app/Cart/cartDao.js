@@ -50,9 +50,22 @@ async function getCart(connection, userIdx){
   return rows;
 }
 
+//장바구니 상품 개수 조회
+async function getCartCnt(connection, userIdx){
+  const query = `
+  SELECT COUNT(*) as totalCnt
+  FROM Cart
+  JOIN Craft C ON C.craftIdx = Cart.craftIdx && C.isDeleted = 'N' && C.isSoldOut = 'N'
+  WHERE Cart.userIdx = ${userIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['totalCnt'];
+}
+
 module.exports = {
   getCartCraftAmount,
   updateCartCraftAmount,
   addCartCraft,
   getCart,
+  getCartCnt,
 }

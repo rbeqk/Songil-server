@@ -26,3 +26,28 @@ exports.getCart = async (userIdx) => {
     return errResponse(baseResponse.DB_ERROR);
   }
 }
+
+//장바구니 상품 개수 조회
+exports.getCartCnt = async (userIdx) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+
+      const totalCnt = await cartDao.getCartCnt(connection, userIdx);
+      const result = {
+        'totalCnt': totalCnt
+      };
+
+      connection.release();
+      return response(baseResponse.SUCCESS, result);
+      
+    }catch(err){
+      connection.release();
+      logger.error(`getCartCnt DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`getCartCnt DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}
