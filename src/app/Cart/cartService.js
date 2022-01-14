@@ -100,3 +100,53 @@ exports.deleteCartCraft = async (userIdx, craftIdx) => {
     return errResponse(baseResponse.DB_ERROR);
   }
 }
+
+//장바구니 상품 수량 수정
+exports.updateCartCraft = async (craftIdx, userIdx, amountChange) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+
+      //존재하는 craftIdx인지
+      const isExistCraftIdx = await craftDao.isExistCraftIdx(connection, craftIdx);
+      if (!isExistCraftIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_CRAFT_IDX);
+      }
+
+      //현재 장바구니에 담긴 craftIdx의 수량
+      const currentCraftCnt = await cartDao.getCartCraftAmount(connection, userIdx, craftIdx);
+      if (!currentCraftCnt){
+        connection.release();
+        return errResponse(baseResponse.NOT_IN_CART_CRAFT_IDX);
+      }
+
+      if (currentCraftCnt == 1 && amountChange == -1){
+        connection.release();
+        return errResponse(baseResponse.INVALID_AMOUNT);
+      }
+
+      await connection.beginTransaction();
+
+      await cartDao.updateCartCraftAmount(connection, userIdx, craftIdx, currentCraftCnt + amountChange);
+
+      await connection.commit();
+      connection.release();
+
+      const result = {
+        'amount': currentCraftCnt + amountChange
+      };
+
+      return response(baseResponse.SUCCESS, result);
+      
+    }catch(err){
+      await connection.rollback();
+      connection.release();
+      logger.error(`updateCartCraft DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`updateCartCraft DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}

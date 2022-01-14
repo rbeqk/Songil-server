@@ -62,3 +62,22 @@ exports.deleteCartCraft = async (req, res) => {
 
   return res.send(deleteCartCraft);
 }
+
+/*
+  API No. 11.5
+  API Name: 장바구니 상품 수량 수정 API
+  [PATCH] /cart/crafts/:craftIdx
+  body: amountChange
+*/
+exports.updateCartCraft = async (req, res) => {
+  const {craftIdx} = req.params;
+  const {userIdx} = req.verifiedToken;
+  const {amountChange} = req.body;
+
+  if (!amountChange) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (![1, -1].includes(amountChange)) return res.send(errResponse(baseResponse.INVALID_AMOUNT_CHANGE));
+
+  const updateCartCraft = await cartService.updateCartCraft(craftIdx, userIdx, amountChange);
+
+  return res.send(updateCartCraft);
+}

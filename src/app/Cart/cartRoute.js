@@ -13,4 +13,7 @@ module.exports = function(app){
 
   //장바구니 상품 삭제 API
   app.delete('/cart/crafts/:craftIdx', jwtMiddleware, cartController.deleteCartCraft);
+
+  //장바구니 상품 수정 API
+  app.patch('/cart/crafts/:craftIdx', jwtMiddleware, cartController.updateCartCraft);
 }
