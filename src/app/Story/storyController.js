@@ -29,7 +29,8 @@ exports.getStoryDetail = async (req, res) => {
 */
 exports.createStory = async (req, res) => {
   const {userIdx} = req.verifiedToken;
-  const {title, content, tag} = req.body;
+  const {title, content} = req.body;
+  let {tag} = req.body;
 
   if (!(title && content) || req.files.length < 1) return res.send(errResponse(baseResponse.IS_EMPTY));
 
@@ -45,6 +46,7 @@ exports.createStory = async (req, res) => {
   }
   if (tag && typeof tag == 'string'){
     if (tag.length > 20) return res.send(errResponse(baseResponse.EXCEED_TAG_LENGTH));
+    tag = [tag];
   }
 
   const imageArr = req.files.map(item => item.location);
@@ -76,7 +78,8 @@ exports.deleteStory = async (req, res) => {
 */
 exports.updateStory = async (req, res) => {
   const {userIdx} = req.verifiedToken;
-  const {title, content, tag} = req.body;
+  const {title, content} = req.body;
+  let {tag} = req.body;
   const {storyIdx} = req.params;
 
   if (!(title || content || tag || req.files.length < 1)) return res.send(errResponse(baseResponse.UPDATE_INFO_EMPTY));
@@ -93,6 +96,7 @@ exports.updateStory = async (req, res) => {
   }
   if (tag && typeof tag == 'string'){
     if (tag.length > 20) return res.send(errResponse(baseResponse.EXCEED_TAG_LENGTH));
+    tag = [tag];
   }
 
   const imageArr = req.files.map(item => item.location);
