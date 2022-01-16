@@ -117,6 +117,7 @@ exports.getArticleDetail = async (articleIdx, userIdx) => {
               'craftIdx': item.craftIdx,
               'name': item.name,
               'mainImageUrl': item.mainImageUrl,
+              'artistIdx': item.artistIdx,
               'artistName': item.artistName,
               'price': item.price
             }
