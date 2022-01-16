@@ -37,7 +37,15 @@ exports.createStory = async (req, res) => {
 
   if (title.length > 100) return res.send(errResponse(baseResponse.EXCEED_STORY_TITLE));
   if (content.length > 2000) return res.send(errResponse(baseResponse.EXCEED_STORY_CONTENT));
-  if (tag && tag.length > 3) return res.send(errResponse(baseResponse.EXCEED_STORY_TAG));
+  if (tag && Array.isArray(tag) && tag.length > 3) return res.send(errResponse(baseResponse.EXCEED_STORY_TAG));
+  if (tag && Array.isArray(tag)){
+    tag.map(item => {
+      if (item.length > 20) return res.send(errResponse(baseResponse.EXCEED_TAG_LENGTH));
+    })
+  }
+  if (tag && typeof tag == 'string'){
+    if (tag.length > 20) return res.send(errResponse(baseResponse.EXCEED_TAG_LENGTH));
+  }
 
   const imageArr = req.files.map(item => item.location);
 
@@ -77,7 +85,15 @@ exports.updateStory = async (req, res) => {
 
   if (title && title.length > 100) return res.send(errResponse(baseResponse.EXCEED_STORY_TITLE));
   if (content && content.length > 2000) return res.send(errResponse(baseResponse.EXCEED_STORY_CONTENT));
-  if (tag && tag.length > 3) return res.send(errResponse(baseResponse.EXCEED_STORY_TAG));
+  if (tag && Array.isArray(tag) && tag.length > 3) return res.send(errResponse(baseResponse.EXCEED_STORY_TAG));
+  if (tag && Array.isArray(tag)){
+    tag.map(item => {
+      if (item.length > 20) return res.send(errResponse(baseResponse.EXCEED_TAG_LENGTH));
+    })
+  }
+  if (tag && typeof tag == 'string'){
+    if (tag.length > 20) return res.send(errResponse(baseResponse.EXCEED_TAG_LENGTH));
+  }
 
   const imageArr = req.files.map(item => item.location);
 
