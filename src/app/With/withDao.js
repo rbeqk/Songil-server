@@ -100,12 +100,17 @@ async function getQnA(connection, userIdx, sort, startItemIdx, pageItemCnt){
         DATE_FORMAT(Q.createdAt, '%Y.%m.%d.')                                            as createdAt,
         Q.userIdx,
         U.nickname                                                                       as userName,
+        U.imageUrl                                                                       as userProfile,
+        IF(Q.userIdx = ${userIdx}, 'Y', 'N')                                             as isUserQnA,
         (SELECT COUNT(QL.userIdx) FROM QnALike QL WHERE QL.qnaIdx = Q.qnaIdx)            as totalLikeCnt,
         IF(${userIdx} = -1, 'N',
             IF(EXISTS(
                       SELECT *
                       FROM QnALike QL
-                      WHERE QL.qnaIdx = Q.qnaIdx && QL.userIdx = ${userIdx}), 'Y', 'N')) as isLike
+                      WHERE QL.qnaIdx = Q.qnaIdx && QL.userIdx = ${userIdx}), 'Y', 'N')) as isLike,
+        (SELECT COUNT(*)
+          FROM QnAComment QAC
+          WHERE QAC.qnaIdx = Q.qnaIdx && QAC.isDeleted = 'N')                             as totalCommentCnt
   FROM QnA Q
           JOIN User U on U.userIdx = Q.userIdx && U.isDeleted = 'N'
   WHERE Q.isDeleted = 'N'
@@ -130,7 +135,8 @@ async function getABTest(connection, startItemIdx, pageItemCnt){
         (SELECT COUNT(*) as totalCommentCnt
           FROM ABTestComment ABC
           WHERE ABC.abTestIdx = AB.abTestIdx && ABC.isDeleted = 'N') as totalCommentCnt,
-        IF(TIMESTAMPDIFF(SECOND, NOW(), deadline) < 0, 'Y', 'N')    as isFinished
+        IF(TIMESTAMPDIFF(SECOND, NOW(), deadline) < 0, 'Y', 'N')    as isFinished,
+        IF(U.userIdx = ${userIdx}, 'Y', 'N') as isUserABTest
   FROM ABTest AB
           JOIN Artist A ON A.artistIdx = AB.artistIdx && A.isDeleted = 'N'
           JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'

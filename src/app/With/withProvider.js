@@ -121,15 +121,18 @@ exports.getWith = async (category, sort, page, userIdx) => {
           qna.forEach(item => {
             result.push({
               'qnaIdx': item.qnaIdx,
+              'userIdx': item.userIdx,
+              'userProfile': item.userProfile,
+              'userName': item.userName,
               'title': item.title,
               'content': item.content,
               'createdAt': item.createdAt,
-              'userIdx': item.userIdx,
-              'userName': item.userName,
+              'isUserQnA': item.isUserQnA,
               'totalLikeCnt': item.totalLikeCnt,
-              'isLike': item.isLike
+              'isLike': item.isLike,
+              'totalCommentCnt': item.totalCommentCnt
             })
-          })
+          });
         }
 
         result.reverse();
@@ -170,6 +173,7 @@ exports.getWith = async (category, sort, page, userIdx) => {
             'imageB': item.imageB,
             'deadline': item.deadline,
             'isFinished': item.isFinished,
+            'isUserABTest': item.isUserABTest,
             'totalCommentCnt': item.totalCommentCnt,
             'voteInfo': voteInfo,
             'finalInfo': finalInfo
