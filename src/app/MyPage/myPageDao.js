@@ -12,7 +12,7 @@ async function getWrittenComment(connection, userIdx, startItemIdx, pageItemCnt)
           JOIN Artist A ON C.artistIdx = A.artistIdx
           JOIN User U ON U.userIdx = A.userIdx
   WHERE CC.isDeleted = 'N' && CC.userIdx = ${userIdx}
-  ORDER BY CC.craftCommentIdx
+  ORDER BY CC.craftCommentIdx DESC
   LIMIT ${startItemIdx}, ${pageItemCnt};
   `;
   const [rows] = await connection.query(query);
@@ -79,7 +79,7 @@ async function getUserWrittenWith(connection, userIdx, artistIdx, startItemIdx, 
     FROM QnA Q
             JOIN User U ON U.userIdx = Q.userIdx && U.isDeleted = 'N'
     WHERE Q.isDeleted = 'N' && Q.userIdx = ${userIdx}
-    ORDER BY originalCreatedAt
+    ORDER BY originalCreatedAt DESC
     LIMIT ${startItemIdx}, ${itemPerPage};
     `;
 
@@ -151,7 +151,7 @@ async function getUserWrittenWith(connection, userIdx, artistIdx, startItemIdx, 
             JOIN Artist A ON A.artistIdx = AB.artistIdx && A.isDeleted = 'N'
             JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
     WHERE AB.isDeleted = 'N' && AB.artistIdx = ${artistIdx}
-    ORDER BY originalCreatedAt
+    ORDER BY originalCreatedAt DESC
     LIMIT ${startItemIdx}, ${itemPerPage};
     `;
 
@@ -246,7 +246,7 @@ async function getUserWrittenWithComment(connection, userIdx, startItemIdx, item
           JOIN Artist A ON A.artistIdx = AB.artistIdx && A.isDeleted = 'N'
           JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
   GROUP BY ABC.abTestIdx
-  ORDER BY originalCreatedAt
+  ORDER BY originalCreatedAt DESC
   LIMIT ${startItemIdx}, ${itemPerPage};
   `;
   const [rows] = await connection.query(query);

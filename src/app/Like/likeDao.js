@@ -99,7 +99,7 @@ async function getLikedArticleInfo(connection, userIdx, startItemIdx, itemPerPag
                                               FROM ArticleLike
                                               WHERE userIdx = ${userIdx}
   )
-  ORDER BY likeCreatedAt
+  ORDER BY likeCreatedAt DESC
   LIMIT ${startItemIdx}, ${itemPerPage};
   `;
   console.log(query)
@@ -118,17 +118,17 @@ async function getLikedCraftInfo(connection, userIdx, startItemIdx, LIKED_CRAFT_
         C.size,
         C.isSoldOut,
         C.artistIdx,
-        U.nickname                                               as artistName,
-        IF(TIMESTAMPDIFF(DAY, C.createdAt, NOW()) > 3, 'N', 'Y') as isNew,
+        U.nickname                                                  as artistName,
+        IF(TIMESTAMPDIFF(DAY, C.createdAt, NOW()) > 3, 'N', 'Y')    as isNew,
         (SELECT COUNT(craftCommentIdx)
           FROM CraftComment CC
-          WHERE CC.craftIdx = C.craftIdx && CC.isDeleted = 'N')   as totalCommentCnt,
+          WHERE CC.craftIdx = C.craftIdx && CC.isDeleted = 'N')      as totalCommentCnt,
         (SELECT COUNT(*)
           FROM CraftLike TCL
-          WHERE TCL.craftIdx = C.craftIdx)                        as totalLikeCnt,
+          WHERE TCL.craftIdx = C.craftIdx)                           as totalLikeCnt,
         (SELECT CL.createdAt
           FROM CraftLike CL
-          WHERE CL.craftIdx = C.craftIdx && CL.userIdx = ${userIdx})       as likedCreatedAt
+          WHERE CL.craftIdx = C.craftIdx && CL.userIdx = ${userIdx}) as likedCreatedAt
   FROM Craft C
           JOIN Artist A ON A.artistIdx = C.artistIdx && A.isDeleted = 'N'
           JOIN User U ON A.userIdx = U.userIdx && U.isDeleted = 'N'
@@ -136,7 +136,7 @@ async function getLikedCraftInfo(connection, userIdx, startItemIdx, LIKED_CRAFT_
                       FROM CraftLike
                       WHERE userIdx = ${userIdx}
   ) && C.isDeleted = 'N'
-  ORDER BY likedCreatedAt
+  ORDER BY likedCreatedAt DESC
   LIMIT ${startItemIdx}, ${LIKED_CRAFT_PER_PAGE};
   `;
   const [rows] = await connection.query(query);
@@ -268,7 +268,7 @@ async function getLikedPost(connection, userIdx, startItemIdx, pageItemCnt){
           JOIN QnA Q ON Q.qnaIdx = QL.qnaIdx && Q.isDeleted = 'N'
           JOIN User U ON U.userIdx = Q.userIdx && U.isDeleted = 'N'
   WHERE QL.userIdx = ${userIdx}
-  ORDER BY originalCreatedAt
+  ORDER BY originalCreatedAt DESC
   LIMIT ${startItemIdx}, ${pageItemCnt};
   `;
   const [rows] = await connection.query(query);

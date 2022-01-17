@@ -57,8 +57,6 @@ exports.getMyComment = async (userIdx, type, page) => {
         }
       }
 
-      result.reverse();
-
       connection.release();
       return response(baseResponse.SUCCESS, result);
 
@@ -100,8 +98,6 @@ exports.getUserWrittenWith = async (userIdx, page) => {
         })
       });
 
-      result.reverse();
-
       connection.release();
       return response(baseResponse.SUCCESS, result);
 
@@ -138,9 +134,7 @@ exports.getUserWrittenWithComment = async (userIdx, page) => {
           'isLike': item.isLike,
           'totalCommentCnt': item.totalCommentCnt
         })
-      })
-
-      result.reverse();
+      });
 
       connection.release();
       return response(baseResponse.SUCCESS, result);

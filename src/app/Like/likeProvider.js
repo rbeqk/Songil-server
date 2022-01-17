@@ -29,9 +29,7 @@ exports.getLikedArticle = async (userIdx, page) => {
           'createdAt': item.createdAt,
           'totalLikeCnt': item.totalLikeCnt,
         })
-      })
-
-      result.reverse();
+      });
 
       connection.release();
       return response(baseResponse.SUCCESS, result);
@@ -69,9 +67,7 @@ exports.getLikedCraft = async (userIdx, page) => {
           'isLike': 'Y',
           'totalCommentCnt': item.totalCommentCnt,
         })
-      })
-
-      result.reverse();
+      });
 
       connection.release();
       return response(baseResponse.SUCCESS, result);
@@ -112,8 +108,6 @@ exports.getLikedPost = async (userIdx, page) => {
           'totalCommentCnt': item.totalCommentCnt
         })
       });
-
-      result.reverse();
 
       connection.release();
       return response(baseResponse.SUCCESS, result);

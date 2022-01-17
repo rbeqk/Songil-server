@@ -31,9 +31,7 @@ exports.getAsk = async (userIdx, page) => {
             'createdAt': item.answerCreatedAt
           }
         })
-      })
-
-      result = result.reverse();
+      });
 
       connection.release();
       return response(baseResponse.SUCCESS, result);
