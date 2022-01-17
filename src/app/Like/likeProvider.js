@@ -3,38 +3,11 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
-const {getTotalPage} = require("../../../modules/pageUtil");
 const {
   LIKED_ARTICLE_PER_PAGE,
   LIKED_CRAFT_PER_PAGE,
   LIKED_WITH_PER_PAGE
 } = require("../../../modules/constants");
-
-exports.getLikedArticleTotalPage = async (userIdx) => {
-  try{
-    const connection = await pool.getConnection(async conn => conn);
-    try{
-      const totalCnt = await likeDao.getLikedArticleTotalCnt(connection, userIdx);
-      const totalPages = getTotalPage(totalCnt, LIKED_ARTICLE_PER_PAGE);
-
-      const result = {
-        'totalPages': totalPages,
-        'itemsPerPage': LIKED_ARTICLE_PER_PAGE
-      };
-
-      connection.release();
-      return response(baseResponse.SUCCESS, result);
-      
-    }catch(err){
-      connection.release();
-      logger.error(`getLikedArticleTotalPage DB Query Error: ${err}`);
-      return errResponse(baseResponse.DB_ERROR);
-    }
-  }catch(err){
-    logger.error(`getLikedArticleTotalPage DB Connection Error: ${err}`);
-    return errResponse(baseResponse.DB_ERROR);
-  }
-}
 
 exports.getLikedArticle = async (userIdx, page) => {
   try{
@@ -70,32 +43,6 @@ exports.getLikedArticle = async (userIdx, page) => {
     }
   }catch(err){
     logger.error(`getLikedArticle DB Connection Error: ${err}`);
-    return errResponse(baseResponse.DB_ERROR);
-  }
-}
-
-exports.getLikedCraftTotalPage = async (userIdx) => {
-  try{
-    const connection = await pool.getConnection(async conn => conn);
-    try{
-      const totalCnt = await likeDao.getLikedCraftTotalCnt(connection, userIdx);
-      const totalPages = getTotalPage(totalCnt, LIKED_CRAFT_PER_PAGE);
-
-      const result = {
-        'totalPages': totalPages,
-        'itemPerPage': LIKED_CRAFT_PER_PAGE
-      };
-
-      connection.release();
-      return response(baseResponse.SUCCESS, result);
-      
-    }catch(err){
-      connection.release();
-      logger.error(`getLikedCraftTotalPage DB Query Error: ${err}`);
-      return errResponse(baseResponse.DB_ERROR);
-    }
-  }catch(err){
-    logger.error(`getLikedCraftTotalPage DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }
@@ -136,41 +83,6 @@ exports.getLikedCraft = async (userIdx, page) => {
     }
   }catch(err){
     logger.error(`getLikedCraft DB Connection Error: ${err}`);
-    return errResponse(baseResponse.DB_ERROR);
-  }
-}
-
-//좋아요한 게시글 페이지(Story && QnA)
-exports.getLikePostCnt = async (userIdx) => {
-  try{
-    const connection = await pool.getConnection(async conn => conn);
-    try{
-
-      //좋아요한 Story 개수
-      const likedStoryCnt = await likeDao.getLikedStoryCnt(connection, userIdx);
-
-      //좋아요한 QnA 개수
-      const likedQnACnt = await likeDao.getLikedQnACnt(connection, userIdx);
-
-      //좋아요한 게시글 개수
-      const totalCnt = likedStoryCnt + likedQnACnt;
-      const totalPages = getTotalPage(totalCnt, LIKED_WITH_PER_PAGE);
-
-      const result = {
-        'totalPages': totalPages,
-        'itemPerPage': LIKED_WITH_PER_PAGE
-      }
-
-      connection.release();
-      return response(baseResponse.SUCCESS, result);
-
-    }catch(err){
-      connection.release();
-      logger.error(`getLikePostCnt DB Query Error: ${err}`);
-      return errResponse(baseResponse.DB_ERROR);
-    }
-  }catch(err){
-    logger.error(`getLikePostCnt DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }

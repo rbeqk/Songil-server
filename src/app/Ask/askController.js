@@ -23,19 +23,6 @@ exports.createCraftAsk = async (req, res) => {
 }
 
 /*
-  API No. 8.2
-  API Name: 1:1 문의 내역 페이지 조회 API
-  [GET] /mypage/ask/page
-*/
-exports.getAskTotalPage = async (req, res) => {
-  const {userIdx} = req.verifiedToken;
-
-  const getAskTotalPage = await askProvider.getAskTotalPage(userIdx);
-
-  return res.send(getAskTotalPage);
-}
-
-/*
   API No. 8.1
   API Name: 1:1 문의 내역 목록 조회 API
   [GET] /mypage/ask

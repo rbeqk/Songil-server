@@ -33,19 +33,6 @@ exports.changeArticleLikeStatus = async (req, res) => {
 }
 
 /*
-  API No. 4.3
-  API Name: 좋아요한 아티클 페이지 개수 조회 API
-  [GET] /my-page/articles/liked/page
-*/
-exports.getLikedArticleTotalPage = async (req, res) => {
-  const {userIdx} = req.verifiedToken;
-
-  const getLikedArticleTotalPage = await likeProvider.getLikedArticleTotalPage(userIdx);
-
-  return res.send(getLikedArticleTotalPage);
-}
-
-/*
   API No. 8.9
   API Name: 좋아요한 아티클 조회 API
   [GET] /my-page/articles/liked
@@ -61,19 +48,6 @@ exports.getLikedArticle = async (req, res) => {
   const getLikedArticle = await likeProvider.getLikedArticle(userIdx, page);
 
   return res.send(getLikedArticle);
-}
-
-/*
-  API No. 8.4
-  API Name: 찜한 상품 페이지 개수 조회 API
-  [GET] /my-page/crafts/liked
-*/
-exports.getLikedCraftTotalPage = async (req, res) => {
-  const {userIdx} = req.verifiedToken;
-
-  const getLikedCraftTotalPage = await likeProvider.getLikedCraftTotalPage(userIdx);
-
-  return res.send(getLikedCraftTotalPage);
 }
 
 /*
@@ -120,19 +94,6 @@ exports.changeUserStoryLikeStatus = async (req, res) => {
   const changeUserStoryLikeStatus = await likeService.changeUserStoryLikeStatus(userIdx, storyIdx);
 
   return res.send(changeUserStoryLikeStatus);
-}
-
-/*
-  API No. 8.10
-  API Name: 좋아요한 게시글 페이지 개수 조회 API
-  [GET] /my-page/with/liked/page
-*/
-exports.getLikePostCnt = async (req, res) => {
-  const {userIdx} = req.verifiedToken;
-
-  const getLikePostCnt = await likeProvider.getLikePostCnt(userIdx);
-
-  return res.send(getLikePostCnt);
 }
 
 /*

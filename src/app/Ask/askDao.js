@@ -8,17 +8,6 @@ async function createCraftAsk(connection, userIdx, craftIdx, content){
   return rows;
 }
 
-//사용자별 1:1 문의 개수 가져오기
-async function getAskCnt(connection, userIdx){
-  const query = `
-  SELECT COUNT(craftAskIdx) as totalCnt
-  FROM CraftAsk
-  WHERE isDeleted = 'N' && userIdx = ${userIdx};
-  `;
-  const [rows] = await connection.query(query);
-  return rows[0]['totalCnt'];
-}
-
 //사용자별 1:1 문의 리스트 가져오기 (상품 및 작가 삭제해도 문의 내역은 동일하게 보임)
 async function getAsk(connection, userIdx, startItemIdx, itemPerPage){
   const query = `
@@ -47,6 +36,5 @@ async function getAsk(connection, userIdx, startItemIdx, itemPerPage){
 
 module.exports = {
   createCraftAsk,
-  getAskCnt,
   getAsk,
 }

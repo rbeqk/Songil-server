@@ -8,14 +8,8 @@ module.exports = function(app){
   //아티클 좋아요 변경 API
   app.patch('/articles/:articleIdx/like', jwtMiddleware, likeController.changeArticleLikeStatus);
 
-  //좋아요한 아티클 페이지 개수 조회 API
-  app.get('/my-page/articles/liked/page', jwtMiddleware, likeController.getLikedArticleTotalPage);
-
   //좋아요한 아티클 조회 API
   app.get('/my-page/articles/liked', jwtMiddleware, likeController.getLikedArticle);
-
-  //찜한 상품 페이지 개수 조회 API
-  app.get('/my-page/crafts/liked/page', jwtMiddleware, likeController.getLikedCraftTotalPage);
 
   //찜한 상품 조회 API
   app.get('/my-page/crafts/liked', jwtMiddleware, likeController.getLikedCraft);
@@ -25,9 +19,6 @@ module.exports = function(app){
 
   //스토리 좋아요 여부 변경 API
   app.patch('/with/stories/:storyIdx/like', jwtMiddleware, likeController.changeUserStoryLikeStatus);
-
-  //좋아요한 게시글 페이지 개수 조회 API
-  app.get('/my-page/with/liked/page', jwtMiddleware, likeController.getLikePostCnt);
 
   //좋아요한 게시글 조회 API
   app.get('/my-page/with/liked', jwtMiddleware, likeController.getLikedPost);

@@ -1,13 +1,3 @@
-//작성한 코멘트 수
-async function getTotalWrittenCommentCnt(connection, userIdx){
-  const query = `
-  SELECT COUNT(craftCommentIdx) as totalCnt FROM CraftComment
-  WHERE userIdx = ${userIdx} && isDeleted = 'N';
-  `;
-  const [rows] = await connection.query(query);
-  return rows[0]['totalCnt'];
-}
-
 //작성한 코멘트
 async function getWrittenComment(connection, userIdx, startItemIdx, pageItemCnt){
   const query = `
@@ -38,40 +28,6 @@ async function getArtistIdx(connection, userIdx){
   const [rows] = await connection.query(query);
   
   return rows[0]?.artistIdx ? rows[0].artistIdx : -1;
-}
-
-//작성 WITH(Story, QnA, ABTest) 개수
-async function getWrittenWithCnt(connection, userIdx, artistIdx){
-  const storyQuery = `
-  SELECT COUNT(storyIdx) as totalCnt
-  FROM Story
-  WHERE userIdx = ${userIdx} && isDeleted = 'N';
-  `;
-  const [storyRows] = await connection.query(storyQuery);
-
-  const QnAQuery = `
-  SELECT COUNT(qnaIdx) as totalCnt
-  FROM QnA
-  WHERE userIdx = ${userIdx} && isDeleted = 'N';
-  `;
-  const [QnARows] = await connection.query(QnAQuery);
-
-  //작가일 경우
-  if (artistIdx !== -1){
-    //AB Test
-    const ABTestQuery = `
-    SELECT COUNT(abTestIdx) as totalCnt
-    FROM ABTest
-    WHERE artistIdx = ${artistIdx} && isDeleted = 'N';
-    `;
-    const [ABTestRows] = await connection.query(ABTestQuery);
-
-    return storyRows[0]['totalCnt'] + QnARows[0]['totalCnt'] + ABTestRows[0]['totalCnt'];
-  }
-  //일반 유저일 경우
-  else{
-    return storyRows[0]['totalCnt'] + QnARows[0]['totalCnt'];
-  }
 }
 
 //내가 쓴 글
@@ -204,29 +160,6 @@ async function getUserWrittenWith(connection, userIdx, artistIdx, startItemIdx, 
   }
 }
 
-//댓글 단 글 페이지 개수(Story, QnA, ABTest)
-async function getUserWrittenWithCommentTotalCnt(connection, userIdx){
-  const storyQuery = `
-  SELECT COUNT(storyCommentIdx) as totalCnt FROM StoryComment
-  WHERE userIdx = ${userIdx} && isDeleted = 'N';
-  `;
-  const [storyRows] = await connection.query(storyQuery);
-  
-  const QnAQuery = `
-  SELECT COUNT(qnaCommentIdx) as totalCnt FROM QnAComment
-  WHERE userIdx = ${userIdx} && isDeleted = 'N';
-  `;
-  const [QnARows] = await connection.query(QnAQuery);
-
-  const ABTestQuery = `
-  SELECT COUNT(abTestCommentIdx) as totalCnt FROM ABTestComment
-  WHERE userIdx = ${userIdx} && isDeleted = 'N';
-  `;
-  const [ABTestRows] = await connection.query(ABTestQuery);
-
-  return storyRows[0]['totalCnt'] + QnARows[0]['totalCnt'] + ABTestRows[0]['totalCnt'];
-}
-
 //댓글 단 글 조회
 async function getUserWrittenWithComment(connection, userIdx, startItemIdx, itemPerPage){
   const query = `
@@ -321,11 +254,8 @@ async function getUserWrittenWithComment(connection, userIdx, startItemIdx, item
 }
 
 module.exports = {
-  getTotalWrittenCommentCnt,
   getWrittenComment,
   getArtistIdx,
-  getWrittenWithCnt,
   getUserWrittenWith,
-  getUserWrittenWithCommentTotalCnt,
   getUserWrittenWithComment,
 }

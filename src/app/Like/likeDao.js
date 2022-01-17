@@ -77,16 +77,6 @@ async function getTotalArticleLikeCnt(connection, articleIdx){
   return rows[0]['totalLikeCnt'];
 }
 
-//사용자의 좋아요 아티클 개수
-async function getLikedArticleTotalCnt(connection, userIdx){
-  const query = `
-  SELECT COUNT(*) as totalCnt FROM ArticleLike
-  WHERE userIdx = ${userIdx};
-  `;
-  const [rows] = await connection.query(query);
-  return rows[0]['totalCnt'];
-}
-
 //사용자의 좋아요 아티클 목록 정보
 async function getLikedArticleInfo(connection, userIdx, startItemIdx, itemPerPage){
   const query = `
@@ -115,16 +105,6 @@ async function getLikedArticleInfo(connection, userIdx, startItemIdx, itemPerPag
   console.log(query)
   const [rows] = await connection.query(query);
   return rows;
-}
-
-//사용자의 찜한 상품 개수
-async function getLikedCraftTotalCnt(connection, userIdx){
-  const query = `
-  SELECT COUNT(*) as totalCnt FROM CraftLike
-  WHERE userIdx = ${userIdx};
-  `;
-  const [rows] = await connection.query(query);
-  return rows[0]['totalCnt'];
 }
 
 //사용자의 찜한 상품 정보
@@ -245,26 +225,6 @@ async function getTotalStoryLikeCnt(connection, storyIdx){
   return rows[0]['totalLikeCnt'];
 }
 
-//좋아요한 Story 개수
-async function getLikedStoryCnt(connection, userIdx){
-  const query = `
-  SELECT COUNT(*) as totalCnt FROM StoryLike
-  WHERE userIdx = ${userIdx};
-  `;
-  const [rows] = await connection.query(query);
-  return rows[0]['totalCnt'];
-}
-
-//좋아요한 QnA 개수
-async function getLikedQnACnt(connection, userIdx){
-  const query = `
-  SELECT COUNT(*) as totalCnt FROM QnALike
-  WHERE userIdx = ${userIdx};
-  `;
-  const [rows] = await connection.query(query);
-  return rows[0]['totalCnt'];
-}
-
 //좋아요한 게시물
 async function getLikedPost(connection, userIdx, startItemIdx, pageItemCnt){
   const query = `
@@ -324,9 +284,7 @@ module.exports = {
   changeArticleToDisLike,
   changeArticleToLike,
   getTotalArticleLikeCnt,
-  getLikedArticleTotalCnt,
   getLikedArticleInfo,
-  getLikedCraftTotalCnt,
   getLikedCraftInfo,
   getQnALikeStatus,
   deleteQnALike,
@@ -336,7 +294,5 @@ module.exports = {
   deleteUserStoryLike,
   createUserStoryLike,
   getTotalStoryLikeCnt,
-  getLikedStoryCnt,
-  getLikedQnACnt,
   getLikedPost,
 }
