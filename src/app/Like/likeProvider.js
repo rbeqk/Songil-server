@@ -28,6 +28,7 @@ exports.getLikedArticle = async (userIdx, page) => {
           'editorName': item.editorName,
           'createdAt': item.createdAt,
           'totalLikeCnt': item.totalLikeCnt,
+          'isLike': 'Y'
         })
       });
 
@@ -101,10 +102,10 @@ exports.getLikedPost = async (userIdx, page) => {
           'mainImageUrl': item.mainImageUrl,
           'title': item.title,
           'content': item.content,
-          'userIdx': item.userIdx,
-          'userName': item.userName,
+          'name': item.name,
           'createdAt': item.createdAt,
           'totalLikeCnt': item.totalLikeCnt,
+          'isLike': 'Y',
           'totalCommentCnt': item.totalCommentCnt
         })
       });

@@ -236,8 +236,7 @@ async function getLikedPost(connection, userIdx, startItemIdx, pageItemCnt){
           FROM StoryImage SI
           WHERE SI.isDeleted = 'N' && SI.storyIdx = SL.storyIdx
           LIMIT 1)                                               as mainImageUrl,
-        S.userIdx,
-        U.nickname                                              as userName,
+        U.nickname                                              as name,
         DATE_FORMAT(S.createdAt, '%Y.%m.%d')                    as createdAt,
         SL.createdAt                                            as originalCreatedAt,
         (SELECT COUNT(*)
@@ -255,9 +254,8 @@ async function getLikedPost(connection, userIdx, startItemIdx, pageItemCnt){
         2 as categoryIdx,
         Q.title,
         Q.content,
-        NULL                                                            as imageUrl,
-        Q.userIdx,
-        U.nickname                                                      as userName,
+        NULL                                                            as mainImageUrl,
+        U.nickname                                                      as name,
         DATE_FORMAT(Q.createdAt, '%Y.%m.%d')                            as createdAt,
         QL.createdAt                                                    as originalCreatedAt,
         (SELECT COUNT(*) FROM QnALike WHERE QnALike.qnaIdx = QL.qnaIdx) as totalLikeCnt,
