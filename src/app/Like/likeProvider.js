@@ -63,8 +63,8 @@ exports.getLikedCraft = async (userIdx, page) => {
           'artistName': item.artistName,
           'price': item.price,
           'isNew': item.isNew,
+          'isSoldOut': item.isSoldOut,
           'totalLikeCnt': item.totalLikeCnt,
-          'isLike': 'Y',
           'totalCommentCnt': item.totalCommentCnt,
         })
       });
