@@ -98,7 +98,7 @@ exports.getLikedPost = async (userIdx, page) => {
         result.push({
           'idx': item.idx,
           'categoryIdx': item.categoryIdx,
-          'imageUrl': item.imageUrl,
+          'mainImageUrl': item.mainImageUrl,
           'title': item.title,
           'content': item.content,
           'userIdx': item.userIdx,

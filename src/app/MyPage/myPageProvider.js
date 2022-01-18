@@ -87,7 +87,7 @@ exports.getUserWrittenWith = async (userIdx, page) => {
         result.push({
           'idx': item.idx,
           'categoryIdx': item.categoryIdx,
-          'imageUrl': item.imageUrl,
+          'mainImageUrl': item.mainImageUrl,
           'title': item.title,
           'content': item.content,
           'name': item.name,
@@ -125,7 +125,7 @@ exports.getUserWrittenWithComment = async (userIdx, page) => {
         result.push({
           'idx': item.idx,
           'categoryIdx': item.categoryIdx,
-          'imageUrl': item.imageUrl,
+          'mainImageUrl': item.mainImageUrl,
           'title': item.title,
           'content': item.content,
           'name': item.name,

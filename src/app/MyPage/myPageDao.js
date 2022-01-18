@@ -42,7 +42,7 @@ async function getUserWrittenWith(connection, userIdx, artistIdx, startItemIdx, 
           (SELECT imageUrl
             FROM StoryImage SI
             WHERE SI.storyIdx = S.storyIdx && SI.isDeleted = 'N'
-            LIMIT 1) as imageUrl,
+            LIMIT 1) as mainImageUrl,
           U.nickname                                                                   as name,
           DATE_FORMAT(S.createdAt, '%Y.%m.%d')                                         as createdAt,
           S.createdAt                                                                  as originalCreatedAt,
@@ -63,7 +63,7 @@ async function getUserWrittenWith(connection, userIdx, artistIdx, startItemIdx, 
           2                                                                        as categoryIdx,
           Q.title,
           Q.content,
-          NULL as imageUrl,
+          NULL as mainImageUrl,
           U.nickname                                                               as name,
           DATE_FORMAT(Q.createdAt, '%Y.%m.%d')                                     as createdAt,
           Q.createdAt                                                              as originalCreatedAt,
@@ -96,7 +96,7 @@ async function getUserWrittenWith(connection, userIdx, artistIdx, startItemIdx, 
           (SELECT imageUrl
             FROM StoryImage SI
             WHERE SI.storyIdx = S.storyIdx && SI.isDeleted = 'N'
-            LIMIT 1)                                                                    as imageUrl,
+            LIMIT 1)                                                                    as mainImageUrl,
           U.nickname                                                                   as name,
           DATE_FORMAT(S.createdAt, '%Y.%m.%d')                                         as createdAt,
           S.createdAt                                                                  as originalCreatedAt,
@@ -117,7 +117,7 @@ async function getUserWrittenWith(connection, userIdx, artistIdx, startItemIdx, 
           2                                                                        as categoryIdx,
           Q.title,
           Q.content,
-          NULL                                                                     as imageUrl,
+          NULL                                                                     as mainImageUrl,
           U.nickname                                                               as name,
           DATE_FORMAT(Q.createdAt, '%Y.%m.%d')                                     as createdAt,
           Q.createdAt                                                              as originalCreatedAt,
@@ -138,7 +138,7 @@ async function getUserWrittenWith(connection, userIdx, artistIdx, startItemIdx, 
           3                                                           as categoryIdx,
           NULL                                                        as title,
           AB.content,
-          NULL                                                        as imageUrl,
+          NULL                                                        as mainImageUrl,
           U.nickname                                                  as name,
           DATE_FORMAT(AB.createdAt, '%Y.%m.%d')                       as createdAt,
           AB.createdAt                                                as originalCreatedAt,
@@ -168,7 +168,7 @@ async function getUserWrittenWithComment(connection, userIdx, startItemIdx, item
         (SELECT imageUrl
           FROM StoryImage SI
           WHERE SI.storyIdx = S.storyIdx && SI.isDeleted = 'N'
-          LIMIT 1)                                                                             as imageUrl,
+          LIMIT 1)                                                                             as mainImageUrl,
         S.title,
         S.content,
         U.nickname                                                                            as name,
