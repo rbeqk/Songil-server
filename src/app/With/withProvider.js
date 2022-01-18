@@ -4,28 +4,26 @@ const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 const {getABTestFinalInfo, getUserVoteInfo} = require('../../../modules/abTestUtil');
-const {getTotalPage} = require("../../../modules/pageUtil");
+const {pageInfo, getTotalPage} = require("../../../modules/pageUtil");
 const {WITH_BY_CATEGORY_PER_PAGE} = require("../../../modules/constants");
 
 exports.getHotTalk = async () => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
-      const getHotTalk = await withDao.getHotTalk(connection);
+      const hotTalk = await withDao.getHotTalk(connection);
 
       let result = [];
 
-      if (getHotTalk.length){
-        getHotTalk.forEach(item => {
-          result.push({
-            'idx': item.idx,
-            'categoryIdx': item.categoryIdx,
-            'text': item.text,
-            'imageUrl': item.imageUrl,
-            'totalCommentCnt': item.totalCommentCnt
-          })
+      hotTalk.forEach(item => {
+        result.push({
+          'idx': item.idx,
+          'categoryIdx': item.categoryIdx,
+          'text': item.text,
+          'imageUrl': item.imageUrl,
+          'totalCommentCnt': item.totalCommentCnt
         })
-      }
+      });
 
       connection.release();
       return response(baseResponse.SUCCESS, result);
@@ -61,10 +59,7 @@ exports.getTotalWithPage = async (category) => {
 
       const totalPages = getTotalPage(totalCnt, WITH_BY_CATEGORY_PER_PAGE);
 
-      const result = {
-        'totalPages': totalPages,
-        'itemsPerPage': WITH_BY_CATEGORY_PER_PAGE
-      }
+      const result = new pageInfo(totalPages, WITH_BY_CATEGORY_PER_PAGE);
 
       connection.release();
       return response(baseResponse.SUCCESS, result);
@@ -96,19 +91,17 @@ exports.getWith = async (category, sort, page, userIdx) => {
         result.story = [];
         const story = await withDao.getStory(connection, userIdx, sort, startItemIdx, WITH_BY_CATEGORY_PER_PAGE);
 
-        if (story.length > 0){
-          story.forEach(item => {
-            result.story.push({
-              'storyIdx': item.storyIdx,
-              'mainImageUrl': item.mainImageUrl,
-              'title': item.title,
-              'userIdx': item.userIdx,
-              'userName': item.userName,
-              'totalLikeCnt': item.totalLikeCnt,
-              'isLike': item.isLike
-            })
+        story.forEach(item => {
+          result.story.push({
+            'storyIdx': item.storyIdx,
+            'mainImageUrl': item.mainImageUrl,
+            'title': item.title,
+            'userIdx': item.userIdx,
+            'userName': item.userName,
+            'totalLikeCnt': item.totalLikeCnt,
+            'isLike': item.isLike
           })
-        }
+        });
 
         result.story.reverse();
       }
@@ -117,23 +110,21 @@ exports.getWith = async (category, sort, page, userIdx) => {
 
         const qna = await withDao.getQnA(connection, userIdx, sort, startItemIdx, WITH_BY_CATEGORY_PER_PAGE);
 
-        if (qna.length > 0){
-          qna.forEach(item => {
-            result.push({
-              'qnaIdx': item.qnaIdx,
-              'userIdx': item.userIdx,
-              'userProfile': item.userProfile,
-              'userName': item.userName,
-              'title': item.title,
-              'content': item.content,
-              'createdAt': item.createdAt,
-              'isUserQnA': item.isUserQnA,
-              'totalLikeCnt': item.totalLikeCnt,
-              'isLike': item.isLike,
-              'totalCommentCnt': item.totalCommentCnt
-            })
-          });
-        }
+        qna.forEach(item => {
+          result.push({
+            'qnaIdx': item.qnaIdx,
+            'userIdx': item.userIdx,
+            'userProfile': item.userProfile,
+            'userName': item.userName,
+            'title': item.title,
+            'content': item.content,
+            'createdAt': item.createdAt,
+            'isUserQnA': item.isUserQnA,
+            'totalLikeCnt': item.totalLikeCnt,
+            'isLike': item.isLike,
+            'totalCommentCnt': item.totalCommentCnt
+          })
+        });
 
         result.reverse();
 
@@ -168,13 +159,14 @@ exports.getWith = async (category, sort, page, userIdx) => {
             'abTestIdx': item.abTestIdx,
             'artistIdx': item.artistIdx,
             'artistImageUrl': item.artistImageUrl,
+            'artistName': item.artistName,
             'content': item.content,
             'imageA': item.imageA,
             'imageB': item.imageB,
             'deadline': item.deadline,
+            'totalCommentCnt': item.totalCommentCnt,
             'isFinished': item.isFinished,
             'isUserABTest': item.isUserABTest,
-            'totalCommentCnt': item.totalCommentCnt,
             'voteInfo': voteInfo,
             'finalInfo': finalInfo
           });
