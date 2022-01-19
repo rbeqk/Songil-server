@@ -57,3 +57,14 @@ exports.createVerificationCode = async (email) => {
     return errResponse(baseResponse.DB_ERROR);
   }
 }
+
+//이메일 인증번호 확인
+exports.checkVerificationCode = async (email, code) => {
+  const cacheData = Cache.get(email);
+  if (!cacheData) return errResponse(baseResponse.INVALID_CODE);
+  if (cacheData != code) return errResponse(baseResponse.INVALID_CODE);
+
+  Cache.del(email);
+
+  return response(baseResponse.SUCCESS);
+}

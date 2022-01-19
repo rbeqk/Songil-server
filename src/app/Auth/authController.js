@@ -20,3 +20,19 @@ exports.createVerificationCode = async (req, res) => {
 
   return res.send(verificationCode);
 }
+
+/*
+  API No. 1.2
+  API Name: 이메일 인증번호 확인 API
+  [GET] /auth
+  query: email, code
+*/
+exports.checkVerificationCode = async (req, res) => {
+  const {email, code} = req.query;
+
+  if (!(email && code)) return res.send(errResponse(baseResponse.IS_EMPTY));
+
+  const checkVerificationCode = await authProvider.checkVerificationCode(email, code);
+
+  return res.send(checkVerificationCode);
+}

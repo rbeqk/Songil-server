@@ -70,6 +70,7 @@ module.exports = {
   //Response
   INVALD_VERIFICATIONCODE: {"isSuccess": false, "code": 3100, "message": "올바르지 않은 인증번호입니다"},
   GET_VERIFICATIONCODE_FIRST: {"isSuccess": false, "code": 3101, "message": "인증번호를 먼저 발급해주세요"},
+  INVALID_CODE: {"isSuccess": false, "code": 3102, "message": "유효하지 않은 인증번호입니다"},
 
   ALREADY_EXISTED_EMAIL: {"isSuccess": false, "code": 3200, "message": "이미 가입한 이메일입니다"},
   DUPLICATED_NICKNAME: {"isSuccess": false, "code": 3201, "message": "중복된 닉네임입니다"},
