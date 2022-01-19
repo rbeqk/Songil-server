@@ -4,8 +4,7 @@ const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 const CryptoJS = require("crypto-js");
-const jwt = require('jsonwebtoken');
-require('dotenv').config();
+const {createJwt} = require("../../../modules/userUtil");
 
 //회원가입
 exports.createUser = async (email, password, nickname) => {
@@ -35,11 +34,7 @@ exports.createUser = async (email, password, nickname) => {
       const createUser = await authDao.createUser(connection, email, encryptedPassword, nickname);
       const userIdx = createUser.insertId;
 
-      const token = await jwt.sign(
-        {userIdx: userIdx},
-        process.env.jwtSecret,
-        {expiresIn: '30d'}
-      )
+      const token = await createJwt(userIdx);
       
       const result = {
         'jwt': token
