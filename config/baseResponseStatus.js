@@ -10,6 +10,7 @@ module.exports = {
 
   INVALID_PHONE_PATTERN: {"isSuccess": false, "code": 2200, "message": "올바르지 않은 핸드폰 번호 형식입니다"},
   NOT_SIGN_UP_PHONE: {"isSuccess": false, "code": 2201, "message": "가입한 핸드폰 번호가 아닙니다"},
+  INVALID_EMAIL_TYPE: {"isSuccess": false, "code": 2202, "message": "올바르지 않은 이메일 형식입니다"},
 
   NEED_PHONE_OR_NICKNAME: {"isSuccess": false, "code": 2210, "message": "핸드폰 번호/닉네임 중 하나를 입력해주세요"},
   NEED_JUST_ONE_CONDITION: {"isSuccess": false, "code": 2211, "message": "핸드폰 번호/닉네임 중 하나만 입력해주세요"},
@@ -70,7 +71,7 @@ module.exports = {
   INVALD_VERIFICATIONCODE: {"isSuccess": false, "code": 3100, "message": "올바르지 않은 인증번호입니다"},
   GET_VERIFICATIONCODE_FIRST: {"isSuccess": false, "code": 3101, "message": "인증번호를 먼저 발급해주세요"},
 
-  DUPLICATED_PHONE: {"isSuccess": false, "code": 3200, "message": "이미 가입한 핸드폰 번호입니다"},
+  ALREADY_EXISTED_EMAIL: {"isSuccess": false, "code": 3200, "message": "이미 가입한 이메일입니다"},
   DUPLICATED_NICKNAME: {"isSuccess": false, "code": 3201, "message": "중복된 닉네임입니다"},
   ALREADY_REPORTED_COMMENT_IDX: {"isSuccess": false, "code": 3202, "message": "기존에 신고한 댓글입니다"},
   ALREADY_FINISHED_ABTEST_IDX: {"isSuccess": false, "code": 3203, "message": "이미 마감된 투표입니다"},

@@ -55,6 +55,7 @@ module.exports = function (){
   require('../src/app/Craft/craftRoute')(app);
   require('../src/app/Cart/cartRoute')(app);
   require('../src/app/Benefit/benefitRoute')(app);
+  require('../src/app/Auth/authRoute')(app);
 
   return app;
 }
