@@ -36,3 +36,19 @@ exports.checkVerificationCode = async (req, res) => {
 
   return res.send(checkVerificationCode);
 }
+
+/*
+  API No. 1.3
+  API Name: 닉네임 중복 체크 API
+  [GET] /auth/duplicated-check
+  query: nickname
+*/
+exports.checkNickname = async (req, res) => {
+  const {nickname} = req.query;
+
+  if (!nickname) return res.send(errResponse(baseResponse.IS_EMPTY));
+
+  const checkNickname = await authProvider.checkNickname(nickname);
+
+  return res.send(checkNickname);
+}

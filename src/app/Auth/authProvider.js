@@ -45,7 +45,8 @@ exports.createVerificationCode = async (email) => {
         subject: '손길 테스트 중입니다.',
         html: `인증번호 테스트 중 입니다.<br/><b>${verificationCode}</b>`
       });
-  
+      
+      connection.release();
       return response(baseResponse.SUCCESS);
     }catch(err){
       connection.release();
@@ -67,4 +68,30 @@ exports.checkVerificationCode = async (email, code) => {
   Cache.del(email);
 
   return response(baseResponse.SUCCESS);
+}
+
+//닉네임 중복 체크
+exports.checkNickname = async (nickname) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+
+      //기존에 존재하는 닉네임인지
+      const isExistNickname = await authDao.isExistNickname(connection, nickname);
+      if (isExistNickname){
+        connection.release();
+        return errResponse(baseResponse.DUPLICATED_NICKNAME);
+      }
+
+      connection.release();
+      return response(baseResponse.SUCCESS);
+    }catch(err){
+      connection.release();
+      logger.error(`checkNickname DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`checkNickname DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
 }
