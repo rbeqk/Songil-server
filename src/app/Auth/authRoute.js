@@ -9,4 +9,7 @@ module.exports = function(app){
 
   //닉네임 중복 체크 API
   app.get('/imsi/auth/duplicated-check', authController.checkNickname);
+
+  //회원가입 API
+  app.post('/imsi/signup', authController.createUser);
 }

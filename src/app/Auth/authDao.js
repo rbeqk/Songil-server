@@ -16,7 +16,18 @@ async function isExistNickname(connection, nickname){
   return rows[0]['isExist'];
 }
 
+//유저 생성
+async function createUser(connection, email, encryptedPassword, nickname){
+  const query = `
+  INSERT INTO User(email, password, nickname)
+  VALUES (?, ?, ?);
+  `;
+  const [rows] = await connection.query(query, [email, encryptedPassword, nickname]);
+  return rows;
+}
+
 module.exports = {
   isExistEmail,
   isExistNickname,
+  createUser,
 }

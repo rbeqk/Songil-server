@@ -1,4 +1,5 @@
 const authProvider = require('./authProvider');
+const authService = require('./authService');
 const baseResponse = require("../../../config/baseResponseStatus");
 const {response} = require("../../../config/response");
 const {errResponse} = require("../../../config/response");
@@ -51,4 +52,21 @@ exports.checkNickname = async (req, res) => {
   const checkNickname = await authProvider.checkNickname(nickname);
 
   return res.send(checkNickname);
+}
+
+/*
+  API No. 1.4
+  API Name: 회원가입 API
+  [POST] /signup
+  body: email, password, nickname
+*/
+exports.createUser = async (req, res) => {
+  const {email, password, nickname} = req.body;
+
+  if (!(email && password && nickname)) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (!validator.isEmail(email)) return res.send(errResponse(baseResponse.INVALID_EMAIL_TYPE));
+
+  const createUser = await authService.createUser(email, password, nickname);
+
+  return res.send(createUser);
 }
