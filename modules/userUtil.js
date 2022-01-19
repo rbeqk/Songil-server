@@ -16,6 +16,17 @@ const getUserIdx = (token) => {
   return userIdx;
 }
 
+const createJwt = async (userIdx) => {
+  const token = await jwt.sign(
+    {userIdx: userIdx},
+    process.env.jwtSecret,
+    {expiresIn: '30d'}
+  );
+
+  return token;
+}
+
 module.exports = {
   getUserIdx,
+  createJwt,
 }

@@ -70,3 +70,20 @@ exports.createUser = async (req, res) => {
 
   return res.send(createUser);
 }
+
+/*
+  API No. 1.5
+  API Name: 로그인 API
+  [POST] /login
+  body: email, password
+*/
+exports.login = async (req, res) => {
+  const {email, password} = req.body;
+
+  if (!(email && password)) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (!validator.isEmail(email)) return res.send(errResponse(baseResponse.INVALID_EMAIL_TYPE));
+
+  const login = await authProvider.login(email, password);
+
+  return res.send(login);
+}

@@ -12,4 +12,7 @@ module.exports = function(app){
 
   //회원가입 API
   app.post('/imsi/signup', authController.createUser);
+
+  //로그인 API
+  app.post('/imsi/login', authController.login);
 }

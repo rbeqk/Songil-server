@@ -82,6 +82,8 @@ module.exports = {
   NO_VOTE_DATA: {"isSuccess": false, "code": 3301, "message": "투표 이력이 없습니다"},
   EMPTY_CRAFT: {"isSuccess": false, "code": 3302, "message": "상품이 없습니다"},
 
+  INVALID_USER_INFO: {"isSuccess": false, "code": 3400, "message": "일치하는 회원 정보가 없습니다"},
+
   DB_ERROR: {"isSuccess": false, "code": 4000, "message": "DB 에러"},
   SERVER_ERROR: {"isSuccess": false, "code": 4001, "message": "Server 에러"},
 }

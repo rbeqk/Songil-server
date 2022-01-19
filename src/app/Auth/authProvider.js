@@ -5,6 +5,8 @@ const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 const nodemailer = require("nodemailer");
 const Cache = require("memory-cache");
+const CryptoJS = require("crypto-js");
+const {createJwt} = require("../../../modules/userUtil");
 
 //인증번호 발급
 exports.createVerificationCode = async (email) => {
@@ -92,6 +94,51 @@ exports.checkNickname = async (nickname) => {
     }
   }catch(err){
     logger.error(`checkNickname DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}
+
+//로그인
+exports.login = async (email, password) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+
+      //존재하는 이메일인지
+      const isExistEmail = await authDao.isExistEmail(connection, email);
+      if (!isExistEmail){
+        connection.release();
+        return errResponse(baseResponse.INVALID_USER_INFO);
+      }
+
+      //암호화 한 비밀번호 가져오기
+      const encryptedPassword = await authDao.getPassword(connection, email);
+
+      //복호화하기
+      const bytes = CryptoJS.AES.decrypt(encryptedPassword, process.env.ENCODE_SECRET_KEY);
+      const decryptedPassword = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+
+      if (password != decryptedPassword){
+        connection.release();
+        return errResponse(baseResponse.INVALID_USER_INFO);
+      }
+
+      const userIdx = await authDao.getUserIdx(connection, email, encryptedPassword);
+      const token = await createJwt(userIdx);
+
+      const result = {
+        'jwt': token
+      };
+
+      connection.release();
+      return response(baseResponse.SUCCESS, result);
+    }catch(err){
+      connection.release();
+      logger.error(`login DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`checkNickloginname DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }

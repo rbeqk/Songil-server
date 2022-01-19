@@ -26,8 +26,31 @@ async function createUser(connection, email, encryptedPassword, nickname){
   return rows;
 }
 
+//암호화한 비밀번호 가져오기
+async function getPassword(connection, email){
+  const query = `
+  SELECT password FROM User
+  WHERE email = ? && isDeleted = 'N';
+  `;
+  const [rows] = await connection.query(query, [email]);
+  return rows[0]['password'];
+}
+
+//로그인 시 userIdx 가져오기
+async function getUserIdx(connection, email, encryptedPassword){
+  const query = `
+  SELECT userIdx
+  FROM User
+  WHERE email = ? && password = ? && isDeleted = 'N';
+  `;
+  const [rows] = await connection.query(query, [email, encryptedPassword]);
+  return rows[0]['userIdx'];
+}
+
 module.exports = {
   isExistEmail,
   isExistNickname,
   createUser,
+  getPassword,
+  getUserIdx,
 }
