@@ -12,7 +12,7 @@ async function getTodayCraft(connection){
   FROM Craft C
           JOIN Artist A ON A.artistIdx = C.artistIdx && A.isDeleted = 'N'
           JOIN User U ON A.userIdx = U.userIdx && U.isDeleted = 'N'
-  WHERE C.isDeleted = 'N'
+  WHERE C.isDeleted = 'N' && C.isSoldOut = 'N'
   ORDER BY RAND()
   LIMIT 15;
   `;
