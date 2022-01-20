@@ -22,19 +22,7 @@ exports.getCraftDetail = async (craftIdx) => {
       const cautions = await craftDao.getCraftCautions(connection, craftIdx);  //유의사항
       const material = await craftDao.getCraftMaterial(connection, craftIdx);  //소재
       const usage = await craftDao.getCraftUsage(connection, craftIdx);  //용도
-
-      const isFreeShippingFee = await craftDao.isFreeShippingFee(connection, craftIdx);  //조건 없이 전체 무료배송인지
-      let shippingFeeList = [];
-      
-      if (isFreeShippingFee === 'Y'){
-        shippingFeeList.push('무료배송');
-      }
-      else{
-        
-        //다른 경우의 수 있을 때 변경 예정
-        const shippingFee = await craftDao.getShippingFeeList(connection, craftIdx);
-        shippingFeeList = shippingFee.map(item => item.shippingFee);
-      }
+      const shippingFee = await craftDao.getCraftShippingFee(connection, craftIdx);
 
       const detailImageList = detailImage.map(item => item.detailImageUrl);
       const cautionsList = cautions.map(item => item.cautions);
@@ -48,7 +36,7 @@ exports.getCraftDetail = async (craftIdx) => {
         'name': basicInfo.name,
         'mainImageUrl': basicInfo.mainImageUrl,
         'price': basicInfo.price,
-        'shippingFee': shippingFeeList,
+        'shippingFee': [shippingFee.basicShippingFee, shippingFee.toFreeShippingFee, shippingFee.extraShippingFee],
         'material': materialList,
         'usage' : usageList,
         'content': basicInfo.content,

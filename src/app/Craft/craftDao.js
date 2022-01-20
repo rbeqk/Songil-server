@@ -83,27 +83,17 @@ async function getCraftUsage(connection, craftIdx){
   return rows;
 }
 
-//조건 없이 전체 무료배송인지
-async function isFreeShippingFee(connection, craftIdx){
+//배송비 관련 정보
+async function getCraftShippingFee(connection, craftIdx){
   const query = `
-  SELECT C.isFreeShipping
-  FROM Craft C
-  WHERE C.craftIdx = ${craftIdx} && C.isDeleted = 'N';
+  SELECT CONCAT('배송비 ', basicShippingFee, '원') as basicShippingFee,
+        IF(toFreeShippingFee, CONCAT(toFreeShippingFee, '원 이상 주문 시 무료'), NULL) as toFreeShippingFee,
+        IF(extraShippingFee, CONCAT('도서 산간 지역 ', extraShippingFee, '원 추가'), NULL) as extraShippingFee
+  FROM Craft
+  WHERE isDeleted = 'N' && craftIdx = ${craftIdx};
   `;
   const [rows] = await connection.query(query);
-  return rows[0]['isFreeShipping'];
-}
-
-//배송비 조건 있을 경우 배송비
-async function getShippingFeeList(connection, craftIdx){
-  const query = `
-  SELECT CONCAT(CSFC.conditions, ' ', IF(CSFC.shippingFee = 0, '무료배송', CONCAT(CSFC.shippingFee, '원'))) as shippingFee
-  FROM Craft C
-          JOIN CraftShippingFeeCondition CSFC ON CSFC.craftIdx = C.craftIdx && CSFC.isDeleted = 'N'
-  WHERE C.craftIdx = ${craftIdx} && C.isDeleted = 'N';
-  `;
-  const [rows] = await connection.query(query);
-  return rows;
+  return rows[0];
 }
 
 module.exports = {
@@ -113,6 +103,5 @@ module.exports = {
   getCraftCautions,
   getCraftMaterial,
   getCraftUsage,
-  isFreeShippingFee,
-  getShippingFeeList,
+  getCraftShippingFee,
 }
