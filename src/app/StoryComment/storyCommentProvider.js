@@ -37,6 +37,7 @@ exports.getStoryComment = async (storyIdx, userIdx, page) => {
           'createdAt': item.createdAt,
           'isUserComment': item.isUserComment,
           'isDeleted': item.isDeleted,
+          'isReported': item.isReported,
           'reComment': []
         });
       });
@@ -54,7 +55,8 @@ exports.getStoryComment = async (storyIdx, userIdx, page) => {
             'isWriter': item.isWriter,
             'comment': item.comment,
             'createdAt': item.createdAt,
-            'isUserComment': item.isUserComment
+            'isUserComment': item.isUserComment,
+            'isReported': item.isReported
           });
         });
       }

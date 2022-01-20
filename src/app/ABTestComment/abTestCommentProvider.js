@@ -36,6 +36,7 @@ exports.getABTestComment = async (abTestIdx, userIdx, page) => {
           'createdAt': item.createdAt,
           'isUserComment': item.isUserComment,
           'isDeleted': item.isDeleted,
+          'isReported': item.isReported,
           'reComment': []
         });
       });
@@ -53,7 +54,8 @@ exports.getABTestComment = async (abTestIdx, userIdx, page) => {
             'isWriter': item.isWriter,
             'comment': item.comment,
             'createdAt': item.createdAt,
-            'isUserComment': item.isUserComment
+            'isUserComment': item.isUserComment,
+            'isReported': item.isReported
           });
         });
       }

@@ -62,7 +62,8 @@ async function getQnAParentComment(connection, qnaIdx, userIdx, pageItemCnt, sta
         QC.comment,
         DATE_FORMAT(QC.createdAt, '%Y.%m.%d') as createdAt,
         IF(QC.userIdx = ${userIdx}, 'Y', 'N') as isUserComment,
-        QC.isDeleted
+        QC.isDeleted,
+        QC.isReported
   FROM QnAComment QC
           JOIN User U ON U.userIdx = QC.userIdx && U.isDeleted = 'N'
           JOIN QnA Q ON Q.qnaIdx = QC.qnaIdx && Q.isDeleted = 'N'
@@ -83,7 +84,8 @@ async function getQnARecomment(connection, parentIdx, userIdx){
         IF(QC.userIdx = Q.userIdx, 'Y', 'N')  as isWriter,
         QC.comment,
         DATE_FORMAT(QC.createdAt, '%Y.%m.%d') as createdAt,
-        IF(QC.userIdx = ${userIdx}, 'Y', 'N') as isUserComment
+        IF(QC.userIdx = ${userIdx}, 'Y', 'N') as isUserComment,
+        QC.isReported
   FROM QnAComment QC
           JOIN User U ON U.userIdx = QC.userIdx && U.isDeleted = 'N'
           JOIN QnA Q ON Q.qnaIdx = QC.qnaIdx && Q.isDeleted = 'N'

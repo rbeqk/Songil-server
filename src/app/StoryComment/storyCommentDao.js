@@ -62,7 +62,8 @@ async function getStoryParentComment(connection, storyIdx, userIdx, startItemIdx
         SC.comment,
         DATE_FORMAT(SC.createdAt, '%Y.%m.%d') as createdAt,
         IF(SC.userIdx = ${userIdx}, 'Y', 'N') as isUserComment,
-        SC.isDeleted
+        SC.isDeleted,
+        SC.isReported
   FROM StoryComment SC
           JOIN User U ON U.userIdx = SC.userIdx && U.isDeleted = 'N'
           JOIN Story S ON S.storyIdx = SC.storyIdx && S.isDeleted = 'N'
@@ -83,7 +84,8 @@ async function getStoryReComment(connection, parentIdx, userIdx){
         IF(S.userIdx = SC.userIdx, 'Y', 'N')  as isWriter,
         SC.comment,
         DATE_FORMAT(SC.createdAt, '%Y.%m.%d') as createdAt,
-        IF(SC.userIdx = ${userIdx}, 'Y', 'N') as isUserComment
+        IF(SC.userIdx = ${userIdx}, 'Y', 'N') as isUserComment,
+        SC.isReported
   FROM StoryComment SC
           JOIN User U ON U.userIdx = SC.userIdx && U.isDeleted = 'N'
           JOIN Story S ON S.storyIdx = SC.storyIdx && S.isDeleted = 'N'

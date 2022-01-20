@@ -65,7 +65,8 @@ async function getABTestParentComment(connection, abTestIdx, userIdx, startItemI
         AC.comment,
         DATE_FORMAT(AC.createdAt, '%Y.%m.%d')                        as createdAt,
         IF(AC.userIdx = ${userIdx}, 'Y', 'N')                        as isUserComment,
-        AC.isDeleted
+        AC.isDeleted,
+        AC.isReported
   FROM ABTestComment AC
           JOIN User U ON U.userIdx = AC.userIdx && U.isDeleted = 'N'
           JOIN ABTest A on AC.abTestIdx = A.abTestIdx && A.isDeleted = 'N'
@@ -89,7 +90,8 @@ async function getABTestReComment(connection, abTestIdx, parentIdx, userIdx){
                           WHERE abTestIdx = ${abTestIdx}), 'Y', 'N') as isWriter,
         AC.comment,
         DATE_FORMAT(AC.createdAt, '%Y.%m.%d')                        as createdAt,
-        IF(AC.userIdx = ${userIdx}, 'Y', 'N')                        as isUserComment
+        IF(AC.userIdx = ${userIdx}, 'Y', 'N')                        as isUserComment,
+        AC.isReported
   FROM ABTestComment AC
           JOIN User U ON U.userIdx = AC.userIdx && U.isDeleted = 'N'
   WHERE AC.parentIdx IS NOT NULL && AC.isDeleted = 'N' && AC.parentIdx = ${parentIdx};
