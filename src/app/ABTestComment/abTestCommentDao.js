@@ -54,17 +54,27 @@ async function deleteABTestomment(connection, abTestCommentIdx){
 //abTest 부모 댓글 가져오기
 async function getABTestParentComment(connection, abTestIdx, userIdx, startItemIdx, pageItemCnt){
   const query = `
-  SELECT AC.abTestCommentIdx                                          as commentIdx,
+  SELECT AC.abTestCommentIdx                                         as commentIdx,
         AC.userIdx,
-        U.imageUrl                                                   as userProfile,
-        U.nickname                                                   as userName,
+        U.imageUrl                                                  as userProfile,
+        U.nickname                                                  as userName,
         IF(AC.userIdx = (SELECT A.userIdx
                           FROM ABTest AB
                                   JOIN Artist A ON A.artistIdx = AB.artistIdx && A.isDeleted = 'N'
                           WHERE abTestIdx = ${abTestIdx}), 'Y', 'N') as isWriter,
         AC.comment,
-        DATE_FORMAT(AC.createdAt, '%Y.%m.%d')                        as createdAt,
-        IF(AC.userIdx = ${userIdx}, 'Y', 'N')                        as isUserComment,
+        CASE
+            WHEN TIMESTAMPDIFF(minute, AC.createdAt, NOW()) < 1
+                THEN '방금 전'
+            WHEN TIMESTAMPDIFF(hour, AC.createdAt, NOW()) < 1
+                THEN CONCAT(TIMESTAMPDIFF(minute, AC.createdAt, NOW()), '분 전')
+            WHEN TIMESTAMPDIFF(hour, AC.createdAt, NOW()) < 24
+                THEN CONCAT(TIMESTAMPDIFF(hour, AC.createdAt, NOW()), '시간 전')
+            WHEN TIMESTAMPDIFF(day, DATE_FORMAT(AC.createdAt, '%Y-%m-%d'), DATE_FORMAT(NOW(),'%Y-%m-%d')) <= 3
+                THEN CONCAT(TIMESTAMPDIFF(day, DATE_FORMAT(AC.createdAt, '%Y-%m-%d'), DATE_FORMAT(NOW(),'%Y-%m-%d')), '일 전')
+            ELSE DATE_FORMAT(AC.createdAt, '%Y.%m.%d. %H:%i')
+            END                                                     as createdAt,
+        IF(AC.userIdx = ${userIdx}, 'Y', 'N')                       as isUserComment,
         AC.isDeleted,
         AC.isReported
   FROM ABTestComment AC
@@ -80,17 +90,28 @@ async function getABTestParentComment(connection, abTestIdx, userIdx, startItemI
 //abTest 대댓글 가져오기
 async function getABTestReComment(connection, abTestIdx, parentIdx, userIdx){
   const query = `
-  SELECT AC.abTestCommentIdx                                          as commentIdx,
+  SELECT AC.abTestCommentIdx                                         as commentIdx,
         AC.userIdx,
-        U.imageUrl                                                   as userProfile,
-        U.nickname                                                   as userName,
+        U.imageUrl                                                  as userProfile,
+        U.nickname                                                  as userName,
         IF(AC.userIdx = (SELECT A.userIdx
                           FROM ABTest AB
                                   JOIN Artist A ON A.artistIdx = AB.artistIdx && A.isDeleted = 'N'
                           WHERE abTestIdx = ${abTestIdx}), 'Y', 'N') as isWriter,
         AC.comment,
-        DATE_FORMAT(AC.createdAt, '%Y.%m.%d')                        as createdAt,
-        IF(AC.userIdx = ${userIdx}, 'Y', 'N')                        as isUserComment,
+        CASE
+            WHEN TIMESTAMPDIFF(minute, AC.createdAt, NOW()) < 1
+                THEN '방금 전'
+            WHEN TIMESTAMPDIFF(hour, AC.createdAt, NOW()) < 1
+                THEN CONCAT(TIMESTAMPDIFF(minute, AC.createdAt, NOW()), '분 전')
+            WHEN TIMESTAMPDIFF(hour, AC.createdAt, NOW()) < 24
+                THEN CONCAT(TIMESTAMPDIFF(hour, AC.createdAt, NOW()), '시간 전')
+            WHEN TIMESTAMPDIFF(day, DATE_FORMAT(AC.createdAt, '%Y-%m-%d'), DATE_FORMAT(NOW(),'%Y-%m-%d')) <= 3
+                THEN CONCAT(TIMESTAMPDIFF(day, DATE_FORMAT(AC.createdAt, '%Y-%m-%d'), DATE_FORMAT(NOW(),'%Y-%m-%d')), '일 전')
+            ELSE DATE_FORMAT(AC.createdAt, '%Y.%m.%d. %H:%i')
+            END                                                     as createdAt,
+        DATE_FORMAT(AC.createdAt, '%Y.%m.%d')                       as createdAt,
+        IF(AC.userIdx = ${userIdx}, 'Y', 'N')                       as isUserComment,
         AC.isReported
   FROM ABTestComment AC
           JOIN User U ON U.userIdx = AC.userIdx && U.isDeleted = 'N'
