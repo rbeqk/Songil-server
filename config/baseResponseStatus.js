@@ -61,6 +61,7 @@ module.exports = {
   EXCEED_CRAFT_COMMENT: {"isSuccess": false, "code": 2364, "message": "comment는 500자 이하로 입력해주세요"},
   EXCEED_CART_CNT: {"isSuccess": false, "code": 2365, "message": "장바구니에는 최대 100개까지만 담을 수 있습니다"},
   EXCEED_TAG_LENGTH: {"isSuccess": false, "code": 2366, "message": "태그는 20글자 이하로 설정해주세요"},
+  EXCEED_NICKNAME: {"isSuccess": false, "code": 2367, "message": "닉네임은 10글자 이하로 설정해주세요"},
 
   NO_PERMISSION: {"isSuccess": false, "code": 2400, "message": "권한이 없습니다"},
   CAN_NOT_REPORT_SELF: {"isSuccess": false, "code": 2401, "message": "자신의 댓글은 신고할 수 없습니다"},

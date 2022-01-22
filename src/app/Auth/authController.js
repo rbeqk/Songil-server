@@ -32,6 +32,7 @@ exports.checkVerificationCode = async (req, res) => {
   const {email, code} = req.query;
 
   if (!(email && code)) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (!validator.isEmail(email)) return res.send(errResponse(baseResponse.INVALID_EMAIL_TYPE));
 
   const checkVerificationCode = await authProvider.checkVerificationCode(email, code);
 
@@ -48,6 +49,7 @@ exports.checkNickname = async (req, res) => {
   const {nickname} = req.query;
 
   if (!nickname) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (nickname.length > 10) return res.send(errResponse(baseResponse.EXCEED_NICKNAME));
 
   const checkNickname = await authProvider.checkNickname(nickname);
 
@@ -65,6 +67,7 @@ exports.createUser = async (req, res) => {
 
   if (!(email && password && nickname)) return res.send(errResponse(baseResponse.IS_EMPTY));
   if (!validator.isEmail(email)) return res.send(errResponse(baseResponse.INVALID_EMAIL_TYPE));
+  if (nickname.length > 10) return res.send(errResponse(baseResponse.EXCEED_NICKNAME));
 
   const createUser = await authService.createUser(email, password, nickname);
 
