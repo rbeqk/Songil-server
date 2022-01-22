@@ -88,7 +88,7 @@ async function getCraftShippingFee(connection, craftIdx){
   const query = `
   SELECT CONCAT('배송비 ', basicShippingFee, '원') as basicShippingFee,
         IF(toFreeShippingFee, CONCAT(toFreeShippingFee, '원 이상 주문 시 무료'), NULL) as toFreeShippingFee,
-        IF(extraShippingFee, CONCAT('도서 산간 지역 ', extraShippingFee, '원 추가'), NULL) as extraShippingFee
+        IF(extraShippingFee != 0, CONCAT('도서 산간 지역 ', extraShippingFee, '원 추가'), NULL) as extraShippingFee
   FROM Craft
   WHERE isDeleted = 'N' && craftIdx = ${craftIdx};
   `;
