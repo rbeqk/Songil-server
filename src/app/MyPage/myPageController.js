@@ -70,7 +70,7 @@ exports.updateUserProfile = async (req, res) => {
   const {userIdx} = req.verifiedToken;
 
   if (!(nickname || userProfile)) return res.send(errResponse(baseResponse.UPDATE_INFO_EMPTY));
-  if (nickname.length > 10) return res.send(errResponse(baseResponse.EXCEED_NICKNAME));
+  if (nickname && nickname.length > 10) return res.send(errResponse(baseResponse.EXCEED_NICKNAME));
   
   const updateUserProfile = await myPageService.updateUserProfile(userIdx, nickname, userProfile);
   return res.send(updateUserProfile);
