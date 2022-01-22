@@ -57,3 +57,21 @@ exports.getUserWrittenWithComment = async (req, res) => {
   const getUserWrittenWithComment = await myPageProvider.getUserWrittenWithComment(userIdx, page);
   return res.send(getUserWrittenWithComment);
 }
+
+/*
+  API No. 8.10
+  API Name: 프로필 수정 API
+  [PATCH] /my-page/profile
+  body: nickname, userProfile
+*/
+exports.updateUserProfile = async (req, res) => {
+  const {nickname} = req.body;
+  const userProfile = req.file?.location;
+  const {userIdx} = req.verifiedToken;
+
+  if (!(nickname || userProfile)) return res.send(errResponse(baseResponse.UPDATE_INFO_EMPTY));
+  if (nickname.length > 10) return res.send(errResponse(baseResponse.EXCEED_NICKNAME));
+  
+  const updateUserProfile = await myPageService.updateUserProfile(userIdx, nickname, userProfile);
+  return res.send(updateUserProfile);
+}

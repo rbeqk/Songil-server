@@ -45,8 +45,21 @@ const craftCommentUpload = multer({
   })
 })
 
+const userProfileUpload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: process.env.bucketName + '/users',
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    acl: 'public-read',
+    key: function (req, file, cb) {
+      cb(null, Date.now() + '_' + file.originalname.split('.')[0] + '.' + file.originalname.split('.').pop())
+    }
+  })
+})
+
 module.exports = {
   storyUpload,
   ABTestUpload,
   craftCommentUpload,
+  userProfileUpload,
 }

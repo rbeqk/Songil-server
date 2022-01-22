@@ -253,9 +253,22 @@ async function getUserWrittenWithComment(connection, userIdx, startItemIdx, item
   return rows;
 }
 
+//유저 프로필 수정
+async function updateUserProfile(connection, userIdx, nickname, userProfile){
+  const query = `
+  UPDATE User
+  SET nickname = IFNULL(?, nickname),
+      imageUrl = IFNULL(?, imageUrl)
+  WHERE userIdx = ${userIdx};
+  `;
+  const [rows] = await connection.query(query, [nickname, userProfile]);
+  return rows;
+}
+
 module.exports = {
   getWrittenComment,
   getArtistIdx,
   getUserWrittenWith,
   getUserWrittenWithComment,
+  updateUserProfile,
 }
