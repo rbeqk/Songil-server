@@ -9,10 +9,10 @@ const s3 = new aws.S3({
   region: 'ap-northeast-2'
 });
 
-const storyUpload = multer({
+const upload = (path) => multer({
   storage: multerS3({
     s3: s3,
-    bucket: process.env.bucketName + '/with/story',
+    bucket: process.env.bucketName + path,
     contentType: multerS3.AUTO_CONTENT_TYPE,
     acl: 'public-read',
     key: function (req, file, cb) {
@@ -21,41 +21,10 @@ const storyUpload = multer({
   })
 })
 
-const ABTestUpload = multer({
-  storage: multerS3({
-    s3: s3,
-    bucket: process.env.bucketName + '/with/abTest',
-    contentType: multerS3.AUTO_CONTENT_TYPE,
-    acl: 'public-read',
-    key: function (req, file, cb) {
-      cb(null, Date.now() + '_' + file.originalname.split('.')[0] + '.' + file.originalname.split('.').pop())
-    }
-  })
-})
-
-const craftCommentUpload = multer({
-  storage: multerS3({
-    s3: s3,
-    bucket: process.env.bucketName + '/with/craft/comment',
-    contentType: multerS3.AUTO_CONTENT_TYPE,
-    acl: 'public-read',
-    key: function (req, file, cb) {
-      cb(null, Date.now() + '_' + file.originalname.split('.')[0] + '.' + file.originalname.split('.').pop())
-    }
-  })
-})
-
-const userProfileUpload = multer({
-  storage: multerS3({
-    s3: s3,
-    bucket: process.env.bucketName + '/users',
-    contentType: multerS3.AUTO_CONTENT_TYPE,
-    acl: 'public-read',
-    key: function (req, file, cb) {
-      cb(null, Date.now() + '_' + file.originalname.split('.')[0] + '.' + file.originalname.split('.').pop())
-    }
-  })
-})
+const storyUpload = upload('/with/story');
+const ABTestUpload = upload('/with/abTest');
+const craftCommentUpload = upload('/with/craft/comment');
+const userProfileUpload = upload('/users');
 
 module.exports = {
   storyUpload,
