@@ -1,5 +1,4 @@
 const askDao = require('./askDao');
-const userDao = require('../User/userDao');
 const craftDao = require('../Craft/craftDao');
 const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
