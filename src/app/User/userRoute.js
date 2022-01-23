@@ -17,9 +17,6 @@ module.exports = function(app){
   //회원가입 API
   app.post('/signup', userController.signUp);
 
-  //자동로그인 API
-  app.post('/login/auto', jwtMiddleware, userController.autoLogin);
-
   //로그인 API
   app.post('/login', userController.login);
 }

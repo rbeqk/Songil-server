@@ -142,3 +142,27 @@ exports.login = async (email, password) => {
     return errResponse(baseResponse.DB_ERROR);
   }
 }
+
+//자동 로그인
+exports.autoLogin = async (userIdx) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+      const isExistUser = await authDao.isExistUser(connection, userIdx);
+      if (!isExistUser){
+        connection.release();
+        return errResponse(baseResponse.INVALID_USER_INFO);
+      }
+
+      connection.release();
+      return response(baseResponse.SUCCESS);
+    }catch(err){
+      connection.release();
+      logger.error(`autoLogin DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`autoLogin DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}

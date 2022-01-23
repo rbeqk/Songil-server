@@ -1,4 +1,5 @@
 module.exports = function(app){
+  const jwtMiddleware = require('../../../config/jwtMiddleware');
   const authController = require('./authController');
 
   //이메일 인증번호 발급 API
@@ -15,4 +16,7 @@ module.exports = function(app){
 
   //로그인 API
   app.post('/imsi/login', authController.login);
+
+  //자동로그인 API
+  app.post('/login/auto', jwtMiddleware, authController.autoLogin);
 }

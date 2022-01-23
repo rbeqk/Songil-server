@@ -47,10 +47,20 @@ async function getUserIdx(connection, email, encryptedPassword){
   return rows[0]['userIdx'];
 }
 
+//존재하는 userIdx인지
+async function isExistUser(connection, userIdx){
+  const query = `
+  SELECT EXISTS(SELECT userIdx FROM User WHERE userIdx = ${userIdx} && isDeleted = 'N') as isExist;
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['isExist'];
+}
+
 module.exports = {
   isExistEmail,
   isExistNickname,
   createUser,
   getPassword,
   getUserIdx,
+  isExistUser,
 }

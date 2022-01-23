@@ -90,3 +90,15 @@ exports.login = async (req, res) => {
 
   return res.send(login);
 }
+
+/*
+  API No. 1.7
+  API Name: 자동로그인 API
+  [POST] /login/auto
+*/
+exports.autoLogin = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+
+  const autoLogin = await authProvider.autoLogin(userIdx);
+  return res.send(autoLogin);
+}
