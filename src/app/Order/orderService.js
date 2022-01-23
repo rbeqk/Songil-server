@@ -9,9 +9,12 @@ exports.addCraftInOrderSheet = async (userIdx, craftIdxArr, amountArr) => {
     const connection = await pool.getConnection(async conn => conn);
     try{
 
-      //존재&&품절X 상품 idx인지
-      const isNotExistOrSoldOutCraftIdx = await orderDao.isNotExistOrSoldOutCraftIdx(connection, craftIdxArr);
-      if (isNotExistOrSoldOutCraftIdx) return res.send(errResponse(baseResponse.INVALID_CRAFT_IDX));
+      //존재&&품절X 상품 idx 개수
+      const existCraftIdxLen = await orderDao.getExistCraftIdxLen(connection, craftIdxArr);
+      if (existCraftIdxLen !== craftIdxArr.length){
+        connection.release();
+        return errResponse(baseResponse.INVALID_CRAFT_IDX);
+      }
 
       const craftLength = craftIdxArr.length;
       let totalCraftPriceArr = [];

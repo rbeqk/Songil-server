@@ -1,10 +1,11 @@
-//존재&&품절X 상품 idx인지
-async function isNotExistOrSoldOutCraftIdx(connection, craftIdxArr){
+//존재&&품절X 상품 idx 개수
+async function getExistCraftIdxLen(connection, craftIdxArr){
   const query = `
-  SELECT EXISTS(SELECT craftIdx FROM Craft WHERE craftIdx IN (?) && isDeleted = 'Y' || isSoldOut = 'Y') as isExist;
+  SELECT COUNT(craftIdx) as totalCnt FROM Craft
+  WHERE isDeleted = 'N' && isSoldOut = 'N' && craftIdx IN (?);
   `;
   const [rows] = await connection.query(query, [craftIdxArr]);
-  return rows[0]['isExist'];
+  return rows[0]['totalCnt'];
 }
 
 //상품 가격 가져오기
@@ -73,7 +74,7 @@ async function getUserPoint(connection, userIdx){
 }
 
 module.exports = {
-  isNotExistOrSoldOutCraftIdx,
+  getExistCraftIdxLen,
   getCraftPrice,
   getCraftBasicShippingFee,
   createOrder,
