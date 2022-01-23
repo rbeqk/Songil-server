@@ -167,7 +167,7 @@ exports.changeUserStoryLikeStatus = async (userIdx, storyIdx) => {
       }
 
       //현재 story 좋아요 status 확인
-      const isStoryLike = await likeDao.getStoryLikeStatus(connection, userIdx, storyIdx);
+      const isStoryLike = await likeDao.getStoryLikeStatus(connection, storyIdx, userIdx);
 
       await connection.beginTransaction();
 
