@@ -56,6 +56,7 @@ module.exports = function (){
   require('../src/app/Cart/cartRoute')(app);
   require('../src/app/Benefit/benefitRoute')(app);
   require('../src/app/Auth/authRoute')(app);
+  require('../src/app/Order/orderRoute')(app);
 
   return app;
 }
