@@ -189,7 +189,7 @@ async function getTotalQnALikeCnt(connection, qnaIdx){
 //유저 story 좋아요 여부
 async function getStoryLikeStatus(connection, storyIdx, userIdx){
   const query = `
-  SELECT IF(EXISTS(SELECT * FROM StoryLike WHERE storyIdx = ${storyIdx} && userIdx = ${userIdx}), 'Y', 'N') as isExist;
+  SELECT EXISTS(SELECT * FROM StoryLike WHERE storyIdx = ${storyIdx} && userIdx = ${userIdx}) as isExist;
   `;
   const [rows] = await connection.query(query);
   return rows[0]['isExist'];
