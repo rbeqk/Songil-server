@@ -4,4 +4,7 @@ module.exports  = function(app){
 
   //주문서 상품 추가 API
   app.post('/order/crafts', jwtMiddleware, orderController.addCraftInOrderSheet);
+
+  //베네핏 적용 API
+  app.post('/order/:orderIdx/benefits', jwtMiddleware, orderController.applyOrderBenefit);
 }

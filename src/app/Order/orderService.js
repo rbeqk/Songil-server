@@ -3,6 +3,7 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
+const {getCanUseBenefitIdxArr} = require('../../../modules/benefitUtil');
 
 exports.addCraftInOrderSheet = async (userIdx, craftIdxArr, amountArr) => {
   try{
@@ -85,6 +86,90 @@ exports.addCraftInOrderSheet = async (userIdx, craftIdxArr, amountArr) => {
     }
   }catch(err){
     logger.error(`addCraftInOrderSheet DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}
+
+//베네핏 적용
+exports.applyOrderBenefit = async (userIdx, orderIdx, benefitIdx) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+
+      const isExistOrderIdx = await orderDao.isExistOrderIdx(connection, orderIdx);
+      if (!isExistOrderIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_ORDER_IDX);
+      }
+
+      const isValidOrderIdx = await orderDao.isValidOrderIdx(connection, orderIdx);
+      if (!isValidOrderIdx){
+        connection.release();
+        return errResponse(baseResponse.ALREADY_PAYMENT_ORDER_IDX);
+      }
+
+      const isUserOrderIdx = await orderDao.isUserOrderIdx(connection, userIdx, orderIdx);
+      if (!isUserOrderIdx){
+        connection.release();
+        return errResponse(baseResponse.NO_PERMISSION);
+      }
+
+      const canUseBenefitIdxArr = await getCanUseBenefitIdxArr(connection, userIdx, orderIdx);
+      if (!canUseBenefitIdxArr){
+        connection.release();
+        return errResponse(baseResponse.DB_ERROR);
+      }
+
+      if (!canUseBenefitIdxArr.includes(benefitIdx)){
+        connection.release();
+        return errResponse(baseResponse.CAN_NOT_USE_BENEFIT_IDX);
+      }
+
+      //해당 베네핏의 category
+      const benefitCategoryIdx = await orderDao.getBenefitCategoryIdx(connection, benefitIdx);
+
+      let usedBenefitInfo;
+
+      //가격 별 베네핏
+      if (benefitCategoryIdx == 1){
+        const totalCraftPrice = await orderDao.getTotalCraftPrice(connection, orderIdx);
+        usedBenefitInfo = await orderDao.getUsedBenefitByPriceInfo(connection, benefitIdx, totalCraftPrice);
+      }
+      //작가 별 베네핏
+      else if (benefitCategoryIdx == 2){
+        const benefitArtistIdx = await orderDao.getBenefitArtistIdx(connection, benefitIdx);
+        const orderCraftByArtist = await orderDao.getOrderCraftByArtist(connection, orderIdx);
+        
+        const totalArtistCraftPrice = orderCraftByArtist.filter(item => item.artistIdx == benefitArtistIdx)[0]['totalArtistCraftPrice'];
+        usedBenefitInfo = await orderDao.getUsedBenefitByArtistInfo(connection, benefitIdx, totalArtistCraftPrice);
+      }
+      //TODO: 상품 별 베네핏
+      else if (benefitCategoryIdx == 3){
+      }
+
+      const benefitTitle = usedBenefitInfo.title;
+      const benefitDiscount = usedBenefitInfo.benefitDiscount;
+
+      await connection.beginTransaction();
+      await orderDao.applyOrderSheetBenefit(connection, orderIdx, benefitIdx, benefitDiscount);
+      await connection.commit();
+
+      const result = {
+        'benefitIdx': benefitIdx,
+        'title': benefitTitle,
+        'discountPrice': benefitDiscount
+      }
+      
+      connection.release();
+      return response(baseResponse.SUCCESS, result);
+
+    }catch(err){
+      connection.release();
+      logger.error(`applyOrderBenefit DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`applyOrderBenefit DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }

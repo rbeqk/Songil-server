@@ -69,6 +69,7 @@ module.exports = {
   CAN_NOT_REPORT_SELF: {"isSuccess": false, "code": 2401, "message": "자신의 댓글은 신고할 수 없습니다"},
   IS_ALREADY_COMMENT_ASK_IDX: {"isSuccess": false, "code": 2402, "message": "이미 답변한 문의입니다"},
   CAN_NOT_COMMENT_TO_DELETED_CRAFT: {"isSuccess": false, "code": 2403, "message": "삭제된 상품의 문의에 대해서는 답변할 수 없습니다"},
+  CAN_NOT_USE_BENEFIT_IDX: {"isSuccess": false, "code": 2404, "message": "사용할 수 없는 benefitIdx입니다"},
 
   //Response
   INVALD_VERIFICATIONCODE: {"isSuccess": false, "code": 3100, "message": "올바르지 않은 인증번호입니다"},

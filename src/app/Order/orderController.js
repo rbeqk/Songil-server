@@ -22,3 +22,21 @@ exports.addCraftInOrderSheet = async (req, res) => {
   
   return res.send(addCraftInOrderSheet);
 }
+
+/*
+  API No. 12.3
+  API Name: 베네핏 적용 API
+  [POST] /order/:orderIdx/benefits
+  body: benefitIdx
+*/
+exports.applyOrderBenefit = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {orderIdx} = req.params;
+  const {benefitIdx} = req.body;
+
+  if (!benefitIdx) return res.send(errResponse(baseResponse.IS_EMPTY));
+
+  const applyOrderBenefit = await orderService.applyOrderBenefit(userIdx, orderIdx, benefitIdx);
+
+  return res.send(applyOrderBenefit);
+}
