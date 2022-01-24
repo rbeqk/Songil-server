@@ -19,8 +19,8 @@ const getCanUseBenefitIdxArr = async (connection, userIdx, orderIdx) => {
       const artistIdx = orderCraftByArtist[i].artistIdx;
       const totalArtistCraftPrice = orderCraftByArtist[i].totalArtistCraftPrice;
 
-      const canUseBenefitIdxAByArtist = await benefitDao.getCanUseBenefitIdxAByArtist(connection, artistIdx, totalArtistCraftPrice, userAllBenefitIdxArr);
-      canUseBenefitIdxByArtistArr.push(canUseBenefitIdxAByArtist);
+      const canUseBenefitArrByArtist = await benefitDao.getCanUseBenefitArrByArtist(connection, artistIdx, totalArtistCraftPrice, userAllBenefitIdxArr);
+      canUseBenefitIdxByArtistArr.push(...canUseBenefitArrByArtist.map(item => item.benefitIdx));
     }
 
     //사용할 수 있는 가격 별 + 작가 별 쿠폰

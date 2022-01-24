@@ -4,6 +4,7 @@ const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 const {BenefitInfoDTO} = require('./benefitDto');
+const {getCanUseBenefitIdxArr} = require('../../../modules/benefitUtil');
 
 //보유 베네핏 조회
 exports.getBenefits = async (userIdx) => {
@@ -50,28 +51,13 @@ exports.getCanUseBenefit = async (userIdx, orderIdx) => {
         return errResponse(baseResponse.NO_PERMISSION);
       }
 
-      //유저의 사용 가능한 모든 베네핏idx
-      const userAllBenefitIdxArr = await benefitDao.getUserAllBenefitIdxArr(connection, userIdx);
-
-      //해당 orderIdx의 총 상품 결제 금액
-      const totalCraftPrice = await benefitDao.getTotalCraftPrice(connection, orderIdx);
-
-      //사용할 수 있는 가격 별 쿠폰
-      const canUseBenefitIdxByPriceArr = await benefitDao.getCanUseBenefitIdxByPriceArr(connection, totalCraftPrice, userAllBenefitIdxArr);
-
-      //사용할 수 있는 작가 별 쿠폰
-      let canUseBenefitIdxByArtistArr = [];
-      const orderCraftByArtist = await benefitDao.getOrderCraftByArtist(connection, orderIdx);
-      for (let i=0; i< orderCraftByArtist.length; i++){
-        const artistIdx = orderCraftByArtist[i].artistIdx;
-        const totalArtistCraftPrice = orderCraftByArtist[i].totalArtistCraftPrice;
-
-        const canUseBenefitIdxAByArtist = await benefitDao.getCanUseBenefitIdxAByArtist(connection, artistIdx, totalArtistCraftPrice, userAllBenefitIdxArr);
-        canUseBenefitIdxByArtistArr.push(canUseBenefitIdxAByArtist);
-      }
-
       //사용할 수 있는 가격 별 + 작가 별 쿠폰
-      const canUseBenefitIdxArr = canUseBenefitIdxByPriceArr.concat(canUseBenefitIdxByArtistArr);
+      const canUseBenefitIdxArr = await getCanUseBenefitIdxArr(connection, userIdx, orderIdx);
+      if (!canUseBenefitIdxArr){
+        connection.release();
+        return errResponse(baseResponse.DB_ERROR);
+      }
+      
       const canUseBenefitInfo = await benefitDao.getCanUseBenefitInfo(connection, canUseBenefitIdxArr);
 
       const result = canUseBenefitInfo.map(item => new BenefitInfoDTO(item));

@@ -90,7 +90,7 @@ async function getOrderCraftByArtist(connection, orderIdx){
 }
 
 //사용할 수 있는 작가 별 쿠폰
-async function getCanUseBenefitIdxAByArtist(connection, artistIdx, totalArtistCraftPrice, userAllBenefitIdxArr){
+async function getCanUseBenefitArrByArtist(connection, artistIdx, totalArtistCraftPrice, userAllBenefitIdxArr){
   const query = `
   SELECT benefitIdx
   FROM Benefit
@@ -98,7 +98,7 @@ async function getCanUseBenefitIdxAByArtist(connection, artistIdx, totalArtistCr
       deadline > NOW() && isDeleted = 'N';
   `;
   const [rows] = await connection.query(query, [userAllBenefitIdxArr]);
-  return rows[0]['benefitIdx'];
+  return rows;
 }
 
 //사용할 수 있는 가격 별 + 작가 별 쿠폰 정보
@@ -144,7 +144,7 @@ module.exports = {
   getTotalCraftPrice,
   getCanUseBenefitIdxByPriceArr,
   getOrderCraftByArtist,
-  getCanUseBenefitIdxAByArtist,
+  getCanUseBenefitArrByArtist,
   getCanUseBenefitInfo,
   isValidOrderIdx,
 }
