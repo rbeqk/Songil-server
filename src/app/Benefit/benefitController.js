@@ -15,3 +15,17 @@ exports.getBenefits = async (req, res) => {
 
   return res.send(getBenefits);
 }
+
+/*
+  API No. 12.3
+  API Name: 주문 시 적용 가능 베네핏 조회 API
+  [GET] /order/:orderIdx/benefits
+*/
+exports.getCanUseBenefit = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {orderIdx} = req.params;
+
+  const getCanUseBenefit = await benefitProvider.getCanUseBenefit(userIdx, orderIdx);
+
+  return res.send(getCanUseBenefit);
+}

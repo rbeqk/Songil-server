@@ -43,6 +43,7 @@ module.exports = {
   NOT_IN_CART_CRAFT_IDX: {"isSuccess": false, "code": 2324, "message": "장바구니에 담긴 craftIdx가 아닙니다"},
   INVALID_AMOUNT_CHANGE:{"isSuccess": false, "code": 2325, "message": "수량 변경을 확인해주세요"},
   INVALID_CRAFT_AMOUNT_LENGTH: {"isSuccess": false, "code": 2326, "message": "상품 배열과 수량 배열 길이는 동일해야합니다"},
+  INVALID_ORDER_IDX: {"isSuccess": false, "code": 2327, "message": "존재하지 않는 orderIdx입니다"},
 
   EXCEED_ASK_CONTENT: {"isSuccess": false, "code": 2350, "message": "content는 300자 이하로 입력해주세요"},
   EXCEED_REPORTED_REASON: {"isSuccess": false, "code": 2351, "message": "신고 사유는 150자 이하로 입력해주세요"},
@@ -79,6 +80,7 @@ module.exports = {
   ALREADY_REPORTED_COMMENT_IDX: {"isSuccess": false, "code": 3202, "message": "기존에 신고한 댓글입니다"},
   ALREADY_FINISHED_ABTEST_IDX: {"isSuccess": false, "code": 3203, "message": "이미 마감된 투표입니다"},
   ALREADY_VOTE_ABTEST_IDX: {"isSuccess": false, "code": 3204, "message": "이미 투표 완료한 abTest입니다"},
+  ALREADY_PAYMENT_ORDER_IDX: {"isSuccess": false, "code": 3205, "message": "이미 결제한 orderIdx입니다"},
 
   EMPTY_USER_SEARCH: {"isSuccess": false, "code": 3300, "message": "사용자의 최근 검색어가 없습니다"},
   NO_VOTE_DATA: {"isSuccess": false, "code": 3301, "message": "투표 이력이 없습니다"},
