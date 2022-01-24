@@ -1,5 +1,4 @@
 //보유 베네핏 조회
-//TODO: 사용 여부에 따른 쿼리 수정 필요
 async function getBenefits(connection, userIdx){
   const query = `
   SELECT UB.benefitIdx,
@@ -19,7 +18,7 @@ async function getBenefits(connection, userIdx){
           JOIN Benefit B ON B.benefitIdx = UB.benefitIdx && B.deadline > NOW() && B.isDeleted = 'N'
           LEFT JOIN Artist A ON A.artistIdx = B.artistIdx && A.isDeleted = 'N'
           LEFT JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
-  WHERE UB.userIdx = ${userIdx}
+  WHERE UB.userIdx = ${userIdx} && UB.isUsed = 'N' && UB.isDeleted = 'N'
   ORDER BY B.benefitIdx DESC;
   `;
   const [rows] = await connection.query(query);

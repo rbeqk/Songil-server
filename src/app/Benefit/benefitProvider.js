@@ -11,7 +11,7 @@ exports.getBenefits = async (userIdx) => {
     const connection = await pool.getConnection(async conn => conn);
     try{
       const benefits = await benefitDao.getBenefits(connection, userIdx);
-      const result = benefits;
+      const result = benefits.map(item => new BenefitInfoDTO(item));
 
       connection.release();
       return response(baseResponse.SUCCESS, result);
