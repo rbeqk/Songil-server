@@ -47,7 +47,6 @@ const getABTestFinalInfo = async (connection, abTestIdx) => {
   return result;
 
   }catch(error){
-    connection.release();
     logger.error(`getABTestFinalInfo DB Query Error: ${err}`);
     return false;
   }
@@ -70,7 +69,6 @@ const getUserVoteInfo = async (connection, userIdx, abTestIdx) => {
     
     return result;
   }catch(err){
-    connection.release();
     logger.error(`getUserVoteInfo DB Query Error: ${err}`);
     return false;
   }
