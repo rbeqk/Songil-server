@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@bootpay/server-rest-client": "^1.0.8",
     "aws-sdk": "^2.1046.0",
     "axios": "^0.24.0",
     "compression": "^1.7.4",

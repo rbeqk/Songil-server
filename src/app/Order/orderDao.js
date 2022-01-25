@@ -236,11 +236,53 @@ async function updateOrderExtraShippingFee(connection, orderIdx, totalExtraShipp
   return rows;
 }
 
+//orderIdx zipcode 적용
 async function updateOrderZipcode(connection, orderIdx, zipcode){
   const query = `
   UPDATE OrderT
   SET zipcode = ${zipcode}
   WHERE orderIdx = ${orderIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
+//orderIdx 최종 결제 금액 가져오기
+async function getOrderFinalPrice(connection, orderIdx){
+  const query = `
+  SELECT finalPrice FROM OrderT
+  WHERE orderIdx = ${orderIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['finalPrice'];
+}
+
+//결제 완료로 변경
+async function updateOrderToPaid(connection, orderIdx, receiptId){
+  const query = `
+  UPDATE OrderT
+  SET isPaid = 'Y',
+      receiptId = ${receiptId}
+  WHERE orderIdx = ${orderIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
+//베네핏 사용 처리
+async function updateBenefitToUsed(connection, orderIdx){
+  const getBenefitIdxQuery = `
+  SELECT benefitIdx FROM OrderT
+  WHERE orderIdx = ${orderIdx};
+  `;
+  const [getBenefitIdx] = await connection.query(getBenefitIdxQuery);
+  const benefitIdx = getBenefitIdx[0]['benefitIdx'];
+
+
+  const query = `
+  UPDATE UserBenefit
+  SET isUsed = 'Y'
+  WHERE userIdx = ${userIdx} && benefitIdx = ${benefitIdx};
   `;
   const [rows] = await connection.query(query);
   return rows;
@@ -269,4 +311,7 @@ module.exports = {
   updateOrderCraftExtraShippingFee,
   updateOrderExtraShippingFee,
   updateOrderZipcode,
+  getOrderFinalPrice,
+  updateOrderToPaid,
+  updateBenefitToUsed,
 }

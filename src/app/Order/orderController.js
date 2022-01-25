@@ -3,6 +3,7 @@ const orderService = require('./orderService');
 const baseResponse = require("../../../config/baseResponseStatus");
 const {response} = require("../../../config/response");
 const {errResponse} = require("../../../config/response");
+const validator = require("validator");
 
 /*
   API No. 12.1
@@ -57,4 +58,22 @@ exports.updateOrderExtraShippingFee = async (req, res) => {
   const updateOrderExtraShippingFee = await orderService.updateOrderExtraShippingFee(userIdx, orderIdx, zipcode);
 
   return res.send(updateOrderExtraShippingFee);
+}
+
+/*
+  API No. 12.6
+  API Name: 결제 검증 API
+  [POST] /order/:orderIdx
+  body: receiptId
+*/
+exports.validatePayment = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {orderIdx} = req.params;
+  const {receiptId} = req.body;
+
+  if (!receiptId) return res.send(errResponse(baseResponse.IS_EMPTY));
+
+  const validatePayment = await orderService.validatePayment(userIdx, orderIdx, receiptId);
+
+  return res.send(validatePayment);
 }
