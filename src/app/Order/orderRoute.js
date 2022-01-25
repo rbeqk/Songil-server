@@ -7,4 +7,7 @@ module.exports  = function(app){
 
   //베네핏 적용 API
   app.post('/order/:orderIdx/benefits', jwtMiddleware, orderController.applyOrderBenefit);
+
+  //추가 배송비 적용 및 조회 API
+  app.post('/order/:orderIdx/extra-fee', jwtMiddleware, orderController.updateOrderExtraShippingFee);
 }

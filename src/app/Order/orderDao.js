@@ -194,6 +194,58 @@ async function applyOrderSheetBenefit(connection, orderIdx, benefitIdx, benefitD
   return rows[0];
 }
 
+//산간지역인 우편번호인지
+async function isExtraFeeZipcode(connection, zipcode){
+  const query = `
+  SELECT EXISTS(SELECT zipcode FROM ExtraFeeZipCode WHERE zipcode = ${zipcode}) as isExist;
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['isExist'];
+}
+
+//orderCraftIdx 별 extraShippingFee 가져오기
+async function getOrderCraftExtraShippingFee(connection, orderIdx){
+  const query = `
+  SELECT OC.orderCraftIdx, C.extraShippingFee FROM OrderCraft OC
+  JOIN Craft C ON C.craftIdx = OC.craftIdx && C.isDeleted = 'N' && C.isSoldOut = 'N'
+  WHERE OC.orderIdx = ${orderIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
+//orderCraftIdx extraShippingFee 적용
+async function updateOrderCraftExtraShippingFee(connection, orderCraftIdx, extraShippingFee){
+  const query = `
+  UPDATE OrderCraft
+  SET extraShippingFee = ${extraShippingFee}
+  WHERE orderCraftIdx = ${orderCraftIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
+//orderIdx totalExtraShippingFee 적용
+async function updateOrderExtraShippingFee(connection, orderIdx, totalExtraShippingFee){
+  const query = `
+  UPDATE OrderT
+  SET totalExtraShippingFee = ${totalExtraShippingFee}
+  WHERE orderIdx = ${orderIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
+async function updateOrderZipcode(connection, orderIdx, zipcode){
+  const query = `
+  UPDATE OrderT
+  SET zipcode = ${zipcode}
+  WHERE orderIdx = ${orderIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   getExistCraftIdxLen,
   getCraftPrice,
@@ -212,4 +264,9 @@ module.exports = {
   getOrderCraftByArtist,
   getUsedBenefitByArtistInfo,
   applyOrderSheetBenefit,
+  isExtraFeeZipcode,
+  getOrderCraftExtraShippingFee,
+  updateOrderCraftExtraShippingFee,
+  updateOrderExtraShippingFee,
+  updateOrderZipcode,
 }

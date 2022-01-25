@@ -40,3 +40,21 @@ exports.applyOrderBenefit = async (req, res) => {
 
   return res.send(applyOrderBenefit);
 }
+
+/*
+  API No. 12.2
+  API Name: 추가 배송비 적용 및 조회 API
+  [POST] /order/:orderIdx/extra-fee
+  body: zipcode
+*/
+exports.updateOrderExtraShippingFee = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {orderIdx} = req.params;
+  const {zipcode} = req.body;
+
+  if (!zipcode) return res.send(errResponse(baseResponse.IS_EMPTY));
+
+  const updateOrderExtraShippingFee = await orderService.updateOrderExtraShippingFee(userIdx, orderIdx, zipcode);
+
+  return res.send(updateOrderExtraShippingFee);
+}
