@@ -44,6 +44,7 @@ module.exports = {
   INVALID_AMOUNT_CHANGE:{"isSuccess": false, "code": 2325, "message": "수량 변경을 확인해주세요"},
   INVALID_CRAFT_AMOUNT_LENGTH: {"isSuccess": false, "code": 2326, "message": "상품 배열과 수량 배열 길이는 동일해야합니다"},
   INVALID_ORDER_IDX: {"isSuccess": false, "code": 2327, "message": "존재하지 않는 orderIdx입니다"},
+  INVALID_RECEIPT_ID: {"isSuccess": false, "code": 2328, "message": "존재하지 않는 receiptId입니다"},
 
   EXCEED_ASK_CONTENT: {"isSuccess": false, "code": 2350, "message": "content는 300자 이하로 입력해주세요"},
   EXCEED_REPORTED_REASON: {"isSuccess": false, "code": 2351, "message": "신고 사유는 150자 이하로 입력해주세요"},

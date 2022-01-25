@@ -272,22 +272,31 @@ exports.validatePayment = async (userIdx, orderIdx, receiptId) => {
         process.env.BOOTPAY_APPLICATION_ID,
         process.env.BOOTPAY_PRIVATE_KEY
       );
-
-      RestClient.getAccessToken().then(async (response) => {
+      
+      try{
+        const response = await RestClient.getAccessToken();
         if (response.status === 200 && response.data.token !== undefined){
-          RestClient.verify(receiptId).then(async (_response) => {
-            if (_response.status === 200){
-              if (_response.data.price === finalPrice && _response.data.status === 1){
-                await connection.beginTransaction();
-                await orderDao.updateOrderToPaid(connection, orderIdx, receiptId);
-                await orderDao.updateBenefitToUsed(connection, orderIdx);
-                //TODO: 포인트 적립
-                await connection.commit();
-              }
+          const _response = await RestClient.verify(receiptId);
+          if (_response.status === 200){
+            if (_response.data.price === finalPrice && _response.data.stauts === 1){
+              await connection.beginTransaction();
+                  await orderDao.updateOrderToPaid(connection, orderIdx, receiptId);
+                  await orderDao.updateBenefitToUsed(connection, orderIdx);
+                  //TODO: 포인트 적립
+                  await connection.commit();
             }
-          });
+          }
         }
-      });
+      }
+      catch(err){
+        console.log(err);
+        if (err.code === -2100){
+          return errResponse(baseResponse.INVALID_RECEIPT_ID);
+        }
+        else{
+          return errResponse(baseResponse.SERVER_ERROR);
+        }
+      }
 
       connection.release();
       return response(baseResponse.SUCCESS);
