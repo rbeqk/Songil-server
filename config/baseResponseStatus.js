@@ -45,6 +45,7 @@ module.exports = {
   INVALID_CRAFT_AMOUNT_LENGTH: {"isSuccess": false, "code": 2326, "message": "상품 배열과 수량 배열 길이는 동일해야합니다"},
   INVALID_ORDER_IDX: {"isSuccess": false, "code": 2327, "message": "존재하지 않는 orderIdx입니다"},
   INVALID_RECEIPT_ID: {"isSuccess": false, "code": 2328, "message": "존재하지 않는 receiptId입니다"},
+  INVALID_POINT: {"isSuccess": false, "code": 2329, "message": "사용할 수 없는 포인트 값입니다"},
 
   EXCEED_ASK_CONTENT: {"isSuccess": false, "code": 2350, "message": "content는 300자 이하로 입력해주세요"},
   EXCEED_REPORTED_REASON: {"isSuccess": false, "code": 2351, "message": "신고 사유는 150자 이하로 입력해주세요"},
@@ -65,6 +66,7 @@ module.exports = {
   EXCEED_CART_CNT: {"isSuccess": false, "code": 2365, "message": "장바구니에는 최대 100개까지만 담을 수 있습니다"},
   EXCEED_TAG_LENGTH: {"isSuccess": false, "code": 2366, "message": "태그는 20글자 이하로 설정해주세요"},
   EXCEED_NICKNAME: {"isSuccess": false, "code": 2367, "message": "닉네임은 10글자 이하로 설정해주세요"},
+  EXCEED_MEMO_LENGTH: {"isSuccess": false, "code": 2368, "message": "배송메모는 50글자 이하로 설정해주세요"},
 
   NO_PERMISSION: {"isSuccess": false, "code": 2400, "message": "권한이 없습니다"},
   CAN_NOT_REPORT_SELF: {"isSuccess": false, "code": 2401, "message": "자신의 댓글은 신고할 수 없습니다"},

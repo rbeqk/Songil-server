@@ -312,3 +312,56 @@ exports.validatePayment = async (userIdx, orderIdx, receiptId) => {
     return errResponse(baseResponse.DB_ERROR);
   }
 }
+
+//배송비 정보 및 사용 포인트 저장
+exports.updateOrderEtcInfo = async (userIdx, orderIdx, recipient, phone, address, detailAddress, memo, pointDiscount) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+
+      const isExistOrderIdx = await orderDao.isExistOrderIdx(connection, orderIdx);
+      if (!isExistOrderIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_ORDER_IDX);
+      }
+
+      const isValidOrderIdx = await orderDao.isValidOrderIdx(connection, orderIdx);
+      if (!isValidOrderIdx){
+        connection.release();
+        return errResponse(baseResponse.ALREADY_PAYMENT_ORDER_IDX);
+      }
+
+      const isUserOrderIdx = await orderDao.isUserOrderIdx(connection, userIdx, orderIdx);
+      if (!isUserOrderIdx){
+        connection.release();
+        return errResponse(baseResponse.NO_PERMISSION);
+      }
+
+      const canUsePoint = await orderDao.canUsePoint(connection, userIdx, pointDiscount);
+      if (!canUsePoint){
+        connection.release();
+        return errResponse(baseResponse.INVALID_POINT);
+      }
+
+      await connection.beginTransaction();
+      await orderDao.updateOrderEtcInfo(
+        connection, orderIdx, recipient, phone, address, detailAddress, memo, pointDiscount
+      );
+      const finalPrice = await orderDao.getFinalPrice(connection, orderIdx);
+      await orderDao.updateOrderFinalPrice(connection, orderIdx, finalPrice);
+      await connection.commit();
+
+      connection.release();
+      return response(baseResponse.SUCCESS);
+      
+    }catch(err){
+      await connection.rollback();
+      connection.release();
+      logger.error(`updateOrderEtcInfo DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`updateOrderEtcInfo DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}

@@ -288,6 +288,65 @@ async function updateBenefitToUsed(connection, orderIdx){
   return rows;
 }
 
+//사용자가 사용할 수 있는 포인트인지
+async function canUsePoint(connection, userIdx, pointDiscount){
+  const query = `
+  SELECT IF(${pointDiscount} > point , 0, 1) as canUsePoint FROM User
+  WHERE userIdx = ${userIdx} && isDeleted = 'N';
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['canUsePoint'];
+}
+
+//배송정보 및 사용 포인트 저장
+async function updateOrderEtcInfo(connection, orderIdx, recipient, phone, address, detailAddress, memo, pointDiscount){
+  const query = `
+  UPDATE OrderT
+  SET recipient = ?,
+      phone = ?,
+      address = ?,
+      detailAddress = ?,
+      memo = IFNULL(?, memo),
+      pointDiscount = ${pointDiscount}
+  WHERE orderIdx = ${orderIdx};
+  `;
+  const [rows] = await connection.query(query, [recipient, phone, address, detailAddress, memo]);
+  return rows;
+}
+
+//orderIdx의 최종 결제 금액 가져오기
+async function getFinalPrice(connection, orderIdx){
+  const query = `
+  SELECT totalCraftPrice + totalBasicShippingFee + totalExtraShippingFee - (benefitDiscount + pointDiscount) as finalPrice
+  FROM OrderT
+  WHERE orderIdx = ${orderIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['finalPrice'];
+}
+
+//유저 포인트 차감
+async function updateUserUsedPoint(connection, userIdx, pointDiscount){
+  const query = `
+  UPDATE User
+  SET point = point - ${pointDiscount}
+  WHERE userIdx = ${userIdx} && isDeleted = 'N';
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
+//orderIdx의 최종 결제 금액 추가
+async function updateOrderFinalPrice(connection, orderIdx, finalPrice){
+  const query = `
+  UPDATE OrderT
+  SET finalPrice = ${finalPrice}
+  WHERE orderIdx = ${orderIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   getExistCraftIdxLen,
   getCraftPrice,
@@ -314,4 +373,9 @@ module.exports = {
   getOrderFinalPrice,
   updateOrderToPaid,
   updateBenefitToUsed,
+  canUsePoint,
+  updateOrderEtcInfo,
+  getFinalPrice,
+  updateUserUsedPoint,
+  updateOrderFinalPrice,
 }

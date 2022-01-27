@@ -61,6 +61,30 @@ exports.updateOrderExtraShippingFee = async (req, res) => {
 }
 
 /*
+  API No. 12.5
+  API Name: 배송비 정보 및 사용 포인트 저장 API
+  [POST] /order/:orderIdx/etc-info
+  body: recipient, phone, address, detailAddress, memo, pointDiscount
+*/
+exports.updateOrderEtcInfo = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {orderIdx} = req.params;
+  const {recipient, phone, address, detailAddress, memo, pointDiscount} = req.body;
+
+  if (!(recipient && phone && address && detailAddress) || pointDiscount === undefined){
+    return res.send(errResponse(baseResponse.IS_EMPTY));
+  }
+  if (pointDiscount < 0) return res.send(errResponse(baseResponse.INVALID_POINT));
+  if (memo && memo.length > 50) return res.send(errResponse(baseResponse.EXCEED_MEMO_LENGTH));
+
+  const updateOrderEtcInfo = await orderService.updateOrderEtcInfo(
+    userIdx, orderIdx, recipient, phone, address, detailAddress, memo, pointDiscount
+  );
+
+  return res.send(updateOrderEtcInfo);
+}
+
+/*
   API No. 12.6
   API Name: 결제 검증 API
   [POST] /order/:orderIdx
