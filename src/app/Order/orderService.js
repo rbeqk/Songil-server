@@ -113,6 +113,24 @@ exports.applyOrderBenefit = async (userIdx, orderIdx, benefitIdx) => {
         return errResponse(baseResponse.ALREADY_PAYMENT_ORDER_IDX);
       }
 
+      //benefitIdx 없을 경우 => 기존에 적용된 베네핏 삭제
+      if (!benefitIdx){
+        const appliedBenefit = await orderDao.getAppliedBenefit(connection, orderIdx);
+        if (appliedBenefit){
+          await orderDao.deleteAppliedBenefit(connection, orderIdx);
+        }
+
+        const result = {
+          'benefitIdx': null,
+          'title': null,
+          'discountPrice': null
+        }
+        
+        connection.release();
+        return response(baseResponse.SUCCESS, result);
+      }
+
+      //benefitIdx 있을 경우 => 베네핏 적용
       const isUserOrderIdx = await orderDao.isUserOrderIdx(connection, userIdx, orderIdx);
       if (!isUserOrderIdx){
         connection.release();

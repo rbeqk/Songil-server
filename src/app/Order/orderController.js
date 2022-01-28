@@ -35,8 +35,6 @@ exports.applyOrderBenefit = async (req, res) => {
   const {orderIdx} = req.params;
   const {benefitIdx} = req.body;
 
-  if (!benefitIdx) return res.send(errResponse(baseResponse.IS_EMPTY));
-
   const applyOrderBenefit = await orderService.applyOrderBenefit(userIdx, orderIdx, benefitIdx);
 
   return res.send(applyOrderBenefit);

@@ -401,6 +401,28 @@ async function updateOrderFinalPrice(connection, orderIdx, finalPrice){
   return rows;
 }
 
+//기존에 적용된 베네핏 가져오기
+async function getAppliedBenefit(connection, orderIdx){
+  const query = `
+  SELECT benefitIdx FROM OrderT
+  WHERE orderIdx = ${orderIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]?.benefitIdx;
+}
+
+//기존에 적용된 베네핏 삭제
+async function deleteAppliedBenefit(connection, orderIdx){
+  const query = `
+  UPDATE OrderT
+  SET benefitIdx = null,
+      benefitDiscount = 0
+  WHERE orderIdx = ${orderIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   deleteUserNotPaidOrderSheet,
   getExistCraftIdxLen,
@@ -433,4 +455,6 @@ module.exports = {
   getFinalPrice,
   updateUserUsedPoint,
   updateOrderFinalPrice,
+  getAppliedBenefit,
+  deleteAppliedBenefit,
 }
