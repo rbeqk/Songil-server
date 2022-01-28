@@ -18,6 +18,9 @@ exports.addCraftInOrderSheet = async (userIdx, craftIdxArr, amountArr) => {
         return errResponse(baseResponse.INVALID_CRAFT_IDX);
       }
 
+      //기존에 주문 안한 주문서 내역 다 삭제
+      await orderDao.deleteUserNotPaidOrderSheet(connection, userIdx);
+
       const craftLength = craftIdxArr.length;
       let totalCraftPriceArr = [];
       let basicShippingFeeArr = [];
@@ -343,7 +346,7 @@ exports.updateOrderEtcInfo = async (userIdx, orderIdx, recipient, phone, address
         return errResponse(baseResponse.NO_PERMISSION);
       }
 
-      const canUsePoint = await orderDao.canUsePoint(connection, userIdx, pointDiscount);
+      const canUsePoint = await orderDao.canUsePoint(connection, userIdx, orderIdx, pointDiscount);
       if (!canUsePoint){
         connection.release();
         return errResponse(baseResponse.INVALID_POINT);

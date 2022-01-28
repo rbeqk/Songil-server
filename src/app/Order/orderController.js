@@ -74,6 +74,7 @@ exports.updateOrderEtcInfo = async (req, res) => {
   if (!(recipient && phone && address && detailAddress) || pointDiscount === undefined){
     return res.send(errResponse(baseResponse.IS_EMPTY));
   }
+  if (!validator.isMobilePhone(phone, 'ko-KR')) return res.send(errResponse(baseResponse.INVALID_PHONE_PATTERN));
   if (pointDiscount < 0) return res.send(errResponse(baseResponse.INVALID_POINT));
   if (memo && memo.length > 50) return res.send(errResponse(baseResponse.EXCEED_MEMO_LENGTH));
 

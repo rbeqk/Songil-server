@@ -1,3 +1,27 @@
+//기존에 주문 안한 주문서 내역 다 삭제
+async function deleteUserNotPaidOrderSheet(connection, userIdx){
+  const getDeleteOrderIdxQuery = `
+  SELECT orderIdx FROM OrderT
+  WHERE userIdx = ${userIdx} && isPaid = 'N';
+  `
+  const [getDeleteOrderIdx] = await connection.query(getDeleteOrderIdxQuery);
+  const deleteOrderIdx = getDeleteOrderIdx[0]?.orderIdx;
+
+  if (deleteOrderIdx){
+    const deleteOrderTQuery = `
+    DELETE FROM OrderT
+    WHERE orderIdx = ${deleteOrderIdx} && isPaid = 'N';
+    `;
+    await connection.query(deleteOrderTQuery);
+
+    const deleteOrderCraftQuery = `
+    DELETE FROM OrderCraft
+    WHERE orderIdx = ${deleteOrderIdx};
+    `;
+    await connection.query(deleteOrderCraftQuery);
+  }
+}
+
 //존재&&품절X 상품 idx 개수
 async function getExistCraftIdxLen(connection, craftIdxArr){
   const query = `
@@ -292,7 +316,19 @@ async function updateBenefitToUsed(connection, userIdx, orderIdx){
 }
 
 //사용자가 사용할 수 있는 포인트인지
-async function canUsePoint(connection, userIdx, pointDiscount){
+async function canUsePoint(connection, userIdx, orderIdx, pointDiscount){
+  const getCurFinalPriceQuery = `
+  SELECT totalCraftPrice + totalBasicShippingFee + totalExtraShippingFee - benefitDiscount as curFinalPrice
+  FROM OrderT
+  WHERE orderIdx = ${orderIdx};
+  `;
+  const [getCurFinalPrice] = await connection.query(getCurFinalPriceQuery);
+  const curFinalPrice = getCurFinalPrice[0]['curFinalPrice'];
+
+  if (curFinalPrice < pointDiscount){
+    return false;
+  }
+
   const query = `
   SELECT IF(${pointDiscount} > point , 0, 1) as canUsePoint FROM User
   WHERE userIdx = ${userIdx} && isDeleted = 'N';
@@ -366,6 +402,7 @@ async function updateOrderFinalPrice(connection, orderIdx, finalPrice){
 }
 
 module.exports = {
+  deleteUserNotPaidOrderSheet,
   getExistCraftIdxLen,
   getCraftPrice,
   getCraftBasicShippingFee,

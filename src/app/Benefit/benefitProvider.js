@@ -57,10 +57,12 @@ exports.getCanUseBenefit = async (userIdx, orderIdx) => {
         connection.release();
         return errResponse(baseResponse.DB_ERROR);
       }
-      
-      const canUseBenefitInfo = await benefitDao.getCanUseBenefitInfo(connection, canUseBenefitIdxArr);
 
-      const result = canUseBenefitInfo.map(item => new BenefitInfoDTO(item));
+      let result = [];
+      if (canUseBenefitIdxArr.length > 0){
+        const canUseBenefitInfo = await benefitDao.getCanUseBenefitInfo(connection, canUseBenefitIdxArr);
+        result = canUseBenefitInfo.map(item => new BenefitInfoDTO(item));
+      }
 
       connection.release();
       return response(baseResponse.SUCCESS, result);
