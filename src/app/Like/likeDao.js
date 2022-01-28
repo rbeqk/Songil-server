@@ -86,15 +86,14 @@ async function getLikedArticleInfo(connection, userIdx, startItemIdx, itemPerPag
         A.editorIdx,
         E.nickname                           as                   editorName,
         DATE_FORMAT(A.createdAt, '%Y.%m.%d') as                   createdAt,
-        IFNULL(AL.totalLikeCnt, 0)           as                   totalLikeCnt,
         (SELECT createdAt
           FROM ArticleLike
-          WHERE userIdx = ${userIdx} && articleIdx = A.articleIdx) likeCreatedAt
+          WHERE userIdx = ${userIdx} && articleIdx = A.articleIdx) likeCreatedAt,
+        (SELECT COUNT(*)
+          FROM ArticleLike
+          WHERE articleIdx = A.articleIdx)    as                   totalLikeCnt
   FROM Article A
           JOIN Editor E on A.editorIdx = E.editorIdx && E.isDeleted = 'N'
-          LEFT JOIN (SELECT articleIdx, COUNT(*) as totalLikeCnt
-                      FROM ArticleLike
-                      GROUP BY articleIdx) as AL ON AL.articleIdx = A.articleIdx
   WHERE A.isDeleted = 'N' && A.articleIdx IN (SELECT articleIdx
                                               FROM ArticleLike
                                               WHERE userIdx = ${userIdx}
@@ -102,7 +101,6 @@ async function getLikedArticleInfo(connection, userIdx, startItemIdx, itemPerPag
   ORDER BY likeCreatedAt DESC
   LIMIT ${startItemIdx}, ${itemPerPage};
   `;
-  console.log(query)
   const [rows] = await connection.query(query);
   return rows;
 }
@@ -237,7 +235,7 @@ async function getLikedPost(connection, userIdx, startItemIdx, pageItemCnt){
           WHERE SI.isDeleted = 'N' && SI.storyIdx = SL.storyIdx
           LIMIT 1)                                               as mainImageUrl,
         U.nickname                                              as name,
-        DATE_FORMAT(S.createdAt, '%Y.%m.%d')                    as createdAt,
+        DATE_FORMAT(S.createdAt, '%Y.%m.%d. %H:%i')                    as createdAt,
         SL.createdAt                                            as originalCreatedAt,
         (SELECT COUNT(*)
           FROM StoryLike
@@ -256,7 +254,7 @@ async function getLikedPost(connection, userIdx, startItemIdx, pageItemCnt){
         Q.content,
         NULL                                                            as mainImageUrl,
         U.nickname                                                      as name,
-        DATE_FORMAT(Q.createdAt, '%Y.%m.%d')                            as createdAt,
+        DATE_FORMAT(Q.createdAt, '%Y.%m.%d. %H:%i')                            as createdAt,
         QL.createdAt                                                    as originalCreatedAt,
         (SELECT COUNT(*) FROM QnALike WHERE QnALike.qnaIdx = QL.qnaIdx) as totalLikeCnt,
         (SELECT COUNT(qnaCommentIdx)

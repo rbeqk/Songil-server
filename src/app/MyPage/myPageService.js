@@ -13,7 +13,7 @@ exports.updateUserProfile = async (userIdx, nickname, userProfile) => {
 
       //기존에 존재하는 닉네임인지
       if (nickname){
-        const isExistNickname = await authDao.isExistNickname(connection, nickname);
+        const isExistNickname = await myPageDao.isExistNickname(connection, userIdx, nickname);
         if (isExistNickname){
           connection.release();
           return errResponse(baseResponse.DUPLICATED_NICKNAME);
