@@ -1,5 +1,4 @@
 module.exports = function (app){
-  const jwtMiddleware = require('../../../config/jwtMiddleware');
   const shopController = require('./shopController');
 
   //shop 화면 조회

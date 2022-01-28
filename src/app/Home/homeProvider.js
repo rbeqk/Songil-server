@@ -20,75 +20,64 @@ exports.getHome = async () => {
       //상단 아티클 (최신순 4개)
       const articleList = await homeDao.getArticleList(connection);
 
-      if (articleList.length > 0){
-        articleList.forEach(item => {
-          result.article.push({
-            'articleIdx': item.articleIdx,
-            'categoryIdx': item.categoryIdx,
-            'title': item.title,
-            'summary': item.summary,
-            'mainImageUrl': item.mainImageUrl
-          });
+      articleList.forEach(item => {
+        result.article.push({
+          'articleIdx': item.articleIdx,
+          'categoryIdx': item.categoryIdx,
+          'title': item.title,
+          'summary': item.summary,
+          'mainImageUrl': item.mainImageUrl
         });
-      }
+      });
 
       //trendCraft (랜덤 15개 - soldout 제외)
       const trendCraft = await homeDao.getTrendCraft(connection);
 
-      if (trendCraft.length > 0){
-        trendCraft.forEach(item => {
-          result.trendCraft.push({
-            'craftIdx': item.craftIdx,
-            'mainImageUrl': item.mainImageUrl,
-            'name': item.name,
-            'artistIdx': item.artistIdx,
-            'artistName': item.artistName,
-            'isNew': item.isNew
-          });
+      trendCraft.forEach(item => {
+        result.trendCraft.push({
+          'craftIdx': item.craftIdx,
+          'mainImageUrl': item.mainImageUrl,
+          'name': item.name,
+          'artistIdx': item.artistIdx,
+          'artistName': item.artistName,
+          'isNew': item.isNew
         });
-      }
+      });
       
       //recommend (랜덤 15개 - soldout 제외)
       const recommend = await homeDao.getRecommend(connection);
 
-      if (recommend.length > 0){
-        recommend.forEach(item => {
-          result.recommend.push({
-            'craftIdx': item.craftIdx,
-            'mainImageUrl': item.mainImageUrl,
-            'name': item.name,
-            'artistIdx': item.artistIdx,
-            'artistName': item.artistName,
-            'price': item.price
-          });
+      recommend.forEach(item => {
+        result.recommend.push({
+          'craftIdx': item.craftIdx,
+          'mainImageUrl': item.mainImageUrl,
+          'name': item.name,
+          'artistIdx': item.artistIdx,
+          'artistName': item.artistName,
+          'price': item.price
         });
-      }
+      });
 
       //talk with (15개 / 커뮤니티 쪽 hot talk와 동일 기준)
       const talkWith = await homeDao.getTalkWith(connection);
       
-      if (talkWith.length > 0){
-        talkWith.forEach(item => {
-          result.talkWith.push({
-            'idx': item.idx,
-            'categoryIdx': item.categoryIdx,
-            'text': item.text
-          });
+      talkWith.forEach(item => {
+        result.talkWith.push({
+          'idx': item.idx,
+          'categoryIdx': item.categoryIdx,
+          'text': item.text
         });
-      }
+      });
 
       //hot Story (좋아요 순 6개)
       const hotStory = await homeDao.getHotStory(connection);
 
-      if (hotStory.length > 0){
-        hotStory.forEach(item => {
-          result.hotStory.push({
-            'storyIdx': item.storyIdx,
-            'mainImageUrl': item.mainImageUrl
-          });
+      hotStory.forEach(item => {
+        result.hotStory.push({
+          'storyIdx': item.storyIdx,
+          'mainImageUrl': item.mainImageUrl
         });
-      }
-
+      });
 
       connection.release();
       return response(baseResponse.SUCCESS, result);

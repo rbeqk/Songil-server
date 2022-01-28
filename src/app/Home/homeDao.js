@@ -4,7 +4,7 @@ async function getArticleList(connection){
   SELECT articleIdx, articleCategoryIdx as categoryIdx, title, mainImageUrl, summary
   FROM Article
   WHERE isDeleted = 'N'
-  ORDER BY articleIdx
+  ORDER BY articleIdx DESC
   LIMIT 4;
   `;
   const [rows] = await connection.query(query);

@@ -68,7 +68,7 @@ exports.getWeeklyPopularCraft = async (req, res) => {
   const {categoryIdx} = req.query;
 
   if (!categoryIdx) return res.send(errResponse(baseResponse.IS_EMPTY));
-  if (categoryIdx < 0 || categoryIdx > 9) return res.send(errResponse(baseResponse.INVALID_CATEGORY_IDX));
+  if (categoryIdx < 1 || categoryIdx > 8) return res.send(errResponse(baseResponse.INVALID_CATEGORY_IDX));
 
   const getWeeklyPopularCraft = await shopProvider.getWeeklyPopularCraft(categoryIdx);
 

@@ -3,7 +3,7 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
-const {getTotalPage} = require("../../../modules/pageUtil");
+const {getTotalPage, pageInfo} = require("../../../modules/pageUtil");
 const {CRAFT_BY_CATEGPRY_PER_PAGE} = require("../../../modules/constants");
 
 exports.getShop = async () => {
@@ -78,10 +78,7 @@ exports.getCraftByCategoryTotalPage = async (craftCategoryIdx) => {
       }
 
       const totalPages = getTotalPage(totalCnt, CRAFT_BY_CATEGPRY_PER_PAGE);
-      const result = {
-        'totalPages': totalPages,
-        'itemsPerPage': CRAFT_BY_CATEGPRY_PER_PAGE
-      }
+      const result = new pageInfo(totalPages, CRAFT_BY_CATEGPRY_PER_PAGE);
 
       connection.release();
       return response(baseResponse.SUCCESS, result);
@@ -155,30 +152,22 @@ exports.getWeeklyPopularCraft = async (categoryIdx) => {
         weeklyPopularCraft = await shopDao.getWeeklyPopularCraft(connection);
       }
 
-      connection.release();
-
       let result =  [];
 
-      //상품이 있을 경우
-      if (weeklyPopularCraft.length > 0){
-        weeklyPopularCraft.forEach(item => {
-          result.push({
-            'craftIdx': item.craftIdx,
-            'mainImageUrl': item.mainImageUrl,
-            'name': item.name,
-            'artistIdx': item.artistIdx,
-            'artistName': item.artistName,
-            'price': item.price,
-            'isNew': item.isNew
-          })
-        });
+      weeklyPopularCraft.forEach(item => {
+        result.push({
+          'craftIdx': item.craftIdx,
+          'mainImageUrl': item.mainImageUrl,
+          'name': item.name,
+          'artistIdx': item.artistIdx,
+          'artistName': item.artistName,
+          'price': item.price,
+          'isNew': item.isNew
+        })
+      });
 
-        return response(baseResponse.SUCCESS, result);
-      }
-      //상품이 없을 경우
-      else{
-        return errResponse(baseResponse.EMPTY_CRAFT);
-      }
+      connection.release();
+      return response(baseResponse.SUCCESS, result);
       
     }catch(err){
       connection.release();
