@@ -60,9 +60,9 @@ async function getStoryTag(connection, storyIdx){
 async function createStoryInfo(connection, userIdx, title, content){
   const query = `
   INSERT INTO Story(userIdx, title, content)
-  VALUES (${userIdx}, '${title}', '${content}');
+  VALUES (${userIdx}, ?, ?);
   `;
-  const [rows] = await connection.query(query);
+  const [rows] = await connection.query(query, [title, content]);
   return rows;
 }
 
@@ -70,9 +70,9 @@ async function createStoryInfo(connection, userIdx, title, content){
 async function createStoryTag(connection, storyIdx, tag){
   const query = `
   INSERT INTO StoryTag(storyIdx, tag)
-  VALUES (${storyIdx}, '${tag}');
+  VALUES (${storyIdx}, ?);
   `;
-  const [rows] = await connection.query(query);
+  const [rows] = await connection.query(query, [tag]);
   return rows;
 }
 
@@ -80,9 +80,9 @@ async function createStoryTag(connection, storyIdx, tag){
 async function createStoryImage(connection, storyIdx, imageUrl){
   const query = `
   INSERT INTO StoryImage(storyIdx, imageUrl)
-  VALUES (${storyIdx}, '${imageUrl}');
+  VALUES (${storyIdx}, ?);
   `;
-  const [rows] = await connection.query(query);
+  const [rows] = await connection.query(query, [imageUrl]);
   return rows;
 }
 
@@ -113,9 +113,9 @@ async function updateStoryInfo(connection, storyIdx, title, content){
   UPDATE Story
   SET title = IFNULL(?, title),
       content = IFNULL(?, content)
-  WHERE storyIdx = ?;
+  WHERE storyIdx = ${storyIdx};
   `;
-  const [rows] = await connection.query(query, [title, content, storyIdx]);
+  const [rows] = await connection.query(query, [title, content]);
   return rows;
 }
 

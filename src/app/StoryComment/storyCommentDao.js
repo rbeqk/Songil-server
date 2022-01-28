@@ -13,9 +13,9 @@ async function isExistStoryCommentParentIdx(connection, parentIdx){
 async function createStoryComment(connection, storyIdx, userIdx, parentIdx, content){
   const query = `
   INSERT INTO StoryComment(storyIdx, userIdx, parentIdx, comment)
-  VALUES (${storyIdx}, ${userIdx}, ${parentIdx}, '${content}');
+  VALUES (${storyIdx}, ${userIdx}, ${parentIdx}, ?);
   `;
-  const [rows] = await connection.query(query);
+  const [rows] = await connection.query(query, [content]);
   return rows;
 }
 
