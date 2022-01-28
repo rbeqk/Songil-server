@@ -93,9 +93,9 @@ async function getAskDetail(connection, craftAskIdx){
   const query = `
   SELECT CA.craftAskIdx as askIdx,
         CA.craftIdx,
-        C.name         as craftName,
+        C.name,
         CA.userIdx,
-        U.nickname,
+        U.nickname     as userName,
         CA.content     as askContent,
         CAA.comment    as answerContent,
         C.isDeleted as craftIsDeleted

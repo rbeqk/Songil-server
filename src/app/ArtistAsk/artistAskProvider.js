@@ -132,10 +132,10 @@ exports.getAskDetail = async (craftAskIdx, userIdx) => {
 
       const result = {
         'askIdx': askDetail.askIdx,
-        'craftIdx': askDetail.askIdx,
-        'craftName': askDetail.craftName,
+        'craftIdx': askDetail.craftIdx,
+        'name': askDetail.name,
         'userIdx': askDetail.userIdx,
-        'nickname': askDetail.nickname,
+        'userName': askDetail.userName,
         'askContent': askDetail.askContent,
         'answerContent': askDetail.answerContent,
         'craftIsDeleted': askDetail.craftIsDeleted,
