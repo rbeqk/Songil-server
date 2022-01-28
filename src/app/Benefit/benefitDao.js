@@ -11,7 +11,8 @@ async function getBenefits(connection, userIdx){
             WHEN B.benefitCategoryIdx = 2 THEN CONCAT(U.nickname, ' 작가 전용 베네핏')
             WHEN B.benefitCategoryIdx = 3 THEN NULL
           END                                                               as title,
-        IF(B.discountPrice IS NOT NULL, NULL,
+        IF(B.discountPrice IS NOT NULL,
+            (CONCAT(B.basisPrice, '원 이상 구매 시')),
             CONCAT(B.basisPrice, '원 이상 구매시, 최대 ', B.maxDiscountPrice, '원 할인')) as detailInfo,
         DATE_FORMAT(B.deadline, '%m.%d')                                   as deadline
   FROM UserBenefit UB
@@ -114,7 +115,8 @@ async function getCanUseBenefitInfo(connection, canUseBenefitIdxArr){
             WHEN B.benefitCategoryIdx = 2 THEN CONCAT(U.nickname, ' 작가 전용 베네핏')
             WHEN B.benefitCategoryIdx = 3 THEN NULL
             END                                                               as title,
-        IF(B.discountPrice IS NOT NULL, NULL,
+        IF(B.discountPrice IS NOT NULL,
+            (CONCAT(B.basisPrice, '원 이상 구매 시')),
             CONCAT(B.basisPrice, '원 이상 구매시, 최대 ', B.maxDiscountPrice, '원 할인')) as detailInfo,
         DATE_FORMAT(B.deadline, '%m.%d')                                      as deadline
   FROM Benefit B
