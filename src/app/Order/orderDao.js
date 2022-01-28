@@ -338,6 +338,12 @@ async function updateUserUsedPoint(connection, userIdx, orderIdx){
   const pointDiscount = getPointDiscount[0]['pointDiscount'];
 
   if (pointDiscount > 0){
+    const addUsedPointTQuery = `
+    INSERT INTO UsedPoint (userIdx, point)
+    VALUES (${userIdx}, ${pointDiscount});
+    `;
+    await connection.query(addUsedPointTQuery);
+
     const query = `
     UPDATE User
     SET point = point - ${pointDiscount}
