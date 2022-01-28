@@ -262,30 +262,33 @@ async function updateOrderToPaid(connection, orderIdx, receiptId){
   const query = `
   UPDATE OrderT
   SET isPaid = 'Y',
-      receiptId = ${receiptId}
+      receiptId = ?,
+      paymentCreatedAt = NOW()
   WHERE orderIdx = ${orderIdx};
   `;
-  const [rows] = await connection.query(query);
+  const [rows] = await connection.query(query, [receiptId]);
   return rows;
 }
 
 //베네핏 사용 처리
-async function updateBenefitToUsed(connection, orderIdx){
+async function updateBenefitToUsed(connection, userIdx, orderIdx){
   const getBenefitIdxQuery = `
   SELECT benefitIdx FROM OrderT
   WHERE orderIdx = ${orderIdx};
   `;
   const [getBenefitIdx] = await connection.query(getBenefitIdxQuery);
-  const benefitIdx = getBenefitIdx[0]['benefitIdx'];
+  const benefitIdx = getBenefitIdx[0]?.benefitIdx;
 
-
-  const query = `
-  UPDATE UserBenefit
-  SET isUsed = 'Y'
-  WHERE userIdx = ${userIdx} && benefitIdx = ${benefitIdx};
-  `;
-  const [rows] = await connection.query(query);
-  return rows;
+  if (benefitIdx){
+    const query = `
+    UPDATE UserBenefit
+    SET isUsed = 'Y',
+        usedAt = NOW()
+    WHERE userIdx = ${userIdx} && benefitIdx = ${benefitIdx};
+    `;
+    const [rows] = await connection.query(query);
+    return rows;
+  }
 }
 
 //사용자가 사용할 수 있는 포인트인지
@@ -326,14 +329,23 @@ async function getFinalPrice(connection, orderIdx){
 }
 
 //유저 포인트 차감
-async function updateUserUsedPoint(connection, userIdx, pointDiscount){
-  const query = `
-  UPDATE User
-  SET point = point - ${pointDiscount}
-  WHERE userIdx = ${userIdx} && isDeleted = 'N';
+async function updateUserUsedPoint(connection, userIdx, orderIdx){
+  const getPointDiscountQuery = `
+  SELECT pointDiscount FROM OrderT
+  WHERE orderIdx = ${orderIdx};
   `;
-  const [rows] = await connection.query(query);
-  return rows;
+  const [getPointDiscount] = await connection.query(getPointDiscountQuery);
+  const pointDiscount = getPointDiscount[0]['pointDiscount'];
+
+  if (pointDiscount > 0){
+    const query = `
+    UPDATE User
+    SET point = point - ${pointDiscount}
+    WHERE userIdx = ${userIdx} && isDeleted = 'N';
+    `;
+    const [rows] = await connection.query(query);
+    return rows;
+  }
 }
 
 //orderIdx의 최종 결제 금액 추가

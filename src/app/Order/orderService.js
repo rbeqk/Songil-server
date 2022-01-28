@@ -278,12 +278,18 @@ exports.validatePayment = async (userIdx, orderIdx, receiptId) => {
         if (response.status === 200 && response.data.token !== undefined){
           const _response = await RestClient.verify(receiptId);
           if (_response.status === 200){
-            if (_response.data.price === finalPrice && _response.data.stauts === 1){
-              await connection.beginTransaction();
-                  await orderDao.updateOrderToPaid(connection, orderIdx, receiptId);
-                  await orderDao.updateBenefitToUsed(connection, orderIdx);
-                  //TODO: 포인트 적립
-                  await connection.commit();
+            if (_response.data.price === finalPrice){
+              if (_response.data.status === 1){
+                await connection.beginTransaction();
+                await orderDao.updateOrderToPaid(connection, orderIdx, receiptId);
+                await orderDao.updateBenefitToUsed(connection, userIdx, orderIdx);
+                await orderDao.updateUserUsedPoint(connection, userIdx, orderIdx);
+                //TODO: 포인트 적립
+                await connection.commit();
+              }
+            }
+            else{
+              return errResponse(baseResponse.FORGE_PAYMENT);
             }
           }
         }

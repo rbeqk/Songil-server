@@ -92,6 +92,8 @@ module.exports = {
 
   INVALID_USER_INFO: {"isSuccess": false, "code": 3400, "message": "일치하는 회원 정보가 없습니다"},
 
+  FORGE_PAYMENT: {"isSuccess": false, "code": 3500, "message": "위조된 요청입니다"},
+
   DB_ERROR: {"isSuccess": false, "code": 4000, "message": "DB 에러"},
   SERVER_ERROR: {"isSuccess": false, "code": 4001, "message": "Server 에러"},
 }
