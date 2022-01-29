@@ -13,7 +13,7 @@ async function getBenefits(connection, userIdx){
           END                                                               as title,
         IF(B.discountPrice IS NOT NULL,
             (CONCAT(B.basisPrice, '원 이상 구매 시')),
-            CONCAT(B.basisPrice, '원 이상 구매시, 최대 ', B.maxDiscountPrice, '원 할인')) as detailInfo,
+            CONCAT(B.basisPrice, '원 이상 구매 시, 최대 ', B.maxDiscountPrice, '원 할인')) as detailInfo,
         DATE_FORMAT(B.deadline, '%m.%d')                                   as deadline
   FROM UserBenefit UB
           JOIN Benefit B ON B.benefitIdx = UB.benefitIdx && B.deadline > NOW() && B.isDeleted = 'N'
