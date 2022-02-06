@@ -1,4 +1,5 @@
 const authDao = require('./authDao');
+const artistAskDao = require('../ArtistAsk/artistAskDao');
 const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
@@ -163,6 +164,30 @@ exports.autoLogin = async (userIdx) => {
     }
   }catch(err){
     logger.error(`autoLogin DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}
+
+//사용자 권한 판단
+exports.getUserAuth = async (userIdx) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+      const isArtist = await artistAskDao.isArtist(connection, userIdx);
+      const type = isArtist ? 2 : 1;
+      const result = {
+        'type': type
+      }
+
+      connection.release();
+      return response(baseResponse.SUCCESS, result);
+    }catch(err){
+      connection.release();
+      logger.error(`getUserAuth DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`getUserAuth DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }

@@ -102,3 +102,15 @@ exports.autoLogin = async (req, res) => {
   const autoLogin = await authProvider.autoLogin(userIdx);
   return res.send(autoLogin);
 }
+
+/*
+  API No. 13.1
+  API Name: 사용자 권한 판단 API
+  [GET] /users/auth
+*/
+exports.getUserAuth = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+
+  const getUserAuth = await authProvider.getUserAuth(userIdx);
+  return res.send(getUserAuth);
+}

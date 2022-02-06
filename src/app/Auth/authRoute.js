@@ -19,4 +19,7 @@ module.exports = function(app){
 
   //자동로그인 API
   app.post('/login/auto', jwtMiddleware, authController.autoLogin);
+
+  //사용자 권한 판단 API
+  app.get('/users/type', jwtMiddleware, authController.getUserAuth);
 }
