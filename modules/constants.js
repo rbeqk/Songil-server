@@ -14,3 +14,7 @@ exports.STORY_COMMENT_PER_PAGE = 5;
 exports.AB_TEST_COMMENT_PER_PAGE = 5;
 exports.WITH_BY_CATEGORY_PER_PAGE = 10;
 exports.MY_PAGE_WRITTEN_POST_COMMENT_PER_PAGE = 5;
+
+exports.STORY = 1;
+exports.QNA = 2;
+exports.ABTEST = 3;

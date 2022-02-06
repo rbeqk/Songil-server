@@ -69,7 +69,7 @@ module.exports = {
   EXCEED_MEMO_LENGTH: {"isSuccess": false, "code": 2368, "message": "배송메모는 50글자 이하로 설정해주세요"},
 
   NO_PERMISSION: {"isSuccess": false, "code": 2400, "message": "권한이 없습니다"},
-  CAN_NOT_REPORT_SELF: {"isSuccess": false, "code": 2401, "message": "자신의 댓글은 신고할 수 없습니다"},
+  CAN_NOT_REPORT_SELF: {"isSuccess": false, "code": 2401, "message": "자신의 글은 신고할 수 없습니다"},
   IS_ALREADY_COMMENT_ASK_IDX: {"isSuccess": false, "code": 2402, "message": "이미 답변한 문의입니다"},
   CAN_NOT_COMMENT_TO_DELETED_CRAFT: {"isSuccess": false, "code": 2403, "message": "삭제된 상품의 문의에 대해서는 답변할 수 없습니다"},
   CAN_NOT_USE_BENEFIT_IDX: {"isSuccess": false, "code": 2404, "message": "사용할 수 없는 benefitIdx입니다"},
@@ -81,7 +81,7 @@ module.exports = {
 
   ALREADY_EXISTED_EMAIL: {"isSuccess": false, "code": 3200, "message": "이미 가입한 이메일입니다"},
   DUPLICATED_NICKNAME: {"isSuccess": false, "code": 3201, "message": "중복된 닉네임입니다"},
-  ALREADY_REPORTED_COMMENT_IDX: {"isSuccess": false, "code": 3202, "message": "기존에 신고한 댓글입니다"},
+  ALREADY_REPORTED_IDX: {"isSuccess": false, "code": 3202, "message": "기존에 신고한 글입니다"},
   ALREADY_FINISHED_ABTEST_IDX: {"isSuccess": false, "code": 3203, "message": "이미 마감된 투표입니다"},
   ALREADY_VOTE_ABTEST_IDX: {"isSuccess": false, "code": 3204, "message": "이미 투표 완료한 abTest입니다"},
   ALREADY_PAYMENT_ORDER_IDX: {"isSuccess": false, "code": 3205, "message": "이미 결제한 orderIdx입니다"},

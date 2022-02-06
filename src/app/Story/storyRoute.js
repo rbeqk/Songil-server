@@ -14,4 +14,7 @@ module.exports = function(app){
 
   //스토리 수정 API
   app.patch('/with/stories/:storyIdx', jwtMiddleware, storyUpload.array('image'), storyController.updateStory);
+
+  //스토리 신고 API
+  app.post('/with/stories/:storyIdx/reported', jwtMiddleware, storyController.reportStory);
 }

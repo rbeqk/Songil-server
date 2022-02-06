@@ -162,6 +162,38 @@ async function deleteStoryComment(connection, storyIdx){
   return rows;
 }
 
+//기존에 신고한 스토리인지
+async function isAlreadyReportedStory(connection, userIdx, storyIdx, withTypeIdx){
+  const query = `
+  SELECT EXISTS(SELECT *
+    FROM ReqReportedWith
+    WHERE withTypeIdx = ${withTypeIdx} && userIdx = ${userIdx} && withIdx = ${storyIdx}) as isExist;
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['isExist'];
+}
+
+//자기 스토리인지
+async function isUserStory(connection, userIdx, storyIdx){
+  const query = `
+  SELECT EXISTS(SELECT *
+    FROM Story
+    WHERE userIdx = ${userIdx} && storyIdx = ${storyIdx} && isDeleted = 'N') as isExist;
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['isExist'];
+}
+
+//스토리 신고
+async function reportStory(connection, userIdx, storyIdx, withTypeIdx, reportedReasonIdx, etcReason){
+  const query = `
+  INSERT INTO ReqReportedWith (withTypeIdx, withIdx, userIdx, reportedReasonIdx, etcReason)
+  VALUES (${withTypeIdx}, ${storyIdx}, ${userIdx}, ${reportedReasonIdx}, ?);
+  `;
+  const [rows] = await connection.query(query, [etcReason]);
+  return rows;
+}
+
 module.exports = {
   isExistStoryIdx,
   getStoryDetail,
@@ -177,4 +209,7 @@ module.exports = {
   deleteStoryImage,
   deleteStoryLike,
   deleteStoryComment,
+  isAlreadyReportedStory,
+  isUserStory,
+  reportStory,
 }
