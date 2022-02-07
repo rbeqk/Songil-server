@@ -69,20 +69,20 @@ exports.getQnAComment = async (req, res) => {
 exports.reportQnAComment = async (req, res) => {
   const {commentIdx: qnaCommentIdx} = req.params;
   const {userIdx} = req.verifiedToken;
-  const {reportedReasonIdx: reportedCommentReasonIdx, etcReason} = req.body;
+  const {reportedReasonIdx, etcReason} = req.body;
 
-  if (!reportedCommentReasonIdx) return res.send(errResponse(baseResponse.IS_EMPTY));
-  if (reportedCommentReasonIdx < 1 || reportedCommentReasonIdx > 7) return res.send(errResponse(baseResponse.INVALID_REPORTED_REASON_IDX));
+  if (!reportedReasonIdx) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (reportedReasonIdx < 1 || reportedReasonIdx > 7) return res.send(errResponse(baseResponse.INVALID_REPORTED_REASON_IDX));
 
   //직접입력 시 사유가 없을 때
-  if (reportedCommentReasonIdx == 7 && !etcReason) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (reportedReasonIdx == 7 && !etcReason) return res.send(errResponse(baseResponse.IS_EMPTY));
 
   //직접입력 아닐 시 사유가 있을 때
-  if (reportedCommentReasonIdx != 7 && etcReason) return res.send(errResponse(baseResponse.SELECT_ANOTHER_ETC_REASON_IDX));
+  if (reportedReasonIdx != 7 && etcReason) return res.send(errResponse(baseResponse.SELECT_ANOTHER_ETC_REASON_IDX));
 
   //직접입력 시 글자수 초과
   if (etcReason && etcReason.length > 150) return res.send(errResponse(baseResponse.EXCEED_REPORTED_REASON));
 
-  const reportQnAComment = await qnaCommentService.reportQnAComment(qnaCommentIdx, userIdx, reportedCommentReasonIdx, etcReason);
+  const reportQnAComment = await qnaCommentService.reportQnAComment(qnaCommentIdx, userIdx, reportedReasonIdx, etcReason);
   return res.send(reportQnAComment);
 }

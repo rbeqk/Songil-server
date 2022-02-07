@@ -4,6 +4,7 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
+const {QNA} = require('../../../modules/constants');
 
 exports.createQnAComment = async (userIdx, qnaIdx, parentIdx, comment) => {
   try{
@@ -87,23 +88,23 @@ exports.deleteQnAComment = async (userIdx, qnaCommentIdx) => {
 }
 
 //QnA 댓글 신고
-exports.reportQnAComment = async (qnaCommentIdx, userIdx, reportedCommentReasonIdx, etcReason) => {
+exports.reportQnAComment = async (qnaCommentIdx, userIdx, reportedReasonIdx, etcReason) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
       
       //존재하는 QnA 댓글 idx인지
-      const isExistSQnACommentIdx = await qnaCommentDao.isExistSQnACommentIdx(connection, qnaCommentIdx);
-      if (!isExistSQnACommentIdx){
+      const isExistQnACommentIdx = await qnaCommentDao.isExistQnACommentIdx(connection, qnaCommentIdx);
+      if (!isExistQnACommentIdx){
         connection.release();
         return errResponse(baseResponse.INVALID_QNA_COMMENT_IDX);
       }
 
       //사용자가 기존에 신고한 QnA 댓글 idx인지
-      const isExistUserReportedCommentIdx = await qnaCommentDao.isExistUserReportedCommentIdx(connection, userIdx, qnaCommentIdx);
-      if (isExistUserReportedCommentIdx){
+      const isAlreadyReportedQnACommentIdx = await qnaCommentDao.isAlreadyReportedQnACommentIdx(connection, userIdx, qnaCommentIdx, QNA);
+      if (isAlreadyReportedQnACommentIdx){
         connection.release();
-        return errResponse(baseResponse.ALREADY_REPORTED_COMMENT_IDX);
+        return errResponse(baseResponse.ALREADY_REPORTED_IDX);
       }
 
       //자기 댓글인지
@@ -114,7 +115,7 @@ exports.reportQnAComment = async (qnaCommentIdx, userIdx, reportedCommentReasonI
       }
 
       await connection.beginTransaction();
-      await qnaCommentDao.reportQnAComment(connection, qnaCommentIdx, userIdx, reportedCommentReasonIdx, etcReason);
+      await qnaCommentDao.reportQnAComment(connection, qnaCommentIdx, userIdx, reportedReasonIdx, etcReason, QNA);
       await connection.commit();
       
       connection.release();

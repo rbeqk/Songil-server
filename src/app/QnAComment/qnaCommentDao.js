@@ -20,7 +20,7 @@ async function createQnAComment(connection, qnaIdx, userIdx, parentIdx, comment)
 }
 
 //존재하는 QnA 댓글 idx인지
-async function isExistSQnACommentIdx(connection, qnaCommentIdx){
+async function isExistQnACommentIdx(connection, qnaCommentIdx){
   const query = `
   SELECT EXISTS(SELECT qnaCommentIdx
     FROM QnAComment
@@ -116,21 +116,21 @@ async function getQnARecomment(connection, parentIdx, userIdx){
 }
 
 //QnA 댓글 신고
-async function reportQnAComment(connection, qnaCommentIdx, userIdx, reportedCommentReasonIdx, etcReason){
+async function reportQnAComment(connection, qnaCommentIdx, userIdx, reportedReasonIdx, etcReason, commentTypeIdx){
   const query = `
-  INSERT INTO ReportedQnAComment(userIdx, qnaCommentIdx, reportedCommentReasonIdx, etcContent)
-  VALUES (${userIdx}, ${qnaCommentIdx}, ${reportedCommentReasonIdx}, IFNULL(?, NULL));
+  INSERT INTO ReqReportedComment(commentTypeIdx, commentIdx, userIdx, reportedReasonIdx, etcReason)
+  VALUES (${commentTypeIdx}, ${qnaCommentIdx}, ${userIdx}, ${reportedReasonIdx}, ?);
   `;
   const [rows] = await connection.query(query, [etcReason]);
   return rows;
 }
 
 //사용자가 기존에 신고한 QnA 댓글 idx인지
-async function isExistUserReportedCommentIdx(connection, userIdx, qnaCommentIdx){
+async function isAlreadyReportedQnACommentIdx(connection, userIdx, qnaCommentIdx, commentTypeIdx){
   const query = `
   SELECT EXISTS(SELECT *
-    FROM ReportedQnAComment
-    WHERE userIdx = ${userIdx} && qnaCommentIdx = ${qnaCommentIdx}) as isExist;
+    FROM ReqReportedComment
+    WHERE userIdx = ${userIdx} && commentIdx = ${qnaCommentIdx} && commentTypeIdx = ${commentTypeIdx}) as isExist;
   `;
   const [rows] = await connection.query(query);
   return rows[0]['isExist'];
@@ -150,12 +150,12 @@ async function isUserQnAComment(connection, userIdx, qnaCommentIdx){
 module.exports = {
   isExistQnACommentParentIdx,
   createQnAComment,
-  isExistSQnACommentIdx,
+  isExistQnACommentIdx,
   getQnACommentUserIdx,
   deleteStoryComment,
   getQnAParentComment,
   getQnARecomment,
   reportQnAComment,
-  isExistUserReportedCommentIdx,
+  isAlreadyReportedQnACommentIdx,
   isUserQnAComment,
 }
