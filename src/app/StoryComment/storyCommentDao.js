@@ -116,21 +116,21 @@ async function getStoryReComment(connection, parentIdx, userIdx){
 }
 
 //스토리 댓글 신고
-async function reportStoryComment(connection, storyCommentIdx, userIdx, reportedCommentReasonIdx, etcReason){
+async function reportStoryComment(connection, storyCommentIdx, userIdx, reportedReasonIdx, etcReason, commentTypeIdx){
   const query = `
-  INSERT INTO ReportedStoryComment(userIdx, storyCommentIdx, reportedCommentReasonIdx, etcContent)
-  VALUES (${userIdx}, ${storyCommentIdx}, ${reportedCommentReasonIdx}, IFNULL(?, NULL));
+  INSERT INTO ReqReportedComment(commentTypeIdx, commentIdx, userIdx, reportedReasonIdx, etcReason)
+  VALUES (${commentTypeIdx}, ${storyCommentIdx}, ${userIdx}, ${reportedReasonIdx}, ?);
   `;
   const [rows] = await connection.query(query, [etcReason]);
   return rows;
 }
 
 //사용자가 기존에 신고한 스토리 댓글 idx인지
-async function isExistUserReportedCommentIdx(connection, userIdx, storyCommentIdx){
+async function isAlreadyReportedStoryCommentIdx(connection, userIdx, storyCommentIdx, commentTypeIdx){
   const query = `
   SELECT EXISTS(SELECT *
-    FROM ReportedStoryComment
-    WHERE userIdx = ${userIdx} && storyCommentIdx = ${storyCommentIdx}) as isExist;
+    FROM ReqReportedComment
+    WHERE userIdx = ${userIdx} && commentIdx = ${storyCommentIdx} && commentTypeIdx = ${commentTypeIdx}) as isExist;
   `;
   const [rows] = await connection.query(query);
   return rows[0]['isExist'];
@@ -156,6 +156,6 @@ module.exports = {
   getStoryParentComment,
   getStoryReComment,
   reportStoryComment,
-  isExistUserReportedCommentIdx,
+  isAlreadyReportedStoryCommentIdx,
   isUserStoryComment,
 }

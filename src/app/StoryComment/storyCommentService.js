@@ -4,6 +4,7 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
+const {STORY} = require('../../../modules/constants');
 
 exports.createStoryComment = async (userIdx, storyIdx, parentIdx, comment) => {
   try{
@@ -87,7 +88,7 @@ exports.deleteStoryComment = async (userIdx, storyCommentIdx) => {
 }
 
 //스토리 댓글 신고
-exports.reportStoryComment = async (storyCommentIdx, userIdx, reportedCommentReasonIdx, etcReason) => {
+exports.reportStoryComment = async (storyCommentIdx, userIdx, reportedReasonIdx, etcReason) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
@@ -100,10 +101,10 @@ exports.reportStoryComment = async (storyCommentIdx, userIdx, reportedCommentRea
       }
 
       //사용자가 기존에 신고한 스토리 댓글 idx인지
-      const isExistUserReportedCommentIdx = await storyCommentDao.isExistUserReportedCommentIdx(connection, userIdx, storyCommentIdx);
-      if (isExistUserReportedCommentIdx){
+      const isAlreadyReportedStoryCommentIdx = await storyCommentDao.isAlreadyReportedStoryCommentIdx(connection, userIdx, storyCommentIdx, STORY);
+      if (isAlreadyReportedStoryCommentIdx){
         connection.release();
-        return errResponse(baseResponse.ALREADY_REPORTED_COMMENT_IDX);
+        return errResponse(baseResponse.ALREADY_REPORTED_IDX);
       }
 
       //자기 댓글인지
@@ -114,7 +115,7 @@ exports.reportStoryComment = async (storyCommentIdx, userIdx, reportedCommentRea
       }
 
       await connection.beginTransaction();
-      await storyCommentDao.reportStoryComment(connection, storyCommentIdx, userIdx, reportedCommentReasonIdx, etcReason);
+      await storyCommentDao.reportStoryComment(connection, storyCommentIdx, userIdx, reportedReasonIdx, etcReason, STORY);
       await connection.commit();
       
       connection.release();
