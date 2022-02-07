@@ -49,24 +49,21 @@ exports.getComment = async (req, res) => {
 exports.reportComment = async (req, res) => {
   const {userIdx} = req.verifiedToken;
   const {commentIdx: craftCommentIdx} = req.params;
-  const {reportedReasonIdx: reportedCommentReasonIdx, etcReason} = req.body;
+  const {reportedReasonIdx, etcReason} = req.body;
 
-  const totalReportedReasonLength = 7;  //총 신고 사유 개수
-  const etcReasonIdx = 7; //직접입력idx
-
-  if (!reportedCommentReasonIdx) return res.send(errResponse(baseResponse.IS_EMPTY));
-  if (reportedCommentReasonIdx < 1 || reportedCommentReasonIdx > totalReportedReasonLength) return res.send(errResponse(baseResponse.INVALID_REPORTED_REASON_IDX));
+  if (!reportedReasonIdx) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (reportedReasonIdx < 1 || reportedReasonIdx > 7) return res.send(errResponse(baseResponse.INVALID_REPORTED_REASON_IDX));
 
   //직접입력 시 사유가 없을 때
-  if (reportedCommentReasonIdx == etcReasonIdx && !etcReason) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (reportedReasonIdx == 7 && !etcReason) return res.send(errResponse(baseResponse.IS_EMPTY));
 
   //직접입력 아닐 시 사유가 있을 때
-  if (reportedCommentReasonIdx != etcReasonIdx && etcReason) return res.send(errResponse(baseResponse.SELECT_ANOTHER_ETC_REASON_IDX));
+  if (reportedReasonIdx != 7 && etcReason) return res.send(errResponse(baseResponse.SELECT_ANOTHER_ETC_REASON_IDX));
 
   //직접입력 시 글자수 초과
   if (etcReason && etcReason.length > 150) return res.send(errResponse(baseResponse.EXCEED_REPORTED_REASON));
 
-  const reportComment = await craftCommentService.reportComment(userIdx, craftCommentIdx, reportedCommentReasonIdx, etcReason);
+  const reportComment = await craftCommentService.reportComment(userIdx, craftCommentIdx, reportedReasonIdx, etcReason);
 
   return res.send(reportComment);
 }

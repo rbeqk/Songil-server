@@ -18,3 +18,4 @@ exports.MY_PAGE_WRITTEN_POST_COMMENT_PER_PAGE = 5;
 exports.STORY = 1;
 exports.QNA = 2;
 exports.ABTEST = 3;
+exports.CRAFT = 4;

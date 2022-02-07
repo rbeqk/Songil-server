@@ -81,11 +81,11 @@ async function isExistCraftCommentIdx(connection, craftCommentIdx){
 }
 
 //사용자가 기존에 신고한 상품 댓글 idx인지
-async function isExistUserReportedCommentIdx(connection, userIdx, craftCommentIdx){
+async function isAlreadyReportedCraftComment(connection, userIdx, craftCommentIdx, commentTypeIdx){
   const query = `
   SELECT EXISTS(SELECT *
-    FROM ReportedCraftComment
-    WHERE userIdx = ${userIdx} && craftCommentIdx = ${craftCommentIdx}) as isExist;
+    FROM ReqReportedComment
+    WHERE userIdx = ${userIdx} && commentIdx = ${craftCommentIdx} && commentTypeIdx = ${commentTypeIdx}) as isExist;
   `;
   const [rows] = await connection.query(query);
   return rows[0]['isExist'];
@@ -103,10 +103,10 @@ async function isUserCraftComment(connection, userIdx, craftCommentIdx){
 }
 
 //댓글 신고
-async function reportComment(connection, userIdx, craftCommentIdx, reportedCommentReasonIdx, etcReason){
+async function reportCraftComment(connection, userIdx, craftCommentIdx, reportedReasonIdx, etcReason, commentTypeIdx){
   const query = `
-  INSERT INTO ReportedCraftComment(userIdx, craftCommentIdx, reportedCommentReasonIdx, etcContent)
-  VALUES (${userIdx}, ${craftCommentIdx}, ${reportedCommentReasonIdx}, IFNULL(?, NULL));
+  INSERT INTO ReqReportedComment(commentTypeIdx, commentIdx, userIdx, reportedReasonIdx, etcReason)
+  VALUES (${commentTypeIdx}, ${craftCommentIdx}, ${userIdx}, ${reportedReasonIdx}, ?);
   `;
   const [rows] = await connection.query(query, [etcReason]);
   return rows;
@@ -150,9 +150,9 @@ module.exports = {
   getCommentInfo,
   getCommentPhoto,
   isExistCraftCommentIdx,
-  isExistUserReportedCommentIdx,
+  isAlreadyReportedCraftComment,
   isUserCraftComment,
-  reportComment,
+  reportCraftComment,
   createCraftComment,
   updatePhotoCraftComment,
   createCraftCommentImage,
