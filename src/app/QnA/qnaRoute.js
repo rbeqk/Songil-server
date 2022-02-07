@@ -13,4 +13,7 @@ module.exports = function(app){
 
   //QnA 수정 API
   app.patch('/with/qna/:qnaIdx', jwtMiddleware, qnaController.updateQnA);
+
+  //QnA 신고 API
+  app.post('/with/qna/:qnaIdx/reported', jwtMiddleware, qnaController.reportQnA);
 }

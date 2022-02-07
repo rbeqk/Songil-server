@@ -103,6 +103,38 @@ async function updateQnA(connection, qnaIdx, title, content){
   return rows;
 }
 
+//기존에 신고한 qna인지
+async function isAlreadyReportedQnA(connection, userIdx, qnaIdx, withTypeIdx){
+  const query = `
+  SELECT EXISTS(SELECT *
+    FROM ReqReportedWith
+    WHERE withTypeIdx = ${withTypeIdx} && userIdx = ${userIdx} && withIdx = ${qnaIdx}) as isExist;
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['isExist'];
+}
+
+//자기 qna인지
+async function isUserQnA(connection, userIdx, qnaIdx){
+  const query = `
+  SELECT EXISTS(SELECT *
+    FROM QnA
+    WHERE userIdx = ${userIdx} && qnaIdx = ${qnaIdx} && isDeleted = 'N') as isExist;
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['isExist'];
+}
+
+//qna 신고
+async function reportQnA(connection, userIdx, qnaIdx, withTypeIdx, reportedReasonIdx, etcReason){
+  const query = `
+  INSERT INTO ReqReportedWith (withTypeIdx, withIdx, userIdx, reportedReasonIdx, etcReason)
+  VALUES (${withTypeIdx}, ${qnaIdx}, ${userIdx}, ${reportedReasonIdx}, ?);
+  `;
+  const [rows] = await connection.query(query, [etcReason]);
+  return rows;
+}
+
 module.exports = {
   isExistQnaIdx,
   getQnADetail,
@@ -112,4 +144,7 @@ module.exports = {
   deleteQnALike,
   deleteQnAComment,
   updateQnA,
+  isAlreadyReportedQnA,
+  isUserQnA,
+  reportQnA,
 }

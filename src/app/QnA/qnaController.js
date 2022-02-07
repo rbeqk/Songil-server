@@ -73,3 +73,30 @@ exports.updateQnA = async (req, res) => {
 
   return res.send(updateQnA);
 }
+
+/*
+  API No. 5.23
+  API Name: QnA 신고 API
+  [POST] /with/qna/:qnaIdx/reported
+  body: reportedReasonIdx, etcReason
+*/
+exports.reportQnA = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {qnaIdx} = req.params;
+  const {reportedReasonIdx, etcReason} = req.body;
+
+  if (!reportedReasonIdx) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (reportedReasonIdx < 1 || reportedReasonIdx > 7) return res.send(errResponse(baseResponse.INVALID_REPORTED_REASON_IDX));
+
+  //직접입력 시 사유가 없을 때
+  if (reportedReasonIdx == 7 && !etcReason) return res.send(errResponse(baseResponse.IS_EMPTY));
+
+  //직접입력 아닐 시 사유가 있을 때
+  if (reportedReasonIdx != 7 && etcReason) return res.send(errResponse(baseResponse.SELECT_ANOTHER_ETC_REASON_IDX));
+
+  //직접입력 시 글자수 초과
+  if (etcReason && etcReason.length > 150) return res.send(errResponse(baseResponse.EXCEED_REPORTED_REASON));
+
+  const reportQnA = await qnaService.reportQnA(userIdx, qnaIdx, reportedReasonIdx, etcReason);
+  return res.send(reportQnA);
+}
