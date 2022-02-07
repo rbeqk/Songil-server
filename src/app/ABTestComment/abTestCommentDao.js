@@ -122,11 +122,11 @@ async function getABTestReComment(connection, abTestIdx, parentIdx, userIdx){
 }
 
 //사용자가 기존에 신고한 ABTest 댓글 idx인지
-async function isExistUserReportedCommentIdx(connection, userIdx, abTestCommentIdx){
+async function isAlreadyReportedABTestCommentIdx(connection, userIdx, abTestCommentIdx, commentTypeIdx){
   const query = `
   SELECT EXISTS(SELECT *
-    FROM ReportedABTestComment
-    WHERE userIdx = ${userIdx} && abTestCommentIdx = ${abTestCommentIdx}) as isExist;
+    FROM ReqReportedComment
+    WHERE userIdx = ${userIdx} && commentIdx = ${abTestCommentIdx} && commentTypeIdx = ${commentTypeIdx}) as isExist;
   `;
   const [rows] = await connection.query(query);
   return rows[0]['isExist'];
@@ -144,10 +144,10 @@ async function isUserABTestComment(connection, userIdx, abTestCommentIdx){
 }
 
 //ABTest 댓글 신고
-async function reportABTestComment(connection, abTestCommentIdx, userIdx, reportedCommentReasonIdx, etcReason){
+async function reportABTestComment(connection, abTestCommentIdx, userIdx, reportedReasonIdx, etcReason, commentTypeIdx){
   const query = `
-  INSERT INTO ReportedABTestComment(userIdx, abTestCommentIdx, reportedCommentReasonIdx, etcContent)
-  VALUES (${userIdx}, ${abTestCommentIdx}, ${reportedCommentReasonIdx}, IFNULL(?, NULL));
+  INSERT INTO ReqReportedComment(commentTypeIdx, commentIdx, userIdx, reportedReasonIdx, etcReason)
+  VALUES (${commentTypeIdx}, ${abTestCommentIdx}, ${userIdx}, ${reportedReasonIdx}, ?);
   `;
   const [rows] = await connection.query(query, [etcReason]);
   return rows;
@@ -161,7 +161,7 @@ module.exports = {
   deleteABTestomment,
   getABTestParentComment,
   getABTestReComment,
-  isExistUserReportedCommentIdx,
+  isAlreadyReportedABTestCommentIdx,
   isUserABTestComment,
   reportABTestComment,
 }
