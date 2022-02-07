@@ -3,6 +3,7 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
+const {ABTEST} = require('../../../modules/constants');
 
 exports.createABTest = async (userIdx, content, deadline, imageArr) => {
   try{
@@ -205,6 +206,52 @@ exports.updateABTest = async (userIdx, abTestIdx, content) => {
     }
   }catch(err){
     logger.error(`updateABTest DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}
+
+//abTest 신고
+exports.reportABTest = async (userIdx, abTestIdx, reportedReasonIdx, etcReason) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+
+      //존재하는 abTestIdx인지
+      const isExistABTestIdx = await abTestDao.isExistABTestIdx(connection, abTestIdx);
+      if (!isExistABTestIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_ABTEST_IDX);
+      }
+
+      //기존에 신고한 abTest인지
+      const isAlreadyReportedABTest = await abTestDao.isAlreadyReportedABTest(connection, userIdx, abTestIdx, ABTEST);
+      if (isAlreadyReportedABTest){
+        connection.release();
+        return errResponse(baseResponse.ALREADY_REPORTED_IDX);
+      }
+
+      //abTest 작가의 userIdx 가져오기
+      const abTestUserIdx = await abTestDao.getAbTestUserIdx(connection, abTestIdx);
+      if (abTestUserIdx == userIdx){
+        connection.release();
+        return errResponse(baseResponse.CAN_NOT_REPORT_SELF);
+      }
+
+      await connection.beginTransaction();
+      await abTestDao.reportABTest(connection, userIdx, abTestIdx, ABTEST, reportedReasonIdx, etcReason);
+      await connection.commit();
+      
+      connection.release();
+      return response(baseResponse.SUCCESS);
+      
+    }catch(err){
+      await connection.rollback();
+      connection.release();
+      logger.error(`reportABTest DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`reportABTest DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }

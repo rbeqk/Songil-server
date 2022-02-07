@@ -20,4 +20,7 @@ module.exports = function (app){
 
   //ABTest 수정 API
   app.patch('/with/ab-test/:abTestIdx', jwtMiddleware, abTestController.updateABTest);
+
+  //ABTest 신고 API
+  app.post('/with/ab-test/:abTestIdx/reported', jwtMiddleware, abTestController.reportABTest);
 }

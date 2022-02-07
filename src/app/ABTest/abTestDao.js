@@ -205,6 +205,27 @@ async function deleteABTestComment(connection, abTestIdx){
   return rows;
 }
 
+//기존에 신고한 abTest인지
+async function isAlreadyReportedABTest(connection, userIdx, abTestIdx, withTypeIdx){
+  const query = `
+  SELECT EXISTS(SELECT *
+    FROM ReqReportedWith
+    WHERE withTypeIdx = ${withTypeIdx} && userIdx = ${userIdx} && withIdx = ${abTestIdx}) as isExist;
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['isExist'];
+}
+
+//abTest 신고
+async function reportABTest(connection, userIdx, abTestIdx, withTypeIdx, reportedReasonIdx, etcReason){
+  const query = `
+  INSERT INTO ReqReportedWith (withTypeIdx, withIdx, userIdx, reportedReasonIdx, etcReason)
+  VALUES (${withTypeIdx}, ${abTestIdx}, ${userIdx}, ${reportedReasonIdx}, ?);
+  `;
+  const [rows] = await connection.query(query, [etcReason]);
+  return rows;
+}
+
 module.exports = {
   isExistABTestIdx,
   getABTestInfo,
@@ -224,4 +245,6 @@ module.exports = {
   deleteVoteABTest,
   updateABTest,
   deleteABTestComment,
+  isAlreadyReportedABTest,
+  reportABTest,
 }
