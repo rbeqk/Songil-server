@@ -5,6 +5,7 @@ const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 
+//1:1 문의하기 작성
 exports.createCraftAsk = async (userIdx, craftIdx, content) => {
   try{
     const connection = await pool.getConnection(async conn => conn);

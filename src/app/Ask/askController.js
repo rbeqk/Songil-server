@@ -6,7 +6,7 @@ const {errResponse} = require("../../../config/response");
 
 /*
   API No. 3.14
-  API Name: 1:1 문의하기 작성 (사용자) API
+  API Name: 1:1 문의하기 작성 API
   [POST] /shop/crafts/:craftIdx/ask
 */
 exports.createCraftAsk = async (req, res) => {
