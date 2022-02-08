@@ -21,10 +21,10 @@ exports.getAsk = async (userIdx, page) => {
             'craftIdx': item.craftIdx,
             'name': item.name,
             'content': item.content,
-            'createdAt': item.askCreatedAt,
+            'createdAt': item.createdAt,
             'status': item.status
           },
-          'answer':(!item.craftAskAnswerIdx) ? null : {
+          'answer':(!item.askAnswerIdx) ? null : {
             'artistIdx': item.artistIdx,
             'artistName': item.artistName,
             'content': item.answerContent,
