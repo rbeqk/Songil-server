@@ -34,33 +34,34 @@ async function getAskCnt(connection, artistIdx){
 //작가 1:1문의 목록 가져오기(삭제된 상품에 대해서도 보이게)
 async function getAskList(connection, artistIdx){
   const query = `
-  SELECT CA.craftAskIdx as askIdx
-  FROM CraftAsk CA
-          JOIN Craft C ON C.craftIdx = CA.craftIdx
-  WHERE CA.isDeleted = 'N' && C.artistIdx = ${artistIdx};
+  SELECT A.askIdx FROM Ask A
+  LEFT JOIN OrderCraft OC ON A.orderCraftIdx = OC.orderCraftIdx
+  JOIN Craft C ON C.craftIdx = IFNULL(A.craftIdx, OC.craftIdx)
+  WHERE C.artistIdx = ${artistIdx} && A.isDeleted = 'N';
   `;
   const [rows] = await connection.query(query);
-  return rows;
+
+  //작가의 문의 목록 없을 경우 유효하지 않은 값으로 설정
+  return rows.length > 0 ? rows.map(item => item.askIdx) : -1;
 }
 
 //문의 목록 상세 정보 가져오기
-async function getAskInfo(connection, askIdxList, startItemIdx, pageItemCnt){
+async function getAskInfo(connection, askList, startItemIdx, pageItemCnt){
   const query = `
-  SELECT CA.craftAskIdx                               as askIdx,
-        CA.craftIdx,
+  SELECT A.askIdx,
+        IFNULL(A.craftIdx, OC.craftIdx)             as craftIdx,
         C.name,
-        C.mainImageUrl,
         U.nickname,
-        CA.craftAskStatusIdx                         as status,
-        DATE_FORMAT(CA.createdAt, '%Y.%m.%d. %k:%i') as createdAt
-  FROM CraftAsk CA
-          JOIN Craft C ON C.craftIdx = CA.craftIdx
-          JOIN User U ON U.userIdx = CA.userIdx && U.isDeleted = 'N'
-  WHERE CA.craftAskIdx IN (${askIdxList}) && CA.isDeleted = 'N'
-  ORDER BY CA.createdAt
+        DATE_FORMAT(A.createdAt, '%Y.%m.%d. %k:%i') as createdAt,
+        A.askStatusIdx as status
+  FROM Ask A
+          LEFT JOIN OrderCraft OC ON A.orderCraftIdx = OC.orderCraftIdx
+          JOIN Craft C ON C.craftIdx = IFNULL(A.craftIdx, OC.craftIdx)
+          JOIN User U ON U.userIdx = A.userIdx
+  WHERE A.askIdx IN (?) && A.isDeleted = 'N'
   LIMIT ${startItemIdx}, ${pageItemCnt};
   `;
-  const [rows] = await connection.query(query);
+  const [rows] = await connection.query(query, [askList]);
   return rows;
 }
 

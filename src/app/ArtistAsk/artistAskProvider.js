@@ -63,12 +63,8 @@ exports.getAsk = async (userIdx, page) => {
       //작가의 문의 목록 가져오기
       const askList = await artistAskDao.getAskList(connection, artistIdx);
 
-      //작가의 문의 목록 없을 경우 유효하지 않은 값으로 설정
-      let askIdxList;
-      askIdxList = askList.length > 0 ? askList.map(item => item.askIdx) : -1;
-
       //문의 목록 상세 정보 가져오기
-      const askInfo = await artistAskDao.getAskInfo(connection, askIdxList, startItemIdx, ARTIST_ASK_ASK_PER_PAGE);
+      const askInfo = await artistAskDao.getAskInfo(connection, askList, startItemIdx, ARTIST_ASK_ASK_PER_PAGE);
 
       let result = [];
       

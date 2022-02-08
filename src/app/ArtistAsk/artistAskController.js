@@ -19,7 +19,7 @@ exports.getAskTotalPage = async (req, res) => {
 
 /*
   API No. 10.3
-  API Name: 1:1 문의 내역 페이지 조회 API
+  API Name: 1:1 문의 내역 조회 API
   [GET] /artist-page/ask
   query: page
 */
