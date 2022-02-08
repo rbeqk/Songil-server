@@ -22,10 +22,10 @@ async function getArtistIdx(connection, userIdx){
 //작가의 총 1:1문의 개수
 async function getAskCnt(connection, artistIdx){
   const query = `
-  SELECT COUNT(CA.craftAskIdx) as totalCnt
-  FROM CraftAsk CA
-          JOIN Craft C ON C.craftIdx = CA.craftIdx
-  WHERE CA.isDeleted = 'N' && C.artistIdx = ${artistIdx};
+  SELECT COUNT(A.askIdx) as totalCnt FROM Ask A
+  LEFT JOIN OrderCraft OC ON A.orderCraftIdx = OC.orderCraftIdx
+  JOIN Craft C ON C.craftIdx = IFNULL(A.craftIdx, OC.craftIdx)
+  WHERE C.artistIdx = ${artistIdx} && A.isDeleted = 'N';
   `;
   const [rows] = await connection.query(query);
   return rows[0]['totalCnt'];
