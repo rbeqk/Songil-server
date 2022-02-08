@@ -40,10 +40,10 @@ exports.getAsk = async (req, res) => {
   [GET] /artist-page/ask/:askIdx
 */
 exports.getAskDetail = async (req, res) => {
-  const {askIdx: craftAskIdx} = req.params;
+  const {askIdx} = req.params;
   const {userIdx} = req.verifiedToken;
 
-  const getAskDetail = await artistAskProvider.getAskDetail(craftAskIdx, userIdx);
+  const getAskDetail = await artistAskProvider.getAskDetail(askIdx, userIdx);
 
   return res.send(getAskDetail);
 }

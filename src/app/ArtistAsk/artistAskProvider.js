@@ -95,14 +95,14 @@ exports.getAsk = async (userIdx, page) => {
   }
 }
 
-exports.getAskDetail = async (craftAskIdx, userIdx) => {
+exports.getAskDetail = async (askIdx, userIdx) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
 
-      //존재하는 craftAskIdx인지
-      const isExistCraftAskIdx = await artistAskDao.isExistCraftAskIdx(connection, craftAskIdx);
-      if (!isExistCraftAskIdx){
+      //존재하는 askIdx인지
+      const isExistAskIdx = await artistAskDao.isExistAskIdx(connection, askIdx);
+      if (!isExistAskIdx){
         connection.release();
         return errResponse(baseResponse.INVALID_ASK_IDX);
       }
@@ -118,20 +118,20 @@ exports.getAskDetail = async (craftAskIdx, userIdx) => {
       const artistIdx = await artistAskDao.getArtistIdx(connection, userIdx);
 
       //문의에 대한 작가 권한 확인
-      const isArtistAsk = await artistAskDao.isArtistAsk(connection, craftAskIdx, artistIdx);
+      const isArtistAsk = await artistAskDao.isArtistAsk(connection, askIdx, artistIdx);
       if (!isArtistAsk){
         connection.release();
         return errResponse(baseResponse.NO_PERMISSION);
       }
 
-      const askDetail = await artistAskDao.getAskDetail(connection, craftAskIdx);
+      const askDetail = await artistAskDao.getAskDetail(connection, askIdx);
 
       const result = {
         'askIdx': askDetail.askIdx,
         'craftIdx': askDetail.craftIdx,
         'name': askDetail.name,
         'userIdx': askDetail.userIdx,
-        'userName': askDetail.userName,
+        'nickname': askDetail.nickname,
         'askContent': askDetail.askContent,
         'answerContent': askDetail.answerContent,
         'craftIsDeleted': askDetail.craftIsDeleted,

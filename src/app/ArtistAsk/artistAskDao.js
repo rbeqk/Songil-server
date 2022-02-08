@@ -66,23 +66,24 @@ async function getAskInfo(connection, askList, startItemIdx, pageItemCnt){
 }
 
 //문의에 대한 작가 권한 확인
-async function isArtistAsk(connection, craftAskIdx, artistIdx){
+async function isArtistAsk(connection, askIdx, artistIdx){
   const query = `
-  SELECT EXISTS(SELECT *
-    FROM Craft C
-    WHERE C.craftIdx = (SELECT CA.craftIdx
-                        FROM CraftAsk CA
-                        WHERE CA.isDeleted = 'N' && CA.craftAskIdx = ${craftAskIdx}) && C.artistIdx = ${artistIdx}) as isExist;
+  SELECT EXISTS(SELECT A.askIdx
+      FROM Ask A
+              LEFT JOIN OrderCraft OC ON A.orderCraftIdx = OC.orderCraftIdx
+              JOIN Craft C ON C.craftIdx = IFNULL(A.craftIdx, OC.craftIdx)
+      WHERE A.askIdx = ${askIdx} && C.artistIdx = ${artistIdx}) as isExist;
   `;
   const [rows] = await connection.query(query);
   return rows[0]['isExist'];
 }
 
-//존재하는 craftAskIdx인지
-async function isExistCraftAskIdx(connection, craftAskIdx){
+//존재하는 askIdx인지
+async function isExistAskIdx(connection, askIdx){
   const query = `
-  SELECT EXISTS(SELECT * FROM CraftAsk
-    WHERE isDeleted = 'N' && craftAskIdx = ${craftAskIdx}) as isExist;
+  SELECT EXISTS(SELECT *
+    FROM Ask
+    WHERE isDeleted = 'N' && askIdx = ${askIdx}) as isExist;
   `;
   const [rows] = await connection.query(query);
   return rows[0]['isExist'];
@@ -90,21 +91,22 @@ async function isExistCraftAskIdx(connection, craftAskIdx){
 
 
 //1:1 문의 상세 정보
-async function getAskDetail(connection, craftAskIdx){
+async function getAskDetail(connection, askIdx){
   const query = `
-  SELECT CA.craftAskIdx as askIdx,
-        CA.craftIdx,
+    SELECT A.askIdx,
+        IFNULL(A.craftIdx, OC.craftIdx) as craftIdx,
         C.name,
-        CA.userIdx,
-        U.nickname     as userName,
-        CA.content     as askContent,
-        CAA.comment    as answerContent,
-        C.isDeleted as craftIsDeleted
-  FROM CraftAsk CA
-      JOIN User U ON U.userIdx = CA.userIdx && U.isDeleted = 'N'
-          JOIN Craft C ON C.craftIdx = CA.craftIdx
-          LEFT JOIN CraftAskAnswer CAA on CA.craftAskIdx = CAA.craftAskIdx
-  WHERE CA.isDeleted = 'N' && CA.craftAskIdx = ${craftAskIdx};
+        A.userIdx,
+        U.nickname,
+        A.content                       as askContent,
+        AA.content                      as answerContent,
+        C.isDeleted                     as craftIsDeleted
+  FROM Ask A
+          LEFT JOIN OrderCraft OC ON A.orderCraftIdx = OC.orderCraftIdx
+          JOIN Craft C ON C.craftIdx = IFNULL(A.craftIdx, OC.craftIdx)
+          JOIN User U ON U.userIdx = A.userIdx
+          LEFT JOIN AskAnswer AA on A.askIdx = AA.askIdx
+  WHERE A.askIdx = ${askIdx};
   `;
   const [rows] = await connection.query(query);
   return rows[0];
@@ -151,7 +153,7 @@ module.exports = {
   getAskList,
   getAskInfo,
   isArtistAsk,
-  isExistCraftAskIdx,
+  isExistAskIdx,
   getAskDetail,
   isAlreadyCommentAskIdx,
   isDeletedCraftAskIdx,
