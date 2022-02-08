@@ -113,11 +113,11 @@ async function getAskDetail(connection, askIdx){
 }
 
 //이미 답변한 문의인지
-async function isAlreadyCommentAskIdx(connection, craftAskIdx){
+async function isAlreadyAnswerAskIdx(connection, askIdx){
   const query = `
-  SELECT EXISTS(SELECT *
-    FROM CraftAskAnswer
-    WHERE craftAskIdx = ${craftAskIdx} && isDeleted = 'N') as isExist;
+  SELECT EXISTS(SELECT AA.askAnswerIdx
+    FROM AskAnswer AA
+    WHERE AA.askIdx = ${askIdx} && AA.isDeleted = 'N') as isExist;
   `;
   const [rows] = await connection.query(query);
   return rows[0]['isExist'];
@@ -137,12 +137,12 @@ async function isDeletedCraftAskIdx(connection, craftAskIdx){
 }
 
 //1:1문의 답변 작성
-async function createAskComment(connection, craftAskIdx, comment){
+async function createAskComment(connection, askIdx, content){
   const query = `
-  INSERT INTO CraftAskAnswer(craftAskIdx, comment)
-  VALUES (${craftAskIdx}, '${comment}');
+  INSERT INTO AskAnswer(askIdx, content)
+  VALUES (${askIdx}, ?);
   `;
-  const [rows] = await connection.query(query);
+  const [rows] = await connection.query(query, [content]);
   return rows;
 }
 
@@ -155,7 +155,7 @@ module.exports = {
   isArtistAsk,
   isExistAskIdx,
   getAskDetail,
-  isAlreadyCommentAskIdx,
+  isAlreadyAnswerAskIdx,
   isDeletedCraftAskIdx,
   createAskComment,
 }

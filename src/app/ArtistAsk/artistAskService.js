@@ -4,14 +4,14 @@ const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 
-exports.createAskComment = async (userIdx, craftAskIdx, comment) => {
+exports.createAskComment = async (userIdx, askIdx, content) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
 
       //존재하는 askIdx인지
-      const isExistCraftAskIdx = await artistAskDao.isExistCraftAskIdx(connection, craftAskIdx);
-      if (!isExistCraftAskIdx){
+      const isExistAskIdx = await artistAskDao.isExistAskIdx(connection, askIdx);
+      if (!isExistAskIdx){
         connection.release();
         return errResponse(baseResponse.INVALID_ASK_IDX);
       }
@@ -27,22 +27,22 @@ exports.createAskComment = async (userIdx, craftAskIdx, comment) => {
       const artistIdx = await artistAskDao.getArtistIdx(connection, userIdx);
 
       //문의에 대한 작가 권한 확인
-      const isArtistAsk = await artistAskDao.isArtistAsk(connection, craftAskIdx, artistIdx);
+      const isArtistAsk = await artistAskDao.isArtistAsk(connection, askIdx, artistIdx);
       if (!isArtistAsk){
         connection.release();
         return errResponse(baseResponse.NO_PERMISSION);
       }
 
       //이미 답변한 문의인지
-      const isAlreadyCommentAskIdx = await artistAskDao.isAlreadyCommentAskIdx(connection, craftAskIdx);
-      if (isAlreadyCommentAskIdx){
+      const isAlreadyAnswerAskIdx = await artistAskDao.isAlreadyAnswerAskIdx(connection, askIdx);
+      if (isAlreadyAnswerAskIdx){
         connection.release();
-        return errResponse(baseResponse.IS_ALREADY_COMMENT_ASK_IDX);
+        return errResponse(baseResponse.IS_ALREADY_ANSWER_ASK_IDX);
       }
 
       //1:1문의 답변 작성
       await connection.beginTransaction();
-      await artistAskDao.createAskComment(connection, craftAskIdx, comment);
+      await artistAskDao.createAskComment(connection, askIdx, content);
       await connection.commit();
 
       connection.release();

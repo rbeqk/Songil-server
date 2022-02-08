@@ -52,17 +52,17 @@ exports.getAskDetail = async (req, res) => {
   API No. 10.5
   API Name: 1:1 문의 답변 등록 API
   [POST] /artist-page/ask/:askIdx
-  body: comment
+  body: content
 */
 exports.createAskComment = async (req, res) => {
   const {userIdx} = req.verifiedToken;
-  const {askIdx: craftAskIdx} = req.params;
-  const {comment} = req.body;
+  const {askIdx} = req.params;
+  const {content} = req.body;
 
-  if (!comment) return res.send(errResponse(baseResponse.IS_EMPTY));
-  if (comment.length > 300) return res.send(errResponse(baseResponse.EXCEED_CRAFT_ASK_COMMENT_REASON));
+  if (!content) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (content.length > 300) return res.send(errResponse(baseResponse.EXCEED_CRAFT_ASK_CONTENT_REASON));
 
-  const createAskComment = await artistAskService.createAskComment(userIdx, craftAskIdx, comment);
+  const createAskComment = await artistAskService.createAskComment(userIdx, askIdx, content);
 
   return res.send(createAskComment);
 }
