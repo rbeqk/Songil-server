@@ -44,14 +44,16 @@ async function isUserOrderIdx(connection, userIdx, orderIdx){
   return rows[0]['isExist'];
 }
 
-//유저의 모든 베네핏
+//유저의 사용 가능한 모든 베네핏(없을 경우 유효하지 않은 값으로)
 async function getUserAllBenefitIdxArr(connection, userIdx){
   const query = `
-  SELECT benefitIdx FROM UserBenefit
-  WHERE userIdx = ${userIdx} && isUsed = 'N' && isDeleted = 'N';
+  SELECT UB.benefitIdx
+  FROM UserBenefit UB
+          JOIN Benefit B ON B.benefitIdx = UB.benefitIdx && B.isDeleted = 'N' && deadline > NOW()
+  WHERE UB.userIdx = ${userIdx} && UB.isUsed = 'N' && UB.isDeleted = 'N';
   `;
   const [rows] = await connection.query(query);
-  return rows.map(item => item.benefitIdx);
+  return rows.length > 0 ? rows.map(item => item.benefitIdx) : [-1];
 }
 
 //해당 주문의 totalCraftPrice 가져오기
@@ -65,11 +67,11 @@ async function getTotalCraftPrice(connection, orderIdx){
 }
 
 //사용할 수 있는 가격 별 쿠폰
-async function getCanUseBenefitIdxByPriceArr(connection, totalCraftPrice, userAllBenefitIdxArr){
+async function getCanUseBenefitIdxArrByPrice(connection, totalCraftPrice, userAllBenefitIdxArr){
   const query = `
   SELECT benefitIdx
   FROM Benefit
-  WHERE benefitIdx IN (?) && Benefit.benefitCategoryIdx = 1 && basisPrice <= ${totalCraftPrice} &&
+  WHERE benefitIdx IN (?) && benefitCategoryIdx = 1 && basisPrice <= ${totalCraftPrice} &&
         deadline > NOW() && isDeleted = 'N';
   `;
   const [rows] = await connection.query(query, [userAllBenefitIdxArr]);
@@ -91,7 +93,7 @@ async function getOrderCraftByArtist(connection, orderIdx){
 }
 
 //사용할 수 있는 작가 별 쿠폰
-async function getCanUseBenefitArrByArtist(connection, artistIdx, totalArtistCraftPrice, userAllBenefitIdxArr){
+async function getCanUseBenefitIdxArrByArtist(connection, artistIdx, totalArtistCraftPrice, userAllBenefitIdxArr){
   const query = `
   SELECT benefitIdx
   FROM Benefit
@@ -99,7 +101,7 @@ async function getCanUseBenefitArrByArtist(connection, artistIdx, totalArtistCra
       deadline > NOW() && isDeleted = 'N';
   `;
   const [rows] = await connection.query(query, [userAllBenefitIdxArr]);
-  return rows;
+  return rows.map(item => item.benefitIdx);
 }
 
 //사용할 수 있는 가격 별 + 작가 별 쿠폰 정보
@@ -144,9 +146,9 @@ module.exports = {
   isUserOrderIdx,
   getUserAllBenefitIdxArr,
   getTotalCraftPrice,
-  getCanUseBenefitIdxByPriceArr,
+  getCanUseBenefitIdxArrByPrice,
   getOrderCraftByArtist,
-  getCanUseBenefitArrByArtist,
+  getCanUseBenefitIdxArrByArtist,
   getCanUseBenefitInfo,
   isValidOrderIdx,
 }
