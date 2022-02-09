@@ -55,8 +55,8 @@ exports.deleteQnAComment = async (userIdx, qnaCommentIdx) => {
     try{
       
       //존재하는 QnA 댓글 idx인지
-      const isExistSQnACommentIdx = await qnaCommentDao.isExistSQnACommentIdx(connection, qnaCommentIdx);
-      if (!isExistSQnACommentIdx){
+      const isExistQnACommentIdx = await qnaCommentDao.isExistQnACommentIdx(connection, qnaCommentIdx);
+      if (!isExistQnACommentIdx){
         connection.release();
         return errResponse(baseResponse.INVALID_QNA_COMMENT_IDX);
       }
