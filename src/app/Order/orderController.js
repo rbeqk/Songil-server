@@ -60,7 +60,7 @@ exports.updateOrderExtraShippingFee = async (req, res) => {
 
 /*
   API No. 12.5
-  API Name: 배송비 정보 및 사용 포인트 저장 API
+  API Name: 배송지 정보 및 사용 포인트 저장 API
   [POST] /order/:orderIdx/etc-info
   body: recipient, phone, address, detailAddress, memo, pointDiscount
 */

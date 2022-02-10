@@ -345,7 +345,7 @@ async function updateOrderEtcInfo(connection, orderIdx, recipient, phone, addres
       phone = ?,
       address = ?,
       detailAddress = ?,
-      memo = IFNULL(?, memo),
+      memo = ?,
       pointDiscount = ${pointDiscount}
   WHERE orderIdx = ${orderIdx};
   `;
@@ -476,6 +476,17 @@ async function getOrderCraftRateInfoByArtist(connection, orderIdx, benefitArtist
   return rows;
 }
 
+//orderCraft 별 포인트 적용
+async function applyOrderCraftPoint(connection, orderCraftIdx, orderCraftIdxPointDiscount){
+  const query = `
+  UPDATE OrderCraft
+  SET pointDiscount = ${orderCraftIdxPointDiscount}
+  WHERE orderCraftIdx = ${orderCraftIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   deleteUserNotPaidOrderSheet,
   getExistCraftIdxLen,
@@ -513,4 +524,5 @@ module.exports = {
   getOrderCraftAllRateInfo,
   applyOrderCraftBenefit,
   getOrderCraftRateInfoByArtist,
+  applyOrderCraftPoint,
 }

@@ -393,7 +393,24 @@ exports.validatePayment = async (userIdx, orderIdx, receiptId) => {
   }
 }
 
-//배송비 정보 및 사용 포인트 저장
+//orderCraftIdx 별 사용 포인트 저장
+applyOrderCraftPoint = async (connection, orderIdx, pointDiscount) => {
+  try{
+    const rateInfo = await orderDao.getOrderCraftAllRateInfo(connection, orderIdx);
+    for (let item of rateInfo){
+      const orderCraftIdx = item.orderCraftIdx;
+      const orderCraftIdxPointDiscount = parseInt(item.rate * pointDiscount);
+      await orderDao.applyOrderCraftPoint(connection, orderCraftIdx, orderCraftIdxPointDiscount);
+    }
+
+    return true;
+  }catch(err){
+    logger.error(`applyOrderCraftPoint func err: ${err}`);
+    return false;
+  }
+}
+
+//배송지 정보 및 사용 포인트 저장
 exports.updateOrderEtcInfo = async (userIdx, orderIdx, recipient, phone, address, detailAddress, memo, pointDiscount) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
@@ -424,11 +441,23 @@ exports.updateOrderEtcInfo = async (userIdx, orderIdx, recipient, phone, address
       }
 
       await connection.beginTransaction();
+
+      //orderT에 배송지 정보, 사용 전체 포인트 저장
       await orderDao.updateOrderEtcInfo(
         connection, orderIdx, recipient, phone, address, detailAddress, memo, pointDiscount
       );
+      
+      //orderCraftIdx 별 사용 포인트 저장
+      const applyPoint = await applyOrderCraftPoint(connection, orderIdx, pointDiscount);
+      if (!applyPoint){
+        connection.release();
+        return errResponse(baseResponse.DB_ERROR);
+      }
+
+      //최종 결제 금액 업데이트
       const finalPrice = await orderDao.getFinalPrice(connection, orderIdx);
       await orderDao.updateOrderFinalPrice(connection, orderIdx, finalPrice);
+      
       await connection.commit();
 
       connection.release();
