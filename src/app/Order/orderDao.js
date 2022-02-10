@@ -138,7 +138,7 @@ async function getTotalCraftPrice(connection, orderIdx){
 async function getBenefitCategoryIdx(connection, benefitIdx){
   const query = `
   SELECT benefitCategoryIdx FROM Benefit
-  WHERE benefitIdx = ${benefitIdx} && isUsed = 'N' && deadline > NOW() && isDeleted = 'N';
+  WHERE benefitIdx = ${benefitIdx} && deadline > NOW() && isDeleted = 'N';
   `;
   const [rows] = await connection.query(query);
   return rows[0]['benefitCategoryIdx'];
@@ -157,7 +157,7 @@ async function getUsedBenefitByPriceInfo(connection, benefitIdx, totalCraftPrice
   FROM Benefit B
           LEFT JOIN Artist A ON A.artistIdx = B.artistIdx && A.isDeleted = 'N'
           LEFT JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
-  WHERE B.benefitIdx = ${benefitIdx} && B.isUsed = 'N' && B.deadline > NOW() && B.isDeleted = 'N';
+  WHERE B.benefitIdx = ${benefitIdx} && B.deadline > NOW() && B.isDeleted = 'N';
   `;
   const [rows] = await connection.query(query);
   return rows[0];
@@ -167,7 +167,7 @@ async function getUsedBenefitByPriceInfo(connection, benefitIdx, totalCraftPrice
 async function getBenefitArtistIdx(connection, benefitIdx){
   const query = `
   SELECT artistIdx FROM Benefit
-  WHERE benefitIdx = ${benefitIdx} && isUsed = 'N' && deadline > NOW() && isDeleted = 'N';
+  WHERE benefitIdx = ${benefitIdx} && deadline > NOW() && isDeleted = 'N';
   `;
   const [rows] = await connection.query(query);
   return rows[0]['artistIdx'];
@@ -200,7 +200,7 @@ async function getUsedBenefitByArtistInfo(connection, benefitIdx, totalArtistCra
   FROM Benefit B
           LEFT JOIN Artist A ON A.artistIdx = B.artistIdx && A.isDeleted = 'N'
           LEFT JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
-  WHERE B.benefitIdx = ${benefitIdx} && B.isUsed = 'N' && B.deadline > NOW() && B.isDeleted = 'N';
+  WHERE B.benefitIdx = ${benefitIdx} && B.deadline > NOW() && B.isDeleted = 'N';
   `;
   const [rows] = await connection.query(query);
   return rows[0];
@@ -413,11 +413,64 @@ async function getAppliedBenefit(connection, orderIdx){
 
 //기존에 적용된 베네핏 삭제
 async function deleteAppliedBenefit(connection, orderIdx){
-  const query = `
+  const deleteOrderTBenefitQuery = `
   UPDATE OrderT
   SET benefitIdx = null,
       benefitDiscount = 0
   WHERE orderIdx = ${orderIdx};
+  `;
+  await connection.query(deleteOrderTBenefitQuery);
+
+  const deleteOrderCraftBenefitQuery = `
+  UPDATE OrderCraft
+  SET benefitDiscount = 0
+  WHERE orderIdx = ${orderIdx};
+  `;
+  await connection.query(deleteOrderCraftBenefitQuery);
+}
+
+//orderIdx 별 orderCraftIdx들의 비율 가져오기
+async function getOrderCraftAllRateInfo(connection, orderIdx){
+  const query = `
+  SELECT OC.orderIdx,
+        OC.orderCraftIdx,
+        OC.totalCraftPrice AS eachTotalCraftPrice,
+        O.totalCraftPrice,
+        OC.totalCraftPrice / O.totalCraftPrice AS rate
+  FROM OrderCraft OC
+          JOIN OrderT O ON O.orderIdx = ${orderIdx}
+  WHERE OC.orderIdx = ${orderIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
+//베네핏 사용 시 비율마다 orderCraft의 베네핏 적용
+async function applyOrderCraftBenefit(connection, orderCraftIdx, orderCraftIdxBenefitDiscount){
+  const query = `
+  UPDATE OrderCraft
+  SET benefitDiscount = ${orderCraftIdxBenefitDiscount}
+  WHERE orderCraftIdx = ${orderCraftIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
+//작가 별 베네핏 사용 시 해당 작가 별 비율
+async function getOrderCraftRateInfoByArtist(connection, orderIdx, benefitArtistIdx){
+  const query = `
+    SELECT OC.orderCraftIdx,
+        OC.orderIdx,
+        OC.craftIdx,
+        OC.totalCraftPrice / (SELECT SUM(OC.totalCraftPrice)
+                              FROM OrderCraft OC
+                                        JOIN Craft C ON C.craftIdx = OC.craftIdx
+                              WHERE OC.orderIdx = ${orderIdx}
+                              GROUP BY C.artistIdx
+                              HAVING C.artistIdx = ${benefitArtistIdx}) AS rate
+  FROM OrderCraft OC
+          JOIN Craft C ON C.craftIdx = OC.craftIdx && C.artistIdx = ${benefitArtistIdx}
+  WHERE OC.orderIdx = ${orderIdx};
   `;
   const [rows] = await connection.query(query);
   return rows;
@@ -457,4 +510,7 @@ module.exports = {
   updateOrderFinalPrice,
   getAppliedBenefit,
   deleteAppliedBenefit,
+  getOrderCraftAllRateInfo,
+  applyOrderCraftBenefit,
+  getOrderCraftRateInfoByArtist,
 }

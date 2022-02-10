@@ -9,7 +9,7 @@ class abTestInfo{
   ) {
     this.vote = vote;
     this.totalVoteCnt = totalVoteCnt;
-    this.percent = percent
+    this.percent = percent;
   }
 }
 

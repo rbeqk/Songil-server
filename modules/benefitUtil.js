@@ -2,6 +2,18 @@ const benefitDao = require('../src/app/Benefit/benefitDao');
 const orderDao = require('../src/app/Order/orderDao');
 const {logger} = require('../config/winston');
 
+class appliedBenefitInfo{
+  constructor(
+    benefitIdx,
+    title,
+    discountPrice
+  ){
+    this.benefitIdx = benefitIdx;
+    this.title = title;
+    this.discountPrice = discountPrice;
+  }
+}
+
 const getCanUseBenefitIdxArr = async (connection, userIdx, orderIdx) => {
   try{
     //유저의 사용 가능한 모든 베네핏idx(없을 경우 유효하지 않은 값으로)
@@ -34,5 +46,6 @@ const getCanUseBenefitIdxArr = async (connection, userIdx, orderIdx) => {
 }
 
 module.exports = {
+  appliedBenefitInfo,
   getCanUseBenefitIdxArr,
 }
