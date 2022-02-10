@@ -103,10 +103,14 @@ deleteAppliedBenefit = async (connection, orderIdx) => {
     if (appliedBenefit){
       await connection.beginTransaction();
       await orderDao.deleteAppliedBenefit(connection, orderIdx);
+
+      const finalPrice = await orderDao.getFinalPrice(connection, orderIdx);
+      await orderDao.updateOrderFinalPrice(connection, orderIdx, finalPrice);
+      
       await connection.commit();
     }
 
-    const result = new appliedBenefitInfo(null, null, null);
+    const result = new appliedBenefitInfo(null, null, null, finalPrice);
     return response(baseResponse.SUCCESS, result);
 
   }catch(err){
@@ -196,9 +200,12 @@ applyNewOrderBenefit = async (connection, userIdx, orderIdx, benefitIdx) => {
       await orderDao.applyOrderCraftBenefit(connection, orderCraftIdx, orderCraftIdxBenefitDiscount);
     }
 
+    const finalPrice = await orderDao.getFinalPrice(connection, orderIdx);
+    await orderDao.updateOrderFinalPrice(connection, orderIdx, finalPrice);
+
     await connection.commit();
 
-    const result = new appliedBenefitInfo(benefitIdx, benefitTitle, benefitDiscount);
+    const result = new appliedBenefitInfo(benefitIdx, benefitTitle, benefitDiscount, finalPrice);
     return response(baseResponse.SUCCESS, result);
 
   }catch(err){
@@ -294,18 +301,27 @@ exports.updateOrderExtraShippingFee = async (userIdx, orderIdx, zipcode) => {
         await orderDao.updateOrderExtraShippingFee(connection, orderIdx, totalExtraShippingFee);
         await orderDao.updateOrderZipcode(connection, orderIdx, zipcode);
 
+        const finalPrice = await orderDao.getFinalPrice(connection, orderIdx);
+        await orderDao.updateOrderFinalPrice(connection, orderIdx, finalPrice);
+
         await connection.commit();
       }
       else{
         await connection.beginTransaction();
+
         await orderDao.updateOrderExtraShippingFee(connection, orderIdx, 0);
         await orderDao.updateOrderCraftExtraShippingFeeToFree(connection, orderIdx);
         await orderDao.updateOrderZipcode(connection, orderIdx, zipcode);
+
+        const finalPrice = await orderDao.getFinalPrice(connection, orderIdx);
+        await orderDao.updateOrderFinalPrice(connection, orderIdx, finalPrice);
+
         await connection.commit();
       }
 
       const result = {
-        'totalExtraShippingFee': totalExtraShippingFee
+        'totalExtraShippingFee': totalExtraShippingFee,
+        'finalPrice': await orderDao.getFinalPrice(connection, orderIdx)
       }
 
       connection.release();
@@ -467,8 +483,12 @@ exports.updateOrderEtcInfo = async (userIdx, orderIdx, recipient, phone, address
       
       await connection.commit();
 
+      const result = {
+        'finalPrice': finalPrice
+      };
+
       connection.release();
-      return response(baseResponse.SUCCESS);
+      return response(baseResponse.SUCCESS, result);
       
     }catch(err){
       await connection.rollback();

@@ -6,11 +6,13 @@ class appliedBenefitInfo{
   constructor(
     benefitIdx,
     title,
-    discountPrice
+    discountPrice,
+    finalPrice
   ){
     this.benefitIdx = benefitIdx;
     this.title = title;
     this.discountPrice = discountPrice;
+    this.finalPrice = finalPrice;
   }
 }
 
