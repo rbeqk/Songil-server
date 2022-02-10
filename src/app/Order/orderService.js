@@ -296,6 +296,13 @@ exports.updateOrderExtraShippingFee = async (userIdx, orderIdx, zipcode) => {
 
         await connection.commit();
       }
+      else{
+        await connection.beginTransaction();
+        await orderDao.updateOrderExtraShippingFee(connection, orderIdx, 0);
+        await orderDao.updateOrderCraftExtraShippingFeeToFree(connection, orderIdx);
+        await orderDao.updateOrderZipcode(connection, orderIdx, zipcode);
+        await connection.commit();
+      }
 
       const result = {
         'totalExtraShippingFee': totalExtraShippingFee

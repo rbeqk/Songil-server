@@ -260,6 +260,17 @@ async function updateOrderExtraShippingFee(connection, orderIdx, totalExtraShipp
   return rows;
 }
 
+//orderCraftIdx extraShippingFee = 0으로 적용
+async function updateOrderCraftExtraShippingFeeToFree(connection, orderIdx){
+  const query = `
+  UPDATE OrderCraft
+  SET extraShippingFee = 0
+  WHERE orderIdx = ${orderIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 //orderIdx zipcode 적용
 async function updateOrderZipcode(connection, orderIdx, zipcode){
   const query = `
@@ -509,6 +520,7 @@ module.exports = {
   isExtraFeeZipcode,
   getOrderCraftExtraShippingFee,
   updateOrderCraftExtraShippingFee,
+  updateOrderCraftExtraShippingFeeToFree,
   updateOrderExtraShippingFee,
   updateOrderZipcode,
   getOrderFinalPrice,
