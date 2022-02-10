@@ -99,8 +99,7 @@ async function getAskDetail(connection, askIdx){
         A.userIdx,
         U.nickname,
         A.content                       as askContent,
-        AA.content                      as answerContent,
-        C.isDeleted                     as craftIsDeleted
+        AA.content                      as answerContent
   FROM Ask A
           LEFT JOIN OrderCraft OC ON A.orderCraftIdx = OC.orderCraftIdx
           JOIN Craft C ON C.craftIdx = IFNULL(A.craftIdx, OC.craftIdx)

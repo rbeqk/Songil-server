@@ -133,8 +133,7 @@ exports.getAskDetail = async (askIdx, userIdx) => {
         'userIdx': askDetail.userIdx,
         'nickname': askDetail.nickname,
         'askContent': askDetail.askContent,
-        'answerContent': askDetail.answerContent,
-        'craftIsDeleted': askDetail.craftIsDeleted,
+        'answerContent': askDetail.answerContent
       };
 
       connection.release();
