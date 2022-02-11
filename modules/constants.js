@@ -19,3 +19,5 @@ exports.STORY = 1;
 exports.QNA = 2;
 exports.ABTEST = 3;
 exports.CRAFT = 4;
+
+exports.USE_POINT_WHEN_PAYING = 1;

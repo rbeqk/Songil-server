@@ -1,3 +1,5 @@
+const {USE_POINT_WHEN_PAYING} = require('../../../modules/constants');
+
 //기존에 주문 안한 주문서 내역 다 삭제
 async function deleteUserNotPaidOrderSheet(connection, userIdx){
   const getDeleteOrderIdxQuery = `
@@ -375,7 +377,7 @@ async function getFinalPrice(connection, orderIdx){
   return rows[0]['finalPrice'];
 }
 
-//유저 포인트 차감
+//상품 구매시 사용 포인트 차감
 async function updateUserUsedPoint(connection, userIdx, orderIdx){
   const getPointDiscountQuery = `
   SELECT pointDiscount FROM OrderT
@@ -385,19 +387,18 @@ async function updateUserUsedPoint(connection, userIdx, orderIdx){
   const pointDiscount = getPointDiscount[0]['pointDiscount'];
 
   if (pointDiscount > 0){
-    const addUsedPointTQuery = `
-    INSERT INTO UsedPoint (userIdx, point)
-    VALUES (${userIdx}, ${pointDiscount});
+    const updatePointStatusQuery = `
+    INSERT INTO PointStatus (userIdx, point, pointInfoIdx)
+    VALUES (${userIdx}, -${pointDiscount}, ${USE_POINT_WHEN_PAYING});
     `;
-    await connection.query(addUsedPointTQuery);
+    await connection.query(updatePointStatusQuery);
 
-    const query = `
+    const updateUserPointQuery = `
     UPDATE User
     SET point = point - ${pointDiscount}
-    WHERE userIdx = ${userIdx} && isDeleted = 'N';
+    WHERE userIdx = ${userIdx};
     `;
-    const [rows] = await connection.query(query);
-    return rows;
+    await connection.query(updateUserPointQuery);
   }
 }
 
