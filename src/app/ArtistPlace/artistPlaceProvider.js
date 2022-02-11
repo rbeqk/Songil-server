@@ -294,7 +294,7 @@ exports.getArtistArticle = async (artistIdx, page, sort, userIdx) => {
             'editorName': item.editorName,
             'createdAt': item.createdAt,
             'totalLikeCnt': item.totalLikeCnt,
-            'isLike': (userIdx != -1) ? 'N' : (await likeDao.articleLikeStatus(connection, userIdx, item.articleIdx) === 1 ? 'Y' : 'N')
+            'isLike': userIdx == -1 ? 'N' : await likeDao.articleLikeStatus(connection, userIdx, item.articleIdx)
           });
         }
       }

@@ -41,9 +41,9 @@ async function getTotalCraftLikeCnt(connection, craftIdx){
 //현재 아티클 좋아요 status 확인
 async function articleLikeStatus(connection, userIdx, articleIdx){
   const query = `
-  SELECT EXISTS(SELECT *
+  SELECT IF(EXISTS(SELECT *
     FROM ArticleLike
-    WHERE userIdx = ${userIdx} && articleIdx = ${articleIdx}) as isLike
+    WHERE userIdx = ${userIdx} && articleIdx = ${articleIdx}), 'Y', 'N') as isLike;
   `;
   const [rows] = await connection.query(query);
   return rows[0]['isLike'];
