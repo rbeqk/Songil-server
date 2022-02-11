@@ -96,6 +96,17 @@ async function getCraftShippingFee(connection, craftIdx){
   return rows[0];
 }
 
+//사용자의 좋아요 여부 가져오기
+async function getUserLikeCraft(connection, userIdx, craftIdx){
+  const query = `
+  SELECT IF(EXISTS(SELECT *
+    FROM CraftLike
+    WHERE userIdx = ${userIdx} && craftIdx = ${craftIdx}), 'Y', 'N') as isLike;
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['isLike'];
+}
+
 module.exports = {
   isExistCraftIdx,
   getCraftBasicInfo,
@@ -104,4 +115,5 @@ module.exports = {
   getCraftMaterial,
   getCraftUsage,
   getCraftShippingFee,
+  getUserLikeCraft,
 }

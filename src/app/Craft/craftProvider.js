@@ -4,7 +4,7 @@ const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 
-exports.getCraftDetail = async (craftIdx) => {
+exports.getCraftDetail = async (userIdx, craftIdx) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
@@ -47,7 +47,8 @@ exports.getCraftDetail = async (craftIdx) => {
         'artistName': basicInfo.artistName,
         'artistIntroduction': basicInfo.artistIntroduction,
         'artistImageUrl': basicInfo.artistImageUrl,
-        'totalCommentCnt': basicInfo.totalCommentCnt
+        'totalCommentCnt': basicInfo.totalCommentCnt,
+        'isLike': userIdx == -1 ? 'N' : await craftDao.getUserLikeCraft(connection, userIdx, craftIdx)
       };
 
       connection.release();
