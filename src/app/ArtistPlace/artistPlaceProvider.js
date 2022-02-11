@@ -9,6 +9,7 @@ const {
   ARTIST_PLACE_ARTIST_CRAFT_PER_PAGE,
   ARTIST_PLACE_ARTIST_ARTICLE_PER_PAGE
 } = require("../../../modules/constants");
+const {pageInfo} = require("../../../modules/pageUtil");
 
 //총 아티클 수 가져오기
 const getTotalArticleCnt = async (connection, artistIdx) => {
@@ -119,10 +120,7 @@ exports.getArtistCraftTotalPage = async (artistIdx) => {
       const totalCnt = await artistPlaceDao.getArtistCraftCnt(connection, artistIdx);
       const totalPages = getTotalPage(totalCnt, ARTIST_PLACE_ARTIST_CRAFT_PER_PAGE);
       
-      const result = {
-        'totalPages': totalPages,
-        'itemsPerPage': ARTIST_PLACE_ARTIST_CRAFT_PER_PAGE
-      };
+      const result = new pageInfo(totalPages, ARTIST_PLACE_ARTIST_CRAFT_PER_PAGE);
       
       connection.release();
       return response(baseResponse.SUCCESS, result);
@@ -216,10 +214,7 @@ exports.getArtistArticleTotalPage = async (artistIdx) => {
       }
 
       const totalPages = getTotalPage(totalCnt, ARTIST_PLACE_ARTIST_ARTICLE_PER_PAGE);
-      const result = {
-        'totalPages': totalPages,
-        'itemPerPage': ARTIST_PLACE_ARTIST_ARTICLE_PER_PAGE
-      };
+      const result = new pageInfo(totalPages, ARTIST_PLACE_ARTIST_ARTICLE_PER_PAGE);
 
       connection.release();
       return response(baseResponse.SUCCESS, result);
