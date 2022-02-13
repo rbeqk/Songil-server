@@ -21,11 +21,16 @@ exports.createCraftAsk = async (userIdx, craftIdx, content) => {
 
       //1:1 문의 작성
       await connection.beginTransaction();
-      await askDao.createCraftAsk(connection, userIdx, craftIdx, content);
+      const createCraftAsk = await askDao.createCraftAsk(connection, userIdx, craftIdx, content);
       await connection.commit();
       connection.release();
 
-      return response(baseResponse.SUCCESS);
+      const askIdx = createCraftAsk.insertId;
+      const result = {
+        'askIdx': askIdx
+      }
+
+      return response(baseResponse.SUCCESS, result);
       
     }catch(err){
       await connection.rollback();
