@@ -21,11 +21,16 @@ exports.createABTest = async (userIdx, content, deadline, imageArr) => {
       const artistIdx = await abTestDao.getArtistIdx(connection, userIdx);
       
       await connection.beginTransaction();
-      await abTestDao.createABTest(connection, content, deadline, imageArr, artistIdx);
+      const createABTest = await abTestDao.createABTest(connection, content, deadline, imageArr, artistIdx);
       await connection.commit();
+
+      const abTestIdx = createABTest.insertId;
+      const result = {
+        'abTestIdx': abTestIdx
+      };
       
       connection.release();
-      return response(baseResponse.SUCCESS);
+      return response(baseResponse.SUCCESS, result);
       
     }catch(err){
       await connection.rollback();
