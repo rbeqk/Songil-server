@@ -46,6 +46,7 @@ module.exports = {
   INVALID_ORDER_IDX: {"isSuccess": false, "code": 2327, "message": "존재하지 않는 orderIdx입니다"},
   INVALID_RECEIPT_ID: {"isSuccess": false, "code": 2328, "message": "존재하지 않는 receiptId입니다"},
   INVALID_POINT: {"isSuccess": false, "code": 2329, "message": "사용할 수 없는 포인트 값입니다"},
+  INVALID_ORDER_CRAFT_IDX: {"isSuccess": false, "code": 2340, "message": "존재하지 않는 orderDetailIdx입니다"},
 
   EXCEED_ASK_CONTENT: {"isSuccess": false, "code": 2350, "message": "content는 300자 이하로 입력해주세요"},
   EXCEED_REPORTED_REASON: {"isSuccess": false, "code": 2351, "message": "신고 사유는 150자 이하로 입력해주세요"},
