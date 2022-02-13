@@ -141,7 +141,6 @@ async function getABTest(connection, startItemIdx, pageItemCnt){
           JOIN Artist A ON A.artistIdx = AB.artistIdx && A.isDeleted = 'N'
           JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
   WHERE AB.isDeleted = 'N'
-  ORDER BY isFinished = 'N' DESC
   LIMIT ${startItemIdx}, ${pageItemCnt};
   `;
   const [rows] = await connection.query(query);
