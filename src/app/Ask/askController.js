@@ -39,3 +39,22 @@ exports.getAsk = async (req, res) => {
 
   return res.send(getAsk);
 }
+
+/*
+  API No. 8.14
+  API Name: 주문현황 문의하기 작성 API
+  [POST] /my-page/orders/:orderDetailIdx/ask
+  body: content
+*/
+exports.createDeliveryAsk = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {orderDetailIdx: orderCraftIdx} = req.params;
+  const {content} = req.body;
+
+  if (!content) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (content.length > 300) return res.send(errResponse(baseResponse.EXCEED_ASK_CONTENT));
+
+  const createDeliveryAsk = await askService.createDeliveryAsk(userIdx, orderCraftIdx, content);
+
+  return res.send(createDeliveryAsk)
+}

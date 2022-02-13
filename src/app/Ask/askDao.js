@@ -36,7 +36,18 @@ async function getAsk(connection, userIdx, startItemIdx, itemPerPage){
   return rows;
 }
 
+//주문현황 문의하기 작성
+async function createDeliveryAsk(connection, userIdx, orderCraftIdx, content){
+  const query = `
+  INSERT INTO Ask (orderCraftIdx, userIdx, content)
+  VALUES (${orderCraftIdx}, ${userIdx}, ?);
+  `;
+  const [rows] = await connection.query(query, [content]);
+  return rows;
+}
+
 module.exports = {
   createCraftAsk,
   getAsk,
+  createDeliveryAsk,
 }

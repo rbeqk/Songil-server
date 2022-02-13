@@ -1,5 +1,6 @@
 const askDao = require('./askDao');
 const craftDao = require('../Craft/craftDao');
+const orderStatusDao = require('../OrderStatus/orderStatusDao');
 const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
@@ -34,6 +35,48 @@ exports.createCraftAsk = async (userIdx, craftIdx, content) => {
     }
   }catch(err){
     logger.error(`createCraftAsk DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}
+
+//주문현황 문의하기 작성
+exports.createDeliveryAsk = async (userIdx, orderCraftIdx, content) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+
+      const isExistOrderCraftIdx = await orderStatusDao.isExistOrderCraftIdx(connection, orderCraftIdx);
+      if (!isExistOrderCraftIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALID_ORDER_CRAFT_IDX);
+      }
+
+      const isUserOrderOrderCraftIdx = await orderStatusDao.isUserOrderOrderCraftIdx(connection, userIdx, orderCraftIdx);
+      if (!isUserOrderOrderCraftIdx){
+        connection.release();
+        return errResponse(baseResponse.NO_PERMISSION);
+      }
+
+      await connection.beginTransaction();
+      const createDeliveryAsk = await askDao.createDeliveryAsk(connection, userIdx, orderCraftIdx, content);
+      await connection.commit();
+
+      const askIdx = createDeliveryAsk.insertId;
+      const result = {
+        'askIdx': askIdx
+      };
+
+      connection.release();
+      return response(baseResponse.SUCCESS, result);
+      
+    }catch(err){
+      await connection.rollback();
+      connection.release();
+      logger.error(`createDeliveryAsk DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`createDeliveryAsk DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }

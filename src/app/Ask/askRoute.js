@@ -7,4 +7,7 @@ module.exports = function(app){
 
   //문의 내역 조회 API
   app.get('/my-page/ask', jwtMiddleware, askController.getAsk);
+
+  //주문현황 문의하기 작성 API
+  app.post('/my-page/orders/:orderDetailIdx/ask', jwtMiddleware, askController.createDeliveryAsk);
 }
