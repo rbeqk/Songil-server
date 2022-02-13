@@ -1,4 +1,5 @@
 const orderDao = require('./orderDao');
+const cartDao = require('../Cart/cartDao');
 const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
@@ -378,10 +379,16 @@ exports.validatePayment = async (userIdx, orderIdx, receiptId) => {
             if (_response.data.price === finalPrice){
               if (_response.data.status === 1){
                 await connection.beginTransaction();
+
+                const craftIdxArr = await orderDao.getCraftIdxByOrderIdx(connection, orderIdx);
+                for (let craftIdx of craftIdxArr){
+                  await cartDao.deleteCartCraft(connection, userIdx, craftIdx);
+                }
                 await orderDao.updateOrderToPaid(connection, orderIdx, receiptId);
                 await orderDao.updateBenefitToUsed(connection, userIdx, orderIdx);
                 await orderDao.updateUserUsedPoint(connection, userIdx, orderIdx);
                 //TODO: 포인트 적립
+                
                 await connection.commit();
               }
             }

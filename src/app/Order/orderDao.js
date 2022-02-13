@@ -499,6 +499,16 @@ async function applyOrderCraftPoint(connection, orderCraftIdx, orderCraftIdxPoin
   return rows;
 }
 
+//주문한 craftIdx 가져오기
+async function getCraftIdxByOrderIdx(connection, orderIdx){
+  const query = `
+  SELECT craftIdx FROM OrderCraft
+  WHERE orderIdx = ${orderIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows.map(item => item.craftIdx);
+}
+
 module.exports = {
   deleteUserNotPaidOrderSheet,
   getExistCraftIdxLen,
@@ -538,4 +548,5 @@ module.exports = {
   applyOrderCraftBenefit,
   getOrderCraftRateInfoByArtist,
   applyOrderCraftPoint,
+  getCraftIdxByOrderIdx,
 }
