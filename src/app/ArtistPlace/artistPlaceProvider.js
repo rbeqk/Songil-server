@@ -172,7 +172,7 @@ exports.getArtistCraft = async (artistIdx, page, sort, userIdx) => {
             'isNew': item.isNew,
             'isSoldOut': item.isSoldOut,
             'totalLikeCnt': item.totalLikeCnt,
-            'isLike': (userIdx != -1) ? 'N' : (await likeDao.craftIsLike(connection, userIdx, item.craftIdx) ? 'Y': 'N'),
+            'isLike': (userIdx == -1) ? 'N' : (await likeDao.craftIsLike(connection, userIdx, item.craftIdx) ? 'Y': 'N'),
             'totalCommentCnt': item.totalCommentCnt
           });
         }
