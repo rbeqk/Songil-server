@@ -37,3 +37,17 @@ exports.getSendingInfo = async (req, res) => {
 
   return res.send(getSendingInfo);
 }
+
+/*
+  API No. 8.13
+  API Name: 배송 현황 조회 API
+  [GET] /my-page/orders/:orderDetailIdx/delivery
+*/
+exports.getDeliveryInfo = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {orderDetailIdx: orderCraftIdx} = req.params;
+
+  const getDeliveryInfo = await deliveryProvider.getDeliveryInfo(userIdx, orderCraftIdx);
+
+  return res.send(getDeliveryInfo);
+}

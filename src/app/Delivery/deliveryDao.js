@@ -56,10 +56,23 @@ async function getSendingInfo(connection, orderCraftIdx){
   return rows[0];
 }
 
+//유저의 orderCraftIdx인지
+async function isUserOrderCraftIdx(connection, userIdx, orderCraftIdx){
+  const query = `
+  SELECT EXISTS(SELECT O.orderIdx
+      FROM OrderCraft OC
+              JOIN OrderT O ON OC.orderIdx = O.orderIdx
+      WHERE OC.orderCraftIdx = ${orderCraftIdx} && O.userIdx = ${userIdx}) as isExist;
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['isExist'];
+}
+
 module.exports = {
   isExistOrderCraftIdx,
   isArtistOrderCraftIdx,
   createSendingInfo,
   isEnteredDeliveryInfo,
   getSendingInfo,
+  isUserOrderCraftIdx,
 }

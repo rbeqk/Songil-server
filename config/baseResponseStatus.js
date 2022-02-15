@@ -92,6 +92,7 @@ module.exports = {
   EMPTY_CRAFT: {"isSuccess": false, "code": 3302, "message": "상품이 없습니다"},
 
   INVALID_USER_INFO: {"isSuccess": false, "code": 3400, "message": "일치하는 회원 정보가 없습니다"},
+  NOT_ENTER_DELIVERY_INFO: {"isSuccess": false, "code": 3401, "message": "발송정보가 입력되지 않았습니다"},
 
   FORGE_PAYMENT: {"isSuccess": false, "code": 3500, "message": "위조된 요청입니다"},
   INVALID_TINVOICE: {"isSuccess": false, "code": 3501, "message": "유효하지 않은 운송장 번호 혹은 택배사 코드입니다"},
