@@ -72,6 +72,7 @@ exports.getAsk = async (userIdx, page) => {
         result.push({
           'askIdx': item.askIdx,
           'craftIdx': item.craftIdx,
+          'mainImageUrl': item.mainImageUrl,
           'name': item.name,
           'nickname': item.nickname,
           'createdAt': item.createdAt,

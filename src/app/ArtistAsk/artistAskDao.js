@@ -50,10 +50,11 @@ async function getAskInfo(connection, askList, startItemIdx, pageItemCnt){
   const query = `
   SELECT A.askIdx,
         IFNULL(A.craftIdx, OC.craftIdx)             as craftIdx,
+        mainImageUrl,
         C.name,
         U.nickname,
         DATE_FORMAT(A.createdAt, '%Y.%m.%d. %k:%i') as createdAt,
-        A.askStatusIdx as status
+        A.askStatusIdx                              as status
   FROM Ask A
           LEFT JOIN OrderCraft OC ON A.orderCraftIdx = OC.orderCraftIdx
           JOIN Craft C ON C.craftIdx = IFNULL(A.craftIdx, OC.craftIdx)
