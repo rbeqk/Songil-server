@@ -4,6 +4,7 @@ const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 
+//1:1 문의 답변 등록
 exports.createAskComment = async (userIdx, askIdx, content) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
@@ -43,6 +44,7 @@ exports.createAskComment = async (userIdx, askIdx, content) => {
       //1:1문의 답변 작성
       await connection.beginTransaction();
       await artistAskDao.createAskComment(connection, askIdx, content);
+      await artistAskDao.updateAskStatus(connection, askIdx);
       await connection.commit();
 
       connection.release();

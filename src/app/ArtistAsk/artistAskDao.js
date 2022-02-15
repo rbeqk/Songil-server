@@ -60,6 +60,7 @@ async function getAskInfo(connection, askList, startItemIdx, pageItemCnt){
           JOIN Craft C ON C.craftIdx = IFNULL(A.craftIdx, OC.craftIdx)
           JOIN User U ON U.userIdx = A.userIdx
   WHERE A.askIdx IN (?) && A.isDeleted = 'N'
+  ORDER BY askIdx
   LIMIT ${startItemIdx}, ${pageItemCnt};
   `;
   const [rows] = await connection.query(query, [askList]);
@@ -146,6 +147,17 @@ async function createAskComment(connection, askIdx, content){
   return rows;
 }
 
+//1:1문의 상태 변경
+async function updateAskStatus(connection, askIdx){
+  const query = `
+  UPDATE Ask
+  SET askStatusIdx = 2
+  WHERE askIdx = ${askIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   isArtist,
   getArtistIdx,
@@ -158,4 +170,5 @@ module.exports = {
   isAlreadyAnswerAskIdx,
   isDeletedCraftAskIdx,
   createAskComment,
+  updateAskStatus,
 }
