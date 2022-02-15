@@ -6,7 +6,7 @@ module.exports = function(app){
   app.post('/cart/crafts/:craftIdx', jwtMiddleware, cartController.addCartCraft);
 
   //장바구니 개수 조회 API
-  app.get('/cart/conut', jwtMiddleware, cartController.getCartCnt);
+  app.get('/cart/count', jwtMiddleware, cartController.getCartCnt);
 
   //장바구니 조회 API
   app.get('/cart', jwtMiddleware, cartController.getCart);
