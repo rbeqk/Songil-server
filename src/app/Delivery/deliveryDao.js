@@ -22,7 +22,7 @@ async function isArtistOrderCraftIdx(connection, artistIdx, orderCraftIdx){
 }
 
 //발송정보 입력
-async function createDeliveryInfo(connection, orderCraftIdx, sentAt, tCode, tInvoice){
+async function createSendingInfo(connection, orderCraftIdx, sentAt, tCode, tInvoice){
   const query = `
   UPDATE OrderCraft
   SET tCode    = ?,
@@ -46,7 +46,7 @@ async function isEnteredDeliveryInfo(connection, orderCraftIdx){
 }
 
 //발송정보 가져오기
-async function getDeliveryInfo(connection, orderCraftIdx){
+async function getSendingInfo(connection, orderCraftIdx){
   const query = `
   SELECT YEAR(sentAt) as year, MONTH(sentAt) as month, DAY(sentAt) as day, tCode, tInvoice
   FROM OrderCraft
@@ -59,7 +59,7 @@ async function getDeliveryInfo(connection, orderCraftIdx){
 module.exports = {
   isExistOrderCraftIdx,
   isArtistOrderCraftIdx,
-  createDeliveryInfo,
+  createSendingInfo,
   isEnteredDeliveryInfo,
-  getDeliveryInfo,
+  getSendingInfo,
 }

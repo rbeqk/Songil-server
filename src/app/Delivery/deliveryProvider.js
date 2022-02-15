@@ -6,7 +6,7 @@ const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 
 //발송정보 조회
-exports.getDeliveryInfo = async (userIdx, orderCraftIdx) => {
+exports.getSendingInfo = async (userIdx, orderCraftIdx) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
@@ -37,7 +37,7 @@ exports.getDeliveryInfo = async (userIdx, orderCraftIdx) => {
         result = null;
       }
       else{
-        const deliveryInfo = await deliveryDao.getDeliveryInfo(connection, orderCraftIdx);
+        const deliveryInfo = await deliveryDao.getSendingInfo(connection, orderCraftIdx);
         result = {
           'year': deliveryInfo.year,
           'month': deliveryInfo.month,
@@ -52,11 +52,11 @@ exports.getDeliveryInfo = async (userIdx, orderCraftIdx) => {
       
     }catch(err){
       connection.release();
-      logger.error(`getDeliveryInfo DB Query Error: ${err}`);
+      logger.error(`getSendingInfo DB Query Error: ${err}`);
       return errResponse(baseResponse.DB_ERROR);
     }
   }catch(err){
-    logger.error(`getDeliveryInfo DB Connection Error: ${err}`);
+    logger.error(`getSendingInfo DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }

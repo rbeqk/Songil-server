@@ -8,7 +8,7 @@ const axios = require('axios');
 require('dotenv').config();
 
 //발송정보 입력
-exports.createDeliveryInfo = async (userIdx, orderCraftIdx, sentAt, tCode, tInvoice) => {
+exports.createSendingInfo = async (userIdx, orderCraftIdx, sentAt, tCode, tInvoice) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
@@ -49,7 +49,7 @@ exports.createDeliveryInfo = async (userIdx, orderCraftIdx, sentAt, tCode, tInvo
       }
 
       await connection.beginTransaction();
-      await deliveryDao.createDeliveryInfo(connection, orderCraftIdx, sentAt, tCode, tInvoice);
+      await deliveryDao.createSendingInfo(connection, orderCraftIdx, sentAt, tCode, tInvoice);
       await connection.commit();
 
       connection.release();
@@ -58,11 +58,11 @@ exports.createDeliveryInfo = async (userIdx, orderCraftIdx, sentAt, tCode, tInvo
     }catch(err){
       await connection.rollback();
       connection.release();
-      logger.error(`createDeliveryInfo DB Query Error: ${err}`);
+      logger.error(`createSendingInfo DB Query Error: ${err}`);
       return errResponse(baseResponse.DB_ERROR);
     }
   }catch(err){
-    logger.error(`createDeliveryInfo DB Connection Error: ${err}`);
+    logger.error(`createSendingInfo DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }

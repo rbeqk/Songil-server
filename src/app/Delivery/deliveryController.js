@@ -10,7 +10,7 @@ const moment = require('moment');
   [POST] /artist-page/ordrers/:orderDetailIdx/sending
   body: year, month, day, tCode, tInvoice
 */
-exports.createDeliveryInfo = async (req, res) => {
+exports.createSendingInfo = async (req, res) => {
   const {userIdx} = req.verifiedToken;
   const {orderDetailIdx: orderCraftIdx} = req.params;
   const {year, month, day, tCode, tInvoice} = req.body;
@@ -20,8 +20,8 @@ exports.createDeliveryInfo = async (req, res) => {
 
   const sentAt = moment(new Date(`${year}-${month}-${day}`)).format("YYYY-MM-DD");
 
-  const createDeliveryInfo = await deliveryService.createDeliveryInfo(userIdx, orderCraftIdx, sentAt, tCode, tInvoice);
-  return res.send(createDeliveryInfo);
+  const createSendingInfo = await deliveryService.createSendingInfo(userIdx, orderCraftIdx, sentAt, tCode, tInvoice);
+  return res.send(createSendingInfo);
 }
 
 /*
@@ -29,11 +29,11 @@ exports.createDeliveryInfo = async (req, res) => {
   API Name: 발송정보 조회 API
   [GET] /artist-page/ordrers/:orderDetailIdx/sending
 */
-exports.getDeliveryInfo = async (req, res) => {
+exports.getSendingInfo = async (req, res) => {
   const {userIdx} = req.verifiedToken;
   const {orderDetailIdx: orderCraftIdx} = req.params;
 
-  const getDeliveryInfo = await deliveryProvider.getDeliveryInfo(userIdx, orderCraftIdx);
+  const getSendingInfo = await deliveryProvider.getSendingInfo(userIdx, orderCraftIdx);
 
-  return res.send(getDeliveryInfo);
+  return res.send(getSendingInfo);
 }
