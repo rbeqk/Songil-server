@@ -1,6 +1,7 @@
 const baseResponse = require('../../../config/baseResponseStatus');
 const { errResponse } = require('../../../config/response');
 const deliveryService = require("./deliveryService");
+const deliveryProvider = require("./deliveryProvider");
 const moment = require('moment');
 
 /*
@@ -21,4 +22,18 @@ exports.createDeliveryInfo = async (req, res) => {
 
   const createDeliveryInfo = await deliveryService.createDeliveryInfo(userIdx, orderCraftIdx, sentAt, tCode, tInvoice);
   return res.send(createDeliveryInfo);
+}
+
+/*
+  API No. 10.8
+  API Name: 발송정보 조회 API
+  [GET] /artist-page/ordrers/:orderDetailIdx/sending
+*/
+exports.getDeliveryInfo = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {orderDetailIdx: orderCraftIdx} = req.params;
+
+  const getDeliveryInfo = await deliveryProvider.getDeliveryInfo(userIdx, orderCraftIdx);
+
+  return res.send(getDeliveryInfo);
 }

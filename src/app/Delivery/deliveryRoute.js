@@ -4,4 +4,7 @@ module.exports = function (app){
 
   //발송정보 입력 API
   app.post('/artist-page/ordrers/:orderDetailIdx/sending', jwtMiddleware, deliveryController.createDeliveryInfo);
+
+  //발송정보  조회 API
+  app.get('/artist-page/ordrers/:orderDetailIdx/sending', jwtMiddleware, deliveryController.getDeliveryInfo);
 }

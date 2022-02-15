@@ -34,8 +34,32 @@ async function createDeliveryInfo(connection, orderCraftIdx, sentAt, tCode, tInv
   return rows;
 }
 
+//발송정보 입력했는지
+async function isEnteredDeliveryInfo(connection, orderCraftIdx){
+  const query = `
+  SELECT IF(tInvoice IS NULL, 0, 1) as isExist
+  FROM OrderCraft
+  WHERE orderCraftIdx = ${orderCraftIdx}
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['isExist'];
+}
+
+//발송정보 가져오기
+async function getDeliveryInfo(connection, orderCraftIdx){
+  const query = `
+  SELECT YEAR(sentAt) as year, MONTH(sentAt) as month, DAY(sentAt) as day, tCode, tInvoice
+  FROM OrderCraft
+  WHERE orderCraftIdx = ${orderCraftIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0];
+}
+
 module.exports = {
   isExistOrderCraftIdx,
   isArtistOrderCraftIdx,
   createDeliveryInfo,
+  isEnteredDeliveryInfo,
+  getDeliveryInfo,
 }
