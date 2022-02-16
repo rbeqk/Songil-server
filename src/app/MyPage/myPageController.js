@@ -75,3 +75,15 @@ exports.updateUserProfile = async (req, res) => {
   const updateUserProfile = await myPageService.updateUserProfile(userIdx, nickname, userProfile);
   return res.send(updateUserProfile);
 }
+
+/*
+  API No. 8.2
+  API Name: 마이페이지 조회 API
+  [GET] /my-page
+*/
+exports.getMyPage = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+
+  const getMyPage = await myPageProvider.getMyPage(userIdx);
+  return res.send(getMyPage);
+}

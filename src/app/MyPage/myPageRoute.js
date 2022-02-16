@@ -14,4 +14,7 @@ module.exports  = function(app){
 
   //프로필 수정 API
   app.patch('/my-page/profile', jwtMiddleware, userProfileUpload.single('userProfile'), myPageController.updateUserProfile);
+
+  //마이페이지 조회 API
+  app.get('/my-page', jwtMiddleware, myPageController.getMyPage);
 }

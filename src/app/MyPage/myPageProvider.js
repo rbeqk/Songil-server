@@ -149,3 +149,41 @@ exports.getUserWrittenWithComment = async (userIdx, page) => {
     return errResponse(baseResponse.DB_ERROR);
   }
 }
+
+//마이페이지 조회
+exports.getMyPage = async (userIdx) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+      const basicInfo = await myPageDao.getMyBasicInfo(connection, userIdx);
+      const benefitCnt = await myPageDao.getUserBenefitCnt(connection, userIdx);
+      const likedCraftCnt = await myPageDao.getUserLikedCraftCnt(connection, userIdx);
+      const orderCnt = await myPageDao.getUserOrderCnt(connection, userIdx);
+      const commentCnt = await myPageDao.getUserCommentCnt(connection, userIdx);
+      const askCnt = await myPageDao.getUserAskCnt(connection, userIdx);
+
+      const result = {
+        'userIdx': userIdx,
+        'userName': basicInfo.userName,
+        'userProfile': basicInfo.userProfile,
+        'point': basicInfo.point,
+        benefitCnt,
+        likedCraftCnt,
+        orderCnt,
+        commentCnt,
+        askCnt
+      };
+
+      connection.release();
+      return response(baseResponse.SUCCESS, result);
+
+    }catch(err){
+      connection.release();
+      logger.error(`getMyPage DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`getMyPage DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}

@@ -274,6 +274,72 @@ async function updateUserProfile(connection, userIdx, nickname, userProfile){
   return rows;
 }
 
+//유저 기본 정보 가져오기
+async function getMyBasicInfo(connection, userIdx){
+  const query = `
+  SELECT nickname AS userName, imageUrl AS userProfile, point
+  FROM User
+  WHERE userIdx = ${userIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0];
+}
+
+//유저 베네핏 개수 가져오기
+async function getUserBenefitCnt(connection, userIdx){
+  const query = `
+  SELECT COUNT(UB.benefitIdx) AS totalCnt
+  FROM UserBenefit UB
+          JOIN Benefit B ON B.benefitIdx = UB.benefitIdx && B.isDeleted = 'N' && deadline > NOW()
+  WHERE UB.userIdx = ${userIdx} && UB.isUsed = 'N' && UB.isDeleted = 'N';
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['totalCnt'];
+}
+
+//유저 찜한 상품 개수 가져오기
+async function getUserLikedCraftCnt(connection, userIdx){
+  const query = `
+  SELECT COUNT(craftIdx) AS totalCnt
+  FROM CraftLike
+  WHERE userIdx = ${userIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['totalCnt'];
+}
+
+//유저 주문현황 개수 가져오기
+async function getUserOrderCnt(connection, userIdx){
+  const query = `
+  SELECT COUNT(orderIdx) AS totalCnt FROM OrderT
+  WHERE userIdx = ${userIdx} && isPaid = 'Y';
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['totalCnt'];
+}
+
+//유저 내 코멘트(=상품 댓글) 개수 가져오기
+async function getUserCommentCnt(connection, userIdx){
+  const query = `
+  SELECT COUNT(craftCommentIdx) AS totalCnt
+  FROM CraftComment
+  WHERE userIdx = ${userIdx} && isDeleted = 'N';
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['totalCnt'];
+}
+
+//유저의 1:1 문의 개수 가져오기
+async function getUserAskCnt(connection, userIdx){
+  const query = `
+  SELECT COUNT(askIdx) AS totalCnt
+  FROM Ask
+  WHERE userIdx = ${userIdx} && isDeleted = 'N';
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['totalCnt'];
+}
+
 module.exports = {
   getWrittenComment,
   getArtistIdx,
@@ -281,4 +347,10 @@ module.exports = {
   getUserWrittenWithComment,
   isExistNickname,
   updateUserProfile,
+  getMyBasicInfo,
+  getUserBenefitCnt,
+  getUserLikedCraftCnt,
+  getUserOrderCnt,
+  getUserCommentCnt,
+  getUserAskCnt,
 }
