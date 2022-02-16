@@ -21,7 +21,7 @@ async function getAsk(connection, userIdx, startItemIdx, itemPerPage){
         C.artistIdx,
         U.nickname                                          as artistName,
         AA.content                                          as answerContent,
-        DATE_FORMAT(A.createdAt, '%Y.%m.%d. %k:%i')         as answerCreatedAt
+        DATE_FORMAT(AA.createdAt, '%Y.%m.%d. %k:%i')         as answerCreatedAt
   FROM Ask A
           LEFT JOIN OrderCraft OC on A.orderCraftIdx = OC.orderCraftIdx
           LEFT JOIN AskAnswer AA on A.askIdx = AA.askIdx && AA.isDeleted = 'N'
