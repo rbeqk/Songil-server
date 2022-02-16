@@ -254,23 +254,23 @@ async function getUserWrittenWithComment(connection, userIdx, startItemIdx, item
 }
 
 //기존에 존재하는 닉네임인지(자기 자신 제외)
-async function isExistNickname(connection, userIdx, nickname){
+async function isExistNickname(connection, userIdx, userName){
   const query = `
   SELECT EXISTS(SELECT * FROM User WHERE nickname = ? && userIdx != ${userIdx} && isDeleted = 'N') as isExist;
   `;
-  const [rows] = await connection.query(query, [nickname]);
+  const [rows] = await connection.query(query, [userName]);
   return rows[0]['isExist'];
 }
 
 //유저 프로필 수정
-async function updateUserProfile(connection, userIdx, nickname, userProfile){
+async function updateUserProfile(connection, userIdx, userName, userProfile){
   const query = `
   UPDATE User
   SET nickname = IFNULL(?, nickname),
       imageUrl = IFNULL(?, imageUrl)
   WHERE userIdx = ${userIdx};
   `;
-  const [rows] = await connection.query(query, [nickname, userProfile]);
+  const [rows] = await connection.query(query, [userName, userProfile]);
   return rows;
 }
 

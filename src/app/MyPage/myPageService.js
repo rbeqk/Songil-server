@@ -6,14 +6,14 @@ const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 
 //유저 프로필 수정
-exports.updateUserProfile = async (userIdx, nickname, userProfile) => {
+exports.updateUserProfile = async (userIdx, userName, userProfile) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
 
       //기존에 존재하는 닉네임인지
-      if (nickname){
-        const isExistNickname = await myPageDao.isExistNickname(connection, userIdx, nickname);
+      if (userName){
+        const isExistNickname = await myPageDao.isExistNickname(connection, userIdx, userName);
         if (isExistNickname){
           connection.release();
           return errResponse(baseResponse.DUPLICATED_NICKNAME);
@@ -21,7 +21,7 @@ exports.updateUserProfile = async (userIdx, nickname, userProfile) => {
       }
 
       await connection.beginTransaction();
-      await myPageDao.updateUserProfile(connection, userIdx, nickname, userProfile);
+      await myPageDao.updateUserProfile(connection, userIdx, userName, userProfile);
       await connection.commit();
 
       connection.release();
