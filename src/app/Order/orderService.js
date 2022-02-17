@@ -8,14 +8,14 @@ const {getCanUseBenefitIdxArr} = require('../../../modules/benefitUtil');
 const RestClient = require('@bootpay/server-rest-client').RestClient;
 const {appliedBenefitInfo} = require('../../../modules/benefitUtil');
 
-exports.addCraftInOrderSheet = async (userIdx, craftIdxArr, amountArr) => {
+exports.addCraftInOrderSheet = async (userIdx, crafts) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
 
       //존재&&품절X 상품 idx 개수
-      const existCraftIdxLen = await orderDao.getExistCraftIdxLen(connection, craftIdxArr);
-      if (existCraftIdxLen !== craftIdxArr.length){
+      const existCraftIdxLen = await orderDao.getExistCraftIdxLen(connection, crafts.map(item => item.craftIdx));
+      if (existCraftIdxLen !== crafts.length){
         connection.release();
         return errResponse(baseResponse.INVALID_CRAFT_IDX);
       }
@@ -23,13 +23,12 @@ exports.addCraftInOrderSheet = async (userIdx, craftIdxArr, amountArr) => {
       //기존에 주문 안한 주문서 내역 다 삭제
       await orderDao.deleteUserNotPaidOrderSheet(connection, userIdx);
 
-      const craftLength = craftIdxArr.length;
+      const craftLength = crafts.length;
       let totalCraftPriceArr = [];
       let basicShippingFeeArr = [];
 
       for (let i=0; i<craftLength; i++){
-        const craftIdx = craftIdxArr[i];
-        const amount = amountArr[i];
+        const {craftIdx, amount} = crafts[i];
 
         const craftPrice = await orderDao.getCraftPrice(connection, craftIdx);
         const totalCraftPrice = craftPrice * amount;
@@ -49,8 +48,7 @@ exports.addCraftInOrderSheet = async (userIdx, craftIdxArr, amountArr) => {
       const orderIdx = createOrder.insertId;
 
       for (let i=0; i<craftLength; i++){
-        const craftIdx = craftIdxArr[i];
-        const amount = amountArr[i];
+        const {craftIdx, amount} = crafts[i];
         const totalCraftPrice = totalCraftPriceArr[i];
         const basicShippingFee = basicShippingFeeArr[i];
 
@@ -64,7 +62,7 @@ exports.addCraftInOrderSheet = async (userIdx, craftIdxArr, amountArr) => {
       result.craft = [];
 
       for (let i =0; i<craftLength; i++){
-        const craftIdx = craftIdxArr[i];
+        const {craftIdx, amount} = crafts[i];
         const craftInfo = await orderDao.getCraftInfo(connection, craftIdx);
         result.craft.push({
           'craftIdx': craftIdx,
@@ -73,7 +71,7 @@ exports.addCraftInOrderSheet = async (userIdx, craftIdxArr, amountArr) => {
           'artistIdx': craftInfo.artistIdx,
           'artistName': craftInfo.artistName,
           'price': totalCraftPriceArr[i],
-          'amount': amountArr[i]
+          'amount': amount
         });
       }
 

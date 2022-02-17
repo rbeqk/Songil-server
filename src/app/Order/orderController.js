@@ -9,17 +9,24 @@ const validator = require("validator");
   API No. 12.1
   API Name: 주문서 상품 추가 API
   [POST] /order/crafts
-  body: craftIdxArr, amountArr
+  body: crafts
 */
 exports.addCraftInOrderSheet = async (req, res) => {
-  const {craftIdxArr, amountArr} = req.body;
+  const {crafts} = req.body;
   const {userIdx} = req.verifiedToken;
 
-  if (!(craftIdxArr && amountArr)) return res.send(errResponse(baseResponse.IS_EMPTY));
-  if (craftIdxArr.length !== amountArr.length) return res.send(errResponse(baseResponse.INVALID_CRAFT_AMOUNT_LENGTH));
-  if (amountArr.filter(item => item < 1).length > 0) return res.send(errResponse(baseResponse.INVALID_AMOUNT));
+  if (!crafts) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (!Array.isArray(crafts)) return res.send(errResponse(baseResponse.INVALID_FORMAT_TYPE));
+  if (crafts.length < 1) return res.send(errResponse(baseResponse.IS_EMPTY));
+  
+  for (let item of crafts){
+    if (typeof item !== 'object') return res.send(errResponse(baseResponse.INVALID_FORMAT_TYPE));
+    if (!item.hasOwnProperty('craftIdx')) return res.send(errResponse(baseResponse.INVALID_FORMAT_TYPE));
+    if (!item.hasOwnProperty('amount')) return res.send(errResponse(baseResponse.INVALID_FORMAT_TYPE));
+  }
+  if (crafts.filter(item => item.amount < 1).length > 0) return res.send(errResponse(baseResponse.INVALID_AMOUNT));
 
-  const addCraftInOrderSheet = await orderService.addCraftInOrderSheet(userIdx, craftIdxArr, amountArr);
+  const addCraftInOrderSheet = await orderService.addCraftInOrderSheet(userIdx, crafts);
   
   return res.send(addCraftInOrderSheet);
 }
