@@ -109,7 +109,7 @@ deleteAppliedBenefit = async (connection, orderIdx) => {
       await connection.commit();
     }
 
-    const result = new appliedBenefitInfo(null, null, null, finalPrice);
+    const result = new appliedBenefitInfo(null, null, 0, finalPrice);
     return response(baseResponse.SUCCESS, result);
 
   }catch(err){
