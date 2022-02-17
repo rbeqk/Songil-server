@@ -1,4 +1,4 @@
-const {USE_POINT_WHEN_PAYING} = require('../../../modules/constants');
+const {POINT_INFO} = require('../../../modules/constants');
 
 //기존에 주문 안한 주문서 내역 다 삭제
 async function deleteUserNotPaidOrderSheet(connection, userIdx){
@@ -389,7 +389,7 @@ async function updateUserUsedPoint(connection, userIdx, orderIdx){
   if (pointDiscount > 0){
     const updatePointStatusQuery = `
     INSERT INTO PointStatus (userIdx, point, pointInfoIdx)
-    VALUES (${userIdx}, -${pointDiscount}, ${USE_POINT_WHEN_PAYING});
+    VALUES (${userIdx}, -${pointDiscount}, ${POINT_INFO.USED_POINT_WHEN_PAYING});
     `;
     await connection.query(updatePointStatusQuery);
 

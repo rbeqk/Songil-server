@@ -4,7 +4,7 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
-const {STORY_COMMENT_PER_PAGE} = require("../../../modules/constants");
+const {ITEMS_PER_PAGE} = require("../../../modules/constants");
 
 //스토리 댓글 조회
 exports.getStoryComment = async (storyIdx, userIdx, page) => {
@@ -19,10 +19,12 @@ exports.getStoryComment = async (storyIdx, userIdx, page) => {
         return errResponse(baseResponse.INVALID_STORY_IDX);
       }
 
-      const startItemIdx = (page - 1) * STORY_COMMENT_PER_PAGE;
+      const startItemIdx = (page - 1) * ITEMS_PER_PAGE.STORY_COMMENT_PER_PAGE;
 
       //부모 댓글 가져오기
-      const parentComment = await storyCommentDao.getStoryParentComment(connection, storyIdx, userIdx, startItemIdx, STORY_COMMENT_PER_PAGE);
+      const parentComment = await storyCommentDao.getStoryParentComment(
+        connection, storyIdx, userIdx, startItemIdx, ITEMS_PER_PAGE.STORY_COMMENT_PER_PAGE
+      );
 
       let result = [];
 

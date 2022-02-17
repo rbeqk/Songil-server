@@ -4,8 +4,8 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
-const {getTotalPage} = require("../../../modules/pageUtil");
-const {CRAFT_COMMENT_PER_PAGE} = require("../../../modules/constants");
+const {getTotalPage, pageInfo} = require("../../../modules/pageUtil");
+const {ITEMS_PER_PAGE} = require("../../../modules/constants");
 
 exports.getCommentTotalPage = async (craftIdx, type) => {
   try{
@@ -30,11 +30,8 @@ exports.getCommentTotalPage = async (craftIdx, type) => {
         totalCnt = await craftCommentDao.getCommentCnt(connection, craftIdx);
       }
 
-      const totalPages = getTotalPage(totalCnt, CRAFT_COMMENT_PER_PAGE);
-      const result = {
-        'totalPages': totalPages,
-        'itemsPerPage': CRAFT_COMMENT_PER_PAGE
-      };
+      const totalPages = getTotalPage(totalCnt, ITEMS_PER_PAGE.CRAFT_COMMENT_PER_PAGE);
+      const result = new pageInfo(totalPages, ITEMS_PER_PAGE.CRAFT_COMMENT_PER_PAGE);
 
       connection.release();
       return response(baseResponse.SUCCESS, result);
@@ -79,17 +76,21 @@ exports.getComment = async (craftIdx, page, type) => {
       result.comments = [];
 
       let commentInfo;
-      const startItemIdx = (page - 1) * CRAFT_COMMENT_PER_PAGE;
+      const startItemIdx = (page - 1) * ITEMS_PER_PAGE.CRAFT_COMMENT_PER_PAGE;
 
       if (commentCnt > 0){
 
         //포토댓글만
         if (type === 'photo'){
-          commentInfo = await craftCommentDao.getCommentInfoOnlyPhoto(connection, craftIdx, startItemIdx, CRAFT_COMMENT_PER_PAGE);
+          commentInfo = await craftCommentDao.getCommentInfoOnlyPhoto(
+            connection, craftIdx, startItemIdx, ITEMS_PER_PAGE.CRAFT_COMMENT_PER_PAGE
+          );
         }
         //댓글 전체
         else if (type === 'all'){
-          commentInfo = await craftCommentDao.getCommentInfo(connection, craftIdx, startItemIdx, CRAFT_COMMENT_PER_PAGE);
+          commentInfo = await craftCommentDao.getCommentInfo(
+            connection, craftIdx, startItemIdx, ITEMS_PER_PAGE.CRAFT_COMMENT_PER_PAGE
+          );
         }
 
         let commentIdx;

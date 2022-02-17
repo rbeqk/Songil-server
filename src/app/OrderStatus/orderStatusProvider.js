@@ -3,7 +3,7 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
-const {MY_PAGE_ORDER_LIST_PER_PAGE} = require("../../../modules/constants");
+const {ITEMS_PER_PAGE} = require("../../../modules/constants");
 
 //결제 정보 조회
 exports.getOrderDetail = async (userIdx, orderCraftIdx) => {
@@ -44,10 +44,12 @@ exports.getOrderList = async (userIdx, page) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
-      const startItemIdx = (page-1) * MY_PAGE_ORDER_LIST_PER_PAGE;
+      const startItemIdx = (page-1) * ITEMS_PER_PAGE.MY_PAGE_ORDER_LIST_PER_PAGE;
       let result = [];
 
-      const userOrderInfoArr = await orderStatusDao.getUserOrderInfoArr(connection, userIdx, startItemIdx, MY_PAGE_ORDER_LIST_PER_PAGE);
+      const userOrderInfoArr = await orderStatusDao.getUserOrderInfoArr(
+        connection, userIdx, startItemIdx, ITEMS_PER_PAGE.MY_PAGE_ORDER_LIST_PER_PAGE
+      );
       for (let i=0; i<userOrderInfoArr.length; i++){
         const {orderIdx, createdAt} = userOrderInfoArr[i];
         const orderCraftInfoArr = await orderStatusDao.getOrderCraftInfoArr(connection, orderIdx);

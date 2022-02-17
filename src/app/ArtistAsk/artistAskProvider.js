@@ -3,8 +3,8 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
-const {getTotalPage} = require("../../../modules/pageUtil");
-const {ARTIST_ASK_ASK_PER_PAGE} = require("../../../modules/constants");
+const {pageInfo, getTotalPage} = require("../../../modules/pageUtil");
+const {ITEMS_PER_PAGE} = require("../../../modules/constants");
 
 exports.getAskTotalPage = async (userIdx) => {
   try{
@@ -22,12 +22,9 @@ exports.getAskTotalPage = async (userIdx) => {
       const artistIdx = await artistAskDao.getArtistIdx(connection, userIdx);
 
       const totalCnt = await artistAskDao.getAskCnt(connection, artistIdx);
-      const totalPages = getTotalPage(totalCnt, ARTIST_ASK_ASK_PER_PAGE);
+      const totalPages = getTotalPage(totalCnt, ITEMS_PER_PAGE.ARTIST_ASK_ASK_PER_PAGE);
       
-      const result = {
-        'totalPages': totalPages,
-        'itemsPerPage': ARTIST_ASK_ASK_PER_PAGE
-      };
+      const result = new pageInfo(totalPages, ITEMS_PER_PAGE.ARTIST_ASK_ASK_PER_PAGE);
 
       connection.release();
       return response(baseResponse.SUCCESS, result);
@@ -58,13 +55,13 @@ exports.getAsk = async (userIdx, page) => {
       //작가idx 가져오기
       const artistIdx = await artistAskDao.getArtistIdx(connection, userIdx);
       
-      const startItemIdx = (page - 1) * ARTIST_ASK_ASK_PER_PAGE;
+      const startItemIdx = (page - 1) * ITEMS_PER_PAGE.ARTIST_ASK_ASK_PER_PAGE;
 
       //작가의 문의 목록 가져오기
       const askList = await artistAskDao.getAskList(connection, artistIdx);
 
       //문의 목록 상세 정보 가져오기
-      const askInfo = await artistAskDao.getAskInfo(connection, askList, startItemIdx, ARTIST_ASK_ASK_PER_PAGE);
+      const askInfo = await artistAskDao.getAskInfo(connection, askList, startItemIdx, ITEMS_PER_PAGE.ARTIST_ASK_ASK_PER_PAGE);
 
       let result = [];
       

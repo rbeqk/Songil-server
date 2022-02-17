@@ -3,7 +3,7 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
-const {ABTEST} = require('../../../modules/constants');
+const {CATEGORY} = require('../../../modules/constants');
 
 exports.createABTest = async (userIdx, content, deadline, imageArr) => {
   try{
@@ -229,7 +229,7 @@ exports.reportABTest = async (userIdx, abTestIdx, reportedReasonIdx, etcReason) 
       }
 
       //기존에 신고한 abTest인지
-      const isAlreadyReportedABTest = await abTestDao.isAlreadyReportedABTest(connection, userIdx, abTestIdx, ABTEST);
+      const isAlreadyReportedABTest = await abTestDao.isAlreadyReportedABTest(connection, userIdx, abTestIdx, CATEGORY.ABTEST);
       if (isAlreadyReportedABTest){
         connection.release();
         return errResponse(baseResponse.ALREADY_REPORTED_IDX);
@@ -243,7 +243,7 @@ exports.reportABTest = async (userIdx, abTestIdx, reportedReasonIdx, etcReason) 
       }
 
       await connection.beginTransaction();
-      await abTestDao.reportABTest(connection, userIdx, abTestIdx, ABTEST, reportedReasonIdx, etcReason);
+      await abTestDao.reportABTest(connection, userIdx, abTestIdx, CATEGORY.ABTEST, reportedReasonIdx, etcReason);
       await connection.commit();
       
       connection.release();

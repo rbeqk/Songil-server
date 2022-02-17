@@ -4,7 +4,7 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
-const {CRAFT} = require('../../../modules/constants');
+const {CATEGORY} = require('../../../modules/constants');
 
 //상품 댓글 신고
 exports.reportComment = async (userIdx, craftCommentIdx, reportedReasonIdx, etcReason) => {
@@ -20,7 +20,9 @@ exports.reportComment = async (userIdx, craftCommentIdx, reportedReasonIdx, etcR
       }
 
       //사용자가 기존에 신고한 상품 댓글 idx인지
-      const isAlreadyReportedCraftComment = await craftCommentDao.isAlreadyReportedCraftComment(connection, userIdx, craftCommentIdx, CRAFT);
+      const isAlreadyReportedCraftComment = await craftCommentDao.isAlreadyReportedCraftComment(
+        connection, userIdx, craftCommentIdx, CATEGORY.CRAFT
+      );
       if (isAlreadyReportedCraftComment){
         connection.release();
         return errResponse(baseResponse.ALREADY_REPORTED_IDX);
@@ -34,7 +36,9 @@ exports.reportComment = async (userIdx, craftCommentIdx, reportedReasonIdx, etcR
       }
 
       await connection.beginTransaction();
-      await craftCommentDao.reportCraftComment(connection, userIdx, craftCommentIdx, reportedReasonIdx, etcReason, CRAFT);
+      await craftCommentDao.reportCraftComment(
+        connection, userIdx, craftCommentIdx, reportedReasonIdx, etcReason, CATEGORY.CRAFT
+      );
       await connection.commit();
 
       connection.release();

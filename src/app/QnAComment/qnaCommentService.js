@@ -4,7 +4,7 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
-const {QNA} = require('../../../modules/constants');
+const {CATEGORY} = require('../../../modules/constants');
 
 exports.createQnAComment = async (userIdx, qnaIdx, parentIdx, comment) => {
   try{
@@ -101,7 +101,9 @@ exports.reportQnAComment = async (qnaCommentIdx, userIdx, reportedReasonIdx, etc
       }
 
       //사용자가 기존에 신고한 QnA 댓글 idx인지
-      const isAlreadyReportedQnACommentIdx = await qnaCommentDao.isAlreadyReportedQnACommentIdx(connection, userIdx, qnaCommentIdx, QNA);
+      const isAlreadyReportedQnACommentIdx = await qnaCommentDao.isAlreadyReportedQnACommentIdx(
+        connection, userIdx, qnaCommentIdx, CATEGORY.QNA
+      );
       if (isAlreadyReportedQnACommentIdx){
         connection.release();
         return errResponse(baseResponse.ALREADY_REPORTED_IDX);
@@ -115,7 +117,9 @@ exports.reportQnAComment = async (qnaCommentIdx, userIdx, reportedReasonIdx, etc
       }
 
       await connection.beginTransaction();
-      await qnaCommentDao.reportQnAComment(connection, qnaCommentIdx, userIdx, reportedReasonIdx, etcReason, QNA);
+      await qnaCommentDao.reportQnAComment(
+        connection, qnaCommentIdx, userIdx, reportedReasonIdx, etcReason, CATEGORY.QNA
+      );
       await connection.commit();
       
       connection.release();

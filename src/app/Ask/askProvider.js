@@ -3,16 +3,16 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
-const {USER_ASK_PER_PAGE} = require("../../../modules/constants");
+const {ITEMS_PER_PAGE} = require("../../../modules/constants");
 
 exports.getAsk = async (userIdx, page) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
       let result = [];
-      const startItemIdx = (page - 1) * USER_ASK_PER_PAGE;
+      const startItemIdx = (page - 1) * ITEMS_PER_PAGE.USER_ASK_PER_PAGE;
 
-      const ask = await askDao.getAsk(connection, userIdx, startItemIdx, USER_ASK_PER_PAGE);
+      const ask = await askDao.getAsk(connection, userIdx, startItemIdx, ITEMS_PER_PAGE.USER_ASK_PER_PAGE);
 
       ask.forEach(item => {
         result.push({

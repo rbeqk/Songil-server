@@ -5,7 +5,7 @@ const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 const {getABTestFinalInfo, getUserVoteInfo} = require('../../../modules/abTestUtil');
 const {pageInfo, getTotalPage} = require("../../../modules/pageUtil");
-const {WITH_BY_CATEGORY_PER_PAGE} = require("../../../modules/constants");
+const {ITEMS_PER_PAGE} = require("../../../modules/constants");
 
 exports.getHotTalk = async () => {
   try{
@@ -57,9 +57,8 @@ exports.getTotalWithPage = async (category) => {
         totalCnt = await withDao.getABTestTotalCnt(connection);
       }
 
-      const totalPages = getTotalPage(totalCnt, WITH_BY_CATEGORY_PER_PAGE);
-
-      const result = new pageInfo(totalPages, WITH_BY_CATEGORY_PER_PAGE);
+      const totalPages = getTotalPage(totalCnt, ITEMS_PER_PAGE.WITH_BY_CATEGORY_PER_PAGE);
+      const result = new pageInfo(totalPages, ITEMS_PER_PAGE.WITH_BY_CATEGORY_PER_PAGE);
 
       connection.release();
       return response(baseResponse.SUCCESS, result);
@@ -82,14 +81,16 @@ exports.getWith = async (category, sort, page, userIdx) => {
     try{
 
       let result;
-      const startItemIdx = (page - 1) * WITH_BY_CATEGORY_PER_PAGE;
+      const startItemIdx = (page - 1) * ITEMS_PER_PAGE.WITH_BY_CATEGORY_PER_PAGE;
 
       if (category === 'story'){
         result = {};
         result.totalCnt = await withDao.getStoryTotalCnt(connection);
         
         result.story = [];
-        const story = await withDao.getStory(connection, userIdx, sort, startItemIdx, WITH_BY_CATEGORY_PER_PAGE);
+        const story = await withDao.getStory(
+          connection, userIdx, sort, startItemIdx, ITEMS_PER_PAGE.WITH_BY_CATEGORY_PER_PAGE
+        );
 
         story.forEach(item => {
           result.story.push({
@@ -108,7 +109,9 @@ exports.getWith = async (category, sort, page, userIdx) => {
       else if (category === 'qna'){
         result = [];
 
-        const qna = await withDao.getQnA(connection, userIdx, sort, startItemIdx, WITH_BY_CATEGORY_PER_PAGE);
+        const qna = await withDao.getQnA(
+          connection, userIdx, sort, startItemIdx, ITEMS_PER_PAGE.WITH_BY_CATEGORY_PER_PAGE
+        );
 
         qna.forEach(item => {
           result.push({
@@ -131,7 +134,9 @@ exports.getWith = async (category, sort, page, userIdx) => {
       }
       else if (category === 'ab-test'){
         result = [];
-        const abTest = await withDao.getABTest(connection, startItemIdx, WITH_BY_CATEGORY_PER_PAGE);
+        const abTest = await withDao.getABTest(
+          connection, startItemIdx, ITEMS_PER_PAGE.WITH_BY_CATEGORY_PER_PAGE
+        );
 
         for (let item of abTest){
 

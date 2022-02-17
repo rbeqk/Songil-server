@@ -4,12 +4,8 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
-const {getTotalPage} = require("../../../modules/pageUtil");
-const {
-  ARTIST_PLACE_ARTIST_CRAFT_PER_PAGE,
-  ARTIST_PLACE_ARTIST_ARTICLE_PER_PAGE
-} = require("../../../modules/constants");
-const {pageInfo} = require("../../../modules/pageUtil");
+const {pageInfo, getTotalPage} = require("../../../modules/pageUtil");
+const {ITEMS_PER_PAGE} = require("../../../modules/constants");
 
 //총 아티클 수 가져오기
 const getTotalArticleCnt = async (connection, artistIdx) => {
@@ -118,9 +114,9 @@ exports.getArtistCraftTotalPage = async (artistIdx) => {
       }
 
       const totalCnt = await artistPlaceDao.getArtistCraftCnt(connection, artistIdx);
-      const totalPages = getTotalPage(totalCnt, ARTIST_PLACE_ARTIST_CRAFT_PER_PAGE);
+      const totalPages = getTotalPage(totalCnt, ITEMS_PER_PAGE.ARTIST_PLACE_ARTIST_CRAFT_PER_PAGE);
       
-      const result = new pageInfo(totalPages, ARTIST_PLACE_ARTIST_CRAFT_PER_PAGE);
+      const result = new pageInfo(totalPages, ITEMS_PER_PAGE.ARTIST_PLACE_ARTIST_CRAFT_PER_PAGE);
       
       connection.release();
       return response(baseResponse.SUCCESS, result);
@@ -150,11 +146,12 @@ exports.getArtistCraft = async (artistIdx, page, sort, userIdx) => {
 
       //작가의 총 craft 개수
       const totalCraftCnt = await artistPlaceDao.getArtistCraftCnt(connection, artistIdx);
-      const startItemIdx = (page - 1) * ARTIST_PLACE_ARTIST_CRAFT_PER_PAGE;
+      const startItemIdx = (page - 1) * ITEMS_PER_PAGE.ARTIST_PLACE_ARTIST_CRAFT_PER_PAGE;
 
       //작가의 craft 가져오기
       //sort popular: 인기순 / new: 최신순 / comment: 댓글많은순 / price: 가격낮은순
-      const artistCraft = (totalCraftCnt !== 0) ? await artistPlaceDao.getArtistCraft(connection, artistIdx, sort, startItemIdx, ARTIST_PLACE_ARTIST_CRAFT_PER_PAGE) : [];
+      const artistCraft = (totalCraftCnt !== 0) ? await artistPlaceDao.getArtistCraft(
+        connection, artistIdx, sort, startItemIdx, ITEMS_PER_PAGE.ARTIST_PLACE_ARTIST_CRAFT_PER_PAGE) : [];
 
       let result = {};
       result.totalCraftCnt = totalCraftCnt;
@@ -213,8 +210,8 @@ exports.getArtistArticleTotalPage = async (artistIdx) => {
         return errResponse(baseResponse.DB_ERROR);
       }
 
-      const totalPages = getTotalPage(totalCnt, ARTIST_PLACE_ARTIST_ARTICLE_PER_PAGE);
-      const result = new pageInfo(totalPages, ARTIST_PLACE_ARTIST_ARTICLE_PER_PAGE);
+      const totalPages = getTotalPage(totalCnt, ITEMS_PER_PAGE.ARTIST_PLACE_ARTIST_ARTICLE_PER_PAGE);
+      const result = new pageInfo(totalPages, ITEMS_PER_PAGE.ARTIST_PLACE_ARTIST_ARTICLE_PER_PAGE);
 
       connection.release();
       return response(baseResponse.SUCCESS, result);
@@ -268,14 +265,15 @@ exports.getArtistArticle = async (artistIdx, page, sort, userIdx) => {
       articleList = [...new Set(articleList)];  //작가 관련 아티클 목록
 
       const totalArticleCnt = articleList.length;
-      const startItemIdx = (page - 1) * ARTIST_PLACE_ARTIST_ARTICLE_PER_PAGE;
+      const startItemIdx = (page - 1) * ITEMS_PER_PAGE.ARTIST_PLACE_ARTIST_ARTICLE_PER_PAGE;
 
       let result = {};
       result.totalArticleCnt = totalArticleCnt;
 
       //작가의 article 가져오기
       //sort popular: 인기순 / new: 최신순
-      const artistArticle = (totalArticleCnt !== 0) ? await artistPlaceDao.getArtistArticle(connection, articleList, sort, startItemIdx, ARTIST_PLACE_ARTIST_ARTICLE_PER_PAGE) : [];
+      const artistArticle = (totalArticleCnt !== 0) ? await artistPlaceDao.getArtistArticle(
+        connection, articleList, sort, startItemIdx, ITEMS_PER_PAGE.ARTIST_PLACE_ARTIST_ARTICLE_PER_PAGE) : [];
 
       result.article = [];
 

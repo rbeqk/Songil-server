@@ -4,7 +4,7 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
-const {ABTEST} = require('../../../modules/constants');
+const {CATEGORY} = require('../../../modules/constants');
 
 exports.createABTestComment = async (userIdx, abTestIdx, parentIdx, comment) => {
   try{
@@ -101,7 +101,7 @@ exports.reportABTestComment = async (abTestCommentIdx, userIdx, reportedReasonId
       }
 
       //사용자가 기존에 신고한 ABTest 댓글 idx인지
-      const isAlreadyReportedABTestCommentIdx = await abTestCommentDao.isAlreadyReportedABTestCommentIdx(connection, userIdx, abTestCommentIdx, ABTEST);
+      const isAlreadyReportedABTestCommentIdx = await abTestCommentDao.isAlreadyReportedABTestCommentIdx(connection, userIdx, abTestCommentIdx, CATEGORY.ABTEST);
       if (isAlreadyReportedABTestCommentIdx){
         connection.release();
         return errResponse(baseResponse.ALREADY_REPORTED_IDX);
@@ -115,7 +115,7 @@ exports.reportABTestComment = async (abTestCommentIdx, userIdx, reportedReasonId
       }
 
       await connection.beginTransaction();
-      await abTestCommentDao.reportABTestComment(connection, abTestCommentIdx, userIdx, reportedReasonIdx, etcReason, ABTEST);
+      await abTestCommentDao.reportABTestComment(connection, abTestCommentIdx, userIdx, reportedReasonIdx, etcReason, CATEGORY.ABTEST);
       await connection.commit();
       
       connection.release();

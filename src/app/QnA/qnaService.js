@@ -3,7 +3,7 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
-const {QNA} = require('../../../modules/constants');
+const {CATEGORY} = require('../../../modules/constants');
 
 exports.createQnA = async (userIdx, title, content) => {
   try{
@@ -130,7 +130,7 @@ exports.reportQnA = async (userIdx, qnaIdx, reportedReasonIdx, etcReason) => {
       }
 
       //기존에 신고한 qna인지
-      const isAlreadyReportedQnA = await qnaDao.isAlreadyReportedQnA(connection, userIdx, qnaIdx, QNA);
+      const isAlreadyReportedQnA = await qnaDao.isAlreadyReportedQnA(connection, userIdx, qnaIdx, CATEGORY.QNA);
       if (isAlreadyReportedQnA){
         connection.release();
         return errResponse(baseResponse.ALREADY_REPORTED_IDX);
@@ -144,7 +144,7 @@ exports.reportQnA = async (userIdx, qnaIdx, reportedReasonIdx, etcReason) => {
       }
 
       await connection.beginTransaction();
-      await qnaDao.reportQnA(connection, userIdx, qnaIdx, QNA, reportedReasonIdx, etcReason);
+      await qnaDao.reportQnA(connection, userIdx, qnaIdx, CATEGORY.QNA, reportedReasonIdx, etcReason);
       await connection.commit();
       
       connection.release();

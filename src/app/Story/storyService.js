@@ -3,7 +3,7 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
-const {STORY} = require('../../../modules/constants');
+const {CATEGORY} = require('../../../modules/constants');
 
 exports.createStory = async (userIdx, title, content, tag, imageArr) => {
   try{
@@ -170,7 +170,7 @@ exports.reportStory = async (userIdx, storyIdx, reportedReasonIdx, etcReason) =>
       }
 
       //기존에 신고한 스토리인지
-      const isAlreadyReportedStory = await storyDao.isAlreadyReportedStory(connection, userIdx, storyIdx, STORY);
+      const isAlreadyReportedStory = await storyDao.isAlreadyReportedStory(connection, userIdx, storyIdx, CATEGORY.STORY);
       if (isAlreadyReportedStory){
         connection.release();
         return errResponse(baseResponse.ALREADY_REPORTED_IDX);
@@ -184,7 +184,7 @@ exports.reportStory = async (userIdx, storyIdx, reportedReasonIdx, etcReason) =>
       }
 
       await connection.beginTransaction();
-      await storyDao.reportStory(connection, userIdx, storyIdx, STORY, reportedReasonIdx, etcReason);
+      await storyDao.reportStory(connection, userIdx, storyIdx, CATEGORY.STORY, reportedReasonIdx, etcReason);
       await connection.commit();
 
       connection.release();

@@ -1,4 +1,4 @@
-const {READY_FOR_DELIVERY, DELIVERY_COMPLETED} = require("../../../modules/constants");
+const {ORDER_STATUS} = require("../../../modules/constants");
 
 //존재하는 orderCraftIdx인지
 async function isExistOrderCraftIdx(connection, orderCraftIdx){
@@ -80,9 +80,9 @@ async function getOrderCraftInfoArr(connection, orderIdx){
         U.nickname                                           AS artistName,
         OC.totalCraftPrice                                   AS price,
         OC.amount,
-        IF(orderStatusIdx = ${READY_FOR_DELIVERY}, 'Y', 'N') AS canReqCancel,
-        IF(orderStatusIdx = ${DELIVERY_COMPLETED}, 'Y', 'N') AS canReqReturn,
-        IF(orderStatusIdx = ${DELIVERY_COMPLETED}, 'Y','N') AS canWriteComment
+        IF(orderStatusIdx = ${ORDER_STATUS.READY_FOR_DELIVERY}, 'Y', 'N') AS canReqCancel,
+        IF(orderStatusIdx = ${ORDER_STATUS.DELIVERY_COMPLETED}, 'Y', 'N') AS canReqReturn,
+        IF(orderStatusIdx = ${ORDER_STATUS.DELIVERY_COMPLETED}, 'Y','N') AS canWriteComment
   FROM OrderCraft OC
           JOIN Craft C ON OC.craftIdx = C.craftIdx
           JOIN Artist A ON C.artistIdx = A.artistIdx

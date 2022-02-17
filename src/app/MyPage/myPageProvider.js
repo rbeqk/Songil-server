@@ -4,11 +4,7 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
-const {
-  MY_PAGE_WRITTEN_CRAFT_COMMENT_PER_PAGE,
-  MY_PAGE_WRITTEN_POST_PER_PAGE,
-  MY_PAGE_WRITTEN_POST_COMMENT_PER_PAGE,
-} = require("../../../modules/constants");
+const {ITEMS_PER_PAGE} = require("../../../modules/constants");
 
 //내 코멘트 조회
 exports.getMyComment = async (userIdx, type, page) => {
@@ -17,7 +13,7 @@ exports.getMyComment = async (userIdx, type, page) => {
     try{
 
       let result = [];
-      const startItemIdx = (page - 1) * MY_PAGE_WRITTEN_CRAFT_COMMENT_PER_PAGE;
+      const startItemIdx = (page - 1) * ITEMS_PER_PAGE.MY_PAGE_WRITTEN_CRAFT_COMMENT_PER_PAGE;
 
       //작성 가능한 코멘트
       if (type === 'available'){
@@ -39,7 +35,9 @@ exports.getMyComment = async (userIdx, type, page) => {
       }
       //작성한 코멘트
       else if (type === 'written'){
-        const writtenComment = await myPageDao.getWrittenComment(connection, userIdx, startItemIdx, MY_PAGE_WRITTEN_CRAFT_COMMENT_PER_PAGE);
+        const writtenComment = await myPageDao.getWrittenComment(
+          connection, userIdx, startItemIdx, ITEMS_PER_PAGE.MY_PAGE_WRITTEN_CRAFT_COMMENT_PER_PAGE
+        );
         
         for (let item of writtenComment){
           const imageArr = await craftCommentDao.getCommentPhoto(connection, item.commentIdx);
@@ -78,8 +76,10 @@ exports.getUserWrittenWith = async (userIdx, page) => {
     try{
 
       const artistIdx = await myPageDao.getArtistIdx(connection, userIdx);
-      const startItemIdx = (page - 1) * MY_PAGE_WRITTEN_POST_PER_PAGE;
-      const userWrittenWith = await myPageDao.getUserWrittenWith(connection, userIdx, artistIdx, startItemIdx, MY_PAGE_WRITTEN_POST_PER_PAGE);
+      const startItemIdx = (page - 1) * ITEMS_PER_PAGE.MY_PAGE_WRITTEN_POST_PER_PAGE;
+      const userWrittenWith = await myPageDao.getUserWrittenWith(
+        connection, userIdx, artistIdx, startItemIdx, ITEMS_PER_PAGE.MY_PAGE_WRITTEN_POST_PER_PAGE
+      );
 
       let result = [];
 
@@ -117,8 +117,10 @@ exports.getUserWrittenWithComment = async (userIdx, page) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
-      const startItemIdx = (page-1) * MY_PAGE_WRITTEN_POST_COMMENT_PER_PAGE;
-      const writtenWithCommentPost = await myPageDao.getUserWrittenWithComment(connection, userIdx, startItemIdx, MY_PAGE_WRITTEN_POST_COMMENT_PER_PAGE);
+      const startItemIdx = (page-1) * ITEMS_PER_PAGE.MY_PAGE_WRITTEN_POST_COMMENT_PER_PAGE;
+      const writtenWithCommentPost = await myPageDao.getUserWrittenWithComment(
+        connection, userIdx, startItemIdx, ITEMS_PER_PAGE.MY_PAGE_WRITTEN_POST_COMMENT_PER_PAGE
+      );
 
       let result = [];
       writtenWithCommentPost.forEach(item => {
