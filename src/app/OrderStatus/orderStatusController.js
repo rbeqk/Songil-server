@@ -15,3 +15,20 @@ exports.getOrderDetail = async (req, res) => {
 
   return res.send(getOrderDetail);
 }
+
+/*
+  API No. 8.11
+  API Name: 주문 현황 조회 API
+  [GET] /my-page/orders
+  query: page
+*/
+exports.getOrderList = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {page} = req.query;
+
+  if (!page) return res.send(errResponse(baseResponse.IS_EMPTY));
+
+  const getOrderList = await orderStatusProvider.getOrderList(userIdx, page);
+
+  return res.send(getOrderList);
+}

@@ -14,6 +14,7 @@ exports.STORY_COMMENT_PER_PAGE = 5;
 exports.AB_TEST_COMMENT_PER_PAGE = 5;
 exports.WITH_BY_CATEGORY_PER_PAGE = 10;
 exports.MY_PAGE_WRITTEN_POST_COMMENT_PER_PAGE = 5;
+exports.MY_PAGE_ORDER_LIST_PER_PAGE = 5;
 
 exports.STORY = 1;
 exports.QNA = 2;
@@ -21,3 +22,11 @@ exports.ABTEST = 3;
 exports.CRAFT = 4;
 
 exports.USE_POINT_WHEN_PAYING = 1;
+
+exports.READY_FOR_DELIVERY = 1;
+exports.BEING_DELIVERIED = 2;
+exports.DELIVERY_COMPLETED = 3;
+exports.REQUEST_CANCEL = 4;
+exports.CALCEL_COMPLETED = 5;
+exports.REQUEST_RETURN = 6;
+exports.RETURN_COMPLELTED = 7;

@@ -3,7 +3,9 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
+const {MY_PAGE_ORDER_LIST_PER_PAGE} = require("../../../modules/constants");
 
+//결제 정보 조회
 exports.getOrderDetail = async (userIdx, orderCraftIdx) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
@@ -33,6 +35,44 @@ exports.getOrderDetail = async (userIdx, orderCraftIdx) => {
     }
   }catch(err){
     logger.error(`getOrderDetail DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}
+
+//주문 현황 조회
+exports.getOrderList = async (userIdx, page) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+      const startItemIdx = (page-1) * MY_PAGE_ORDER_LIST_PER_PAGE;
+      let result = [];
+
+      const userOrderInfoArr = await orderStatusDao.getUserOrderInfoArr(connection, userIdx, startItemIdx, MY_PAGE_ORDER_LIST_PER_PAGE);
+      for (let i=0; i<userOrderInfoArr.length; i++){
+        const {orderIdx, createdAt} = userOrderInfoArr[i];
+        const orderCraftInfoArr = await orderStatusDao.getOrderCraftInfoArr(connection, orderIdx);
+
+        result.push({
+          createdAt,
+          orderIdx,
+          'orderDetail': []
+        });
+
+        for (let orderCraftInfo of orderCraftInfoArr){
+          result[i].orderDetail.push(orderCraftInfo);
+        }
+      }
+
+      connection.release();
+      return response(baseResponse.SUCCESS, result);
+
+    }catch(err){
+      connection.release();
+      logger.error(`getOrderList DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`getOrderList DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }
