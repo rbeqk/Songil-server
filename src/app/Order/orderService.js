@@ -99,11 +99,11 @@ exports.addCraftInOrderSheet = async (userIdx, crafts) => {
 deleteAppliedBenefit = async (connection, orderIdx) => {
   try{
     const appliedBenefit = await orderDao.getAppliedBenefit(connection, orderIdx);
+    let finalPrice = await orderDao.getFinalPrice(connection, orderIdx);
     if (appliedBenefit){
       await connection.beginTransaction();
       await orderDao.deleteAppliedBenefit(connection, orderIdx);
-
-      const finalPrice = await orderDao.getFinalPrice(connection, orderIdx);
+      finalPrice = await orderDao.getFinalPrice(connection, orderIdx);
       await orderDao.updateOrderFinalPrice(connection, orderIdx, finalPrice);
       
       await connection.commit();
