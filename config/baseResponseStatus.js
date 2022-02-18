@@ -99,6 +99,7 @@ module.exports = {
   FORGE_PAYMENT: {"isSuccess": false, "code": 3500, "message": "위조된 요청입니다"},
   INVALID_TINVOICE: {"isSuccess": false, "code": 3501, "message": "유효하지 않은 운송장 번호 혹은 택배사 코드입니다"},
   CAN_NOT_CANCEL_STATUS: {"isSuccess": false, "code": 3502, "message": "주문취소가 불가능합니다"},
+  CAN_NOT_CREATE_SENDING_INFO: {"isSuccess": false, "code": 3503, "message": "발송정보 입력이 불가능합니다"},
 
   DB_ERROR: {"isSuccess": false, "code": 4000, "message": "DB 에러"},
   SERVER_ERROR: {"isSuccess": false, "code": 4001, "message": "Server 에러"},

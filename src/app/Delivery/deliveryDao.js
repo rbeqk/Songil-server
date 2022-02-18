@@ -1,3 +1,5 @@
+const {ORDER_STATUS} = require('../../../modules/constants');
+
 //존재하는 orderCraftIdx인지
 async function isExistOrderCraftIdx(connection, orderCraftIdx){
   const query = `
@@ -21,6 +23,17 @@ async function isArtistOrderCraftIdx(connection, artistIdx, orderCraftIdx){
   return rows[0]['isExist'];
 }
 
+//발송정보 입력 가능한 상태인지
+async function canCreateSendingInfo(connection, orderCraftIdx){
+  const query = `
+  SELECT IF(orderStatusIdx = ${ORDER_STATUS.READY_FOR_DELIVERY}, 1, 0) AS canCreate
+  FROM OrderCraft
+  WHERE orderCraftIdx = ${orderCraftIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['canCreate'];
+}
+
 //발송정보 입력
 async function createSendingInfo(connection, orderCraftIdx, sentAt, tCode, tInvoice){
   const query = `
@@ -31,6 +44,18 @@ async function createSendingInfo(connection, orderCraftIdx, sentAt, tCode, tInvo
   WHERE orderCraftIdx = ${orderCraftIdx};
   `;
   const [rows] = await connection.query(query, [tCode, tInvoice, sentAt]);
+  return rows;
+}
+
+//발송 후 orderCraft 상태 변경
+async function updateOrderCraftStatus(connection, orderCraftIdx, orderStatusIdx, deliveryStatusIdx){
+  const query = `
+  UPDATE OrderCraft
+  SET orderStatusIdx    = ${orderStatusIdx},
+      deliveryStatusIdx = ${deliveryStatusIdx}
+  WHERE orderCraftIdx = ${orderCraftIdx};
+  `;
+  const [rows] = await connection.query(query);
   return rows;
 }
 
@@ -71,7 +96,9 @@ async function isUserOrderCraftIdx(connection, userIdx, orderCraftIdx){
 module.exports = {
   isExistOrderCraftIdx,
   isArtistOrderCraftIdx,
+  canCreateSendingInfo,
   createSendingInfo,
+  updateOrderCraftStatus,
   isEnteredDeliveryInfo,
   getSendingInfo,
   isUserOrderCraftIdx,
