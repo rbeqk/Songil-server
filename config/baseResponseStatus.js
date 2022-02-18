@@ -15,7 +15,7 @@ module.exports = {
   NEED_PHONE_OR_NICKNAME: {"isSuccess": false, "code": 2210, "message": "핸드폰 번호/닉네임 중 하나를 입력해주세요"},
   NEED_JUST_ONE_CONDITION: {"isSuccess": false, "code": 2211, "message": "핸드폰 번호/닉네임 중 하나만 입력해주세요"},
   NEED_PAGE: {"isSuccess": false, "code": 2212, "message": "page를 입력해주세요"},
-  SELECT_ANOTHER_ETC_REASON_IDX: {"isSuccess": false, "code": 2213, "message": "신고 사유 입력 시 직접 작성으로 체크해주세요"},
+  SELECT_ANOTHER_ETC_REASON_IDX: {"isSuccess": false, "code": 2213, "message": "사유 입력 시 직접 작성으로 체크해주세요"},
 
   INVALID_CRAFT_IDX: {"isSuccess": false, "code": 2301, "message": "존재하지 않는 craftIdx입니다"},
   INVALID_CONSUMER_IDX: {"isSuccess": false, "code": 2302, "message": "존재하지 않는 소비자입니다"},
@@ -50,7 +50,7 @@ module.exports = {
   INVALID_REASON_IDX: {"isSuccess": false, "code": 2341, "message": "존재하지 않는 reasonIdx입니다"},
 
   EXCEED_ASK_CONTENT: {"isSuccess": false, "code": 2350, "message": "content는 300자 이하로 입력해주세요"},
-  EXCEED_REPORTED_REASON: {"isSuccess": false, "code": 2351, "message": "신고 사유는 150자 이하로 입력해주세요"},
+  EXCEED_REPORTED_REASON: {"isSuccess": false, "code": 2351, "message": "etcReason은 150자 이하로 입력해주세요"},
   EXCEED_CRAFT_ASK_CONTENT_REASON: {"isSuccess": false, "code": 2352, "message": "문의 답변은 300자 이하로 입력해주세요"},
   EXCEED_QNA_TITLE: {"isSuccess": false, "code": 2353, "message": "title은 300자 이하로 입력해주세요"},
   EXCEED_QNA_CONTENT: {"isSuccess": false, "code": 2354, "message": "content은 3000자 이하로 입력해주세요"},
