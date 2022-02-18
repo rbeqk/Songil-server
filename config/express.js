@@ -59,6 +59,7 @@ module.exports = function (){
   require('../src/app/OrderStatus/orderStatusRoute')(app);
   require('../src/app/Delivery/deliveryRoute')(app);
   require('../src/app/ArtistPage/artistPageRoute')(app);
+  require('../src/app/OrderCancel/orderCancelRoute')(app);
 
   return app;
 }

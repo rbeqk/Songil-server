@@ -47,6 +47,7 @@ module.exports = {
   INVALID_RECEIPT_ID: {"isSuccess": false, "code": 2328, "message": "존재하지 않는 receiptId입니다"},
   INVALID_POINT: {"isSuccess": false, "code": 2329, "message": "사용할 수 없는 포인트 값입니다"},
   INVALID_ORDER_CRAFT_IDX: {"isSuccess": false, "code": 2340, "message": "존재하지 않는 orderDetailIdx입니다"},
+  INVALID_REASON_IDX: {"isSuccess": false, "code": 2341, "message": "존재하지 않는 reasonIdx입니다"},
 
   EXCEED_ASK_CONTENT: {"isSuccess": false, "code": 2350, "message": "content는 300자 이하로 입력해주세요"},
   EXCEED_REPORTED_REASON: {"isSuccess": false, "code": 2351, "message": "신고 사유는 150자 이하로 입력해주세요"},
@@ -68,6 +69,7 @@ module.exports = {
   EXCEED_TAG_LENGTH: {"isSuccess": false, "code": 2366, "message": "태그는 20글자 이하로 설정해주세요"},
   EXCEED_NICKNAME: {"isSuccess": false, "code": 2367, "message": "닉네임은 10글자 이하로 설정해주세요"},
   EXCEED_MEMO_LENGTH: {"isSuccess": false, "code": 2368, "message": "배송메모는 50글자 이하로 설정해주세요"},
+  EXCEED_ETC_REASON: {"isSuccess": false, "code": 2369, "message": "기타 사유는 150글자 이하로 입력해주세요"},
 
   NO_PERMISSION: {"isSuccess": false, "code": 2400, "message": "권한이 없습니다"},
   CAN_NOT_REPORT_SELF: {"isSuccess": false, "code": 2401, "message": "자신의 글은 신고할 수 없습니다"},
@@ -96,6 +98,7 @@ module.exports = {
 
   FORGE_PAYMENT: {"isSuccess": false, "code": 3500, "message": "위조된 요청입니다"},
   INVALID_TINVOICE: {"isSuccess": false, "code": 3501, "message": "유효하지 않은 운송장 번호 혹은 택배사 코드입니다"},
+  CAN_NOT_CANCEL_STATUS: {"isSuccess": false, "code": 3502, "message": "주문취소가 불가능합니다"},
 
   DB_ERROR: {"isSuccess": false, "code": 4000, "message": "DB 에러"},
   SERVER_ERROR: {"isSuccess": false, "code": 4001, "message": "Server 에러"},
