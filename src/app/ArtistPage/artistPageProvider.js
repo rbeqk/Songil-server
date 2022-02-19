@@ -31,10 +31,11 @@ exports.getOrderCraftUserInfo = async (userIdx, orderCraftIdx) => {
         return errResponse(baseResponse.NO_PERMISSION);
       }
 
-      const info = await artistPageDao.getOrderCraftUserInfo(connection, orderCraftIdx);
+      //결제 상세와 동일
+      const orderDetail = await orderStatusDao.getOrderDetail(connection, orderCraftIdx);
 
       connection.release();
-      return response(baseResponse.SUCCESS, info);
+      return response(baseResponse.SUCCESS, orderDetail);
 
     }catch(err){
       connection.release();
