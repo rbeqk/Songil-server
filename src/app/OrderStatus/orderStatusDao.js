@@ -35,7 +35,7 @@ async function getOrderDetail(connection, orderCraftIdx){
         OC.amount,
         O.recipient,
         O.phone,
-        CONCAT('(', O.zipcode, ')', O.address, ' ', O.detailAddress) as address,
+        CONCAT('(', O.zipcode, ')', ' ', O.address, ' ', O.detailAddress) as address,
         O.memo,
         OC.totalCraftPrice,
         OC.basicShippingFee,
