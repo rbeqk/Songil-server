@@ -93,6 +93,22 @@ async function isUserOrderCraftIdx(connection, userIdx, orderCraftIdx){
   return rows[0]['isExist'];
 }
 
+//배송 현황 조회
+async function getTrackingInfo(connection, orderCraftIdx){
+  const query = `
+  SELECT location,
+        kind,
+        createdAt                          AS originalCreatedAt,
+        DATE_FORMAT(createdAt, '%Y-%m-%d') AS date,
+        DATE_FORMAT(createdAt, '%H:%i:%S') AS timeString
+  FROM TrackingInfo
+  WHERE orderCraftIdx = ${orderCraftIdx}
+  ORDER BY originalCreatedAt DESC;
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   isExistOrderCraftIdx,
   isArtistOrderCraftIdx,
@@ -102,4 +118,5 @@ module.exports = {
   isEnteredDeliveryInfo,
   getSendingInfo,
   isUserOrderCraftIdx,
+  getTrackingInfo,
 }

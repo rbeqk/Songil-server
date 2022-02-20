@@ -43,11 +43,11 @@ exports.getSendingInfo = async (req, res) => {
   API Name: 배송 현황 조회 API
   [GET] /my-page/orders/:orderDetailIdx/delivery
 */
-exports.getDeliveryInfo = async (req, res) => {
+exports.getTrackingInfo = async (req, res) => {
   const {userIdx} = req.verifiedToken;
   const {orderDetailIdx: orderCraftIdx} = req.params;
 
-  const getDeliveryInfo = await deliveryProvider.getDeliveryInfo(userIdx, orderCraftIdx);
+  const getTrackingInfo = await deliveryProvider.getTrackingInfo(userIdx, orderCraftIdx);
 
-  return res.send(getDeliveryInfo);
+  return res.send(getTrackingInfo);
 }

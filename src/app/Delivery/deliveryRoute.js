@@ -9,5 +9,5 @@ module.exports = function (app){
   app.get('/artist-page/ordrers/:orderDetailIdx/sending', jwtMiddleware, deliveryController.getSendingInfo);
 
   //배송 현황 조회 API
-  app.get('/my-page/orders/:orderDetailIdx/delivery', jwtMiddleware, deliveryController.getDeliveryInfo);
+  app.get('/my-page/orders/:orderDetailIdx/tracking', jwtMiddleware, deliveryController.getTrackingInfo);
 }

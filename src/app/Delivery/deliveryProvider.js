@@ -64,7 +64,7 @@ exports.getSendingInfo = async (userIdx, orderCraftIdx) => {
 }
 
 //배송 현황 조회
-exports.getDeliveryInfo = async (userIdx, orderCraftIdx) => {
+exports.getTrackingInfo = async (userIdx, orderCraftIdx) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
@@ -85,30 +85,15 @@ exports.getDeliveryInfo = async (userIdx, orderCraftIdx) => {
         return errResponse(baseResponse.NOT_ENTER_DELIVERY_INFO);
       }
 
-      const sendingInfo = await deliveryDao.getSendingInfo(connection, orderCraftIdx);
-      const tCode = sendingInfo.tCode;
-      const tInvoice = sendingInfo.tInvoice;
-
-      const deliveryInfo = await axios('https://info.sweettracker.co.kr/api/v1/trackingInfo', {
-        params: {
-          t_key: process.env.SWEET_TRACKER_KEY,
-          t_code: tCode,
-          t_invoice: tInvoice
-        }
-      });
-
-      if (deliveryInfo.data?.code){
-        logger.error(deliveryInfo.data.msg);
-        return errResponse(baseResponse.SERVER_ERROR);
-      }
-
+      const trackingInfo = await deliveryDao.getTrackingInfo(connection, orderCraftIdx);
       let result = [];
-      deliveryInfo.data.trackingDetails.forEach(item => {
+
+      trackingInfo.forEach(item => {
         result.push({
-          time: item.timeString.split(' '),
-          where: item.where,
-          kind: item.kind
-        })
+          'time': [item.date, item.timeString],
+          'where': item.location,
+          'kind': item.kind
+        });
       });
 
       connection.release();
@@ -116,11 +101,11 @@ exports.getDeliveryInfo = async (userIdx, orderCraftIdx) => {
       
     }catch(err){
       connection.release();
-      logger.error(`getDeliveryInfo DB Query Error: ${err}`);
+      logger.error(`getTrackingInfo DB Query Error: ${err}`);
       return errResponse(baseResponse.DB_ERROR);
     }
   }catch(err){
-    logger.error(`getDeliveryInfo DB Connection Error: ${err}`);
+    logger.error(`getTrackingInfo DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }
