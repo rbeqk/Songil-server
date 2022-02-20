@@ -155,8 +155,13 @@ exports.autoLogin = async (userIdx) => {
         return errResponse(baseResponse.INVALID_USER_INFO);
       }
 
+      const jwt = await createJwt(userIdx);
+      const result = {
+        jwt
+      };
+
       connection.release();
-      return response(baseResponse.SUCCESS);
+      return response(baseResponse.SUCCESS, result);
     }catch(err){
       connection.release();
       logger.error(`autoLogin DB Query Error: ${err}`);
