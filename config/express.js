@@ -61,6 +61,7 @@ module.exports = function (){
   require('../src/app/Delivery/deliveryRoute')(app);
   require('../src/app/ArtistPage/artistPageRoute')(app);
   require('../src/app/OrderCancel/orderCancelRoute')(app);
+  require('../src/app/OrderReturn/orderReturnRoute')(app);
 
   return app;
 }
