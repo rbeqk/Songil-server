@@ -2,6 +2,7 @@ const schedule = require('node-schedule');
 const {pool} = require('../config/database');
 const {logger} = require('../config/winston');
 const {response, errResponse} = require('../config/response');
+const {ORDER_STATUS, DELIVERY_STATUS} = require('./constants');
 const axios = require('axios');
 require('dotenv').config();
 
@@ -32,6 +33,16 @@ const addTrackingInfo = async (connection, orderCraftIdx, time, where, kind) => 
   await connection.query(query, [where, kind, time]);
 }
 
+const updateOrderCraftDeliveryStatus = async (connection, orderCraftIdx) => {
+  const query = `
+  UPDATE OrderCraft
+  SET orderStatusIdx    = ${ORDER_STATUS.DELIVERY_COMPLETED},
+      deliveryStatusIdx = ${DELIVERY_STATUS.DELIVERY_COMPLETED}
+  WHERE orderCraftIdx = ${orderCraftIdx};
+  `;
+  await connection.query(query);
+}
+
 const TrackingSchedule = schedule.scheduleJob('0 0-15/1 * * 1-6', async () => {
   console.log(new Date());
   console.log(`TrackingSchedule: ${new Date()}`);
@@ -58,10 +69,15 @@ const TrackingSchedule = schedule.scheduleJob('0 0-15/1 * * 1-6', async () => {
         }
 
         const trackingDetails = deliveryInfo.data.trackingDetails;
+        const completeYN = deliveryInfo.data.completeYN;
 
         const orderCraftDeliveryLen = await getOrderCraftDeliveryLen(connection, orderCraftIdx);
 
         if (trackingDetails.length > orderCraftDeliveryLen){
+          if (completeYN === 'Y'){
+            await updateOrderCraftDeliveryStatus(connection, orderCraftIdx);
+          }
+
           for (let i = orderCraftDeliveryLen; i < trackingDetails.length; i++){
             const time = trackingDetails[i].timeString;
             const where = trackingDetails[i].where;
