@@ -1,4 +1,3 @@
-const artistPlaceService = require('./artistPlaceService');
 const artistPlaceProvider = require('./artistPlaceProvider');
 const baseResponse = require("../../../config/baseResponseStatus");
 const {response} = require("../../../config/response");

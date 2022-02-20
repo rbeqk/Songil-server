@@ -139,8 +139,6 @@ async function getArtistArticle(connection, articleList, sort, startItemIdx, pag
           (CASE WHEN '${sort}' = 'popular' THEN totalLikeCnt END) ASC
   LIMIT ${startItemIdx}, ${pageItemCnt}
   `;
-
-  console.log(query)
   const [rows] = await connection.query(query);
   return rows;
 }

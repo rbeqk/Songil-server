@@ -1,5 +1,4 @@
 const shopProvider = require("../../app/Shop/shopProvider");
-const shopService = require("../../app/Shop/shopService");
 const baseResponse = require("../../../config/baseResponseStatus");
 const {response} = require("../../../config/response");
 const {errResponse} = require("../../../config/response");

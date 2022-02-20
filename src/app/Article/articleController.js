@@ -1,4 +1,3 @@
-const articleService = require('./articleService');
 const articleProvider = require('./articleProvider');
 const baseResponse = require("../../../config/baseResponseStatus");
 const {response} = require("../../../config/response");
