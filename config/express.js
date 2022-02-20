@@ -34,6 +34,7 @@ module.exports = function (){
     store: sessionStore
   }));
 
+  require('../modules/deliveryUtil');
   require('../src/app/CraftComment/craftCommentRoute')(app);
   require('../src/app/Like/likeRoute')(app);
   require('../src/app/Shop/shopRoute')(app);
