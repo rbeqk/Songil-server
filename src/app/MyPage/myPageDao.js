@@ -263,15 +263,29 @@ async function isExistNickname(connection, userIdx, userName){
 }
 
 //유저 프로필 수정
-async function updateUserProfile(connection, userIdx, userName, userProfile){
-  const query = `
-  UPDATE User
-  SET nickname = IFNULL(?, nickname),
-      imageUrl = IFNULL(?, imageUrl)
-  WHERE userIdx = ${userIdx};
-  `;
-  const [rows] = await connection.query(query, [userName, userProfile]);
-  return rows;
+async function updateUserProfile(connection, userIdx, setDefault, userName, userProfile){
+  
+  //프로필 사진 기본으로 변경 시
+  if (setDefault){
+    const query = `
+    UPDATE User
+    SET nickname = IFNULL(?, nickname),
+        imageUrl = NULL
+    WHERE userIdx = ${userIdx};
+    `;
+    const [rows] = await connection.query(query, [userName]);
+    return rows;
+  }
+  else{
+    const query = `
+    UPDATE User
+    SET nickname = IFNULL(?, nickname),
+        imageUrl = IFNULL(?, imageUrl)
+    WHERE userIdx = ${userIdx};
+    `;
+    const [rows] = await connection.query(query, [userName, userProfile]);
+    return rows;
+  }
 }
 
 //유저 기본 정보 가져오기

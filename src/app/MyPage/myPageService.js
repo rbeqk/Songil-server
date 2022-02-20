@@ -6,7 +6,7 @@ const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 
 //유저 프로필 수정
-exports.updateUserProfile = async (userIdx, userName, userProfile) => {
+exports.updateUserProfile = async (userIdx, setDefault, userName, userProfile) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
@@ -21,7 +21,7 @@ exports.updateUserProfile = async (userIdx, userName, userProfile) => {
       }
 
       await connection.beginTransaction();
-      await myPageDao.updateUserProfile(connection, userIdx, userName, userProfile);
+      await myPageDao.updateUserProfile(connection, userIdx, setDefault, userName, userProfile);
       await connection.commit();
 
       connection.release();
