@@ -85,16 +85,23 @@ exports.getTrackingInfo = async (userIdx, orderCraftIdx) => {
         return errResponse(baseResponse.NOT_ENTER_DELIVERY_INFO);
       }
 
-      const trackingInfo = await deliveryDao.getTrackingInfo(connection, orderCraftIdx);
-      let result = [];
-
-      trackingInfo.forEach(item => {
-        result.push({
+      const deliveryInfo = await deliveryDao.getDeliveryInfo(connection, orderCraftIdx);
+      const tracking = await deliveryDao.getTrackingInfo(connection, orderCraftIdx);
+      
+      let trackingInfo = [];
+      tracking.forEach(item => {
+        trackingInfo.push({
           'time': [item.date, item.timeString],
           'where': item.location,
           'kind': item.kind
         });
       });
+      
+      const result = {
+        'tCode': deliveryInfo.tCode,
+        'tInvoice': deliveryInfo.tInvoice,
+        trackingInfo
+      };
 
       connection.release();
       return response(baseResponse.SUCCESS, result);

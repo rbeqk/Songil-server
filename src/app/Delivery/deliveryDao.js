@@ -109,6 +109,17 @@ async function getTrackingInfo(connection, orderCraftIdx){
   return rows;
 }
 
+//배송정보 가져오기
+async function getDeliveryInfo(connection, orderCraftIdx){
+  const query = `
+  SELECT tCode, tInvoice
+  FROM OrderCraft
+  WHERE orderCraftIdx = ${orderCraftIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0];
+}
+
 module.exports = {
   isExistOrderCraftIdx,
   isArtistOrderCraftIdx,
@@ -119,4 +130,5 @@ module.exports = {
   getSendingInfo,
   isUserOrderCraftIdx,
   getTrackingInfo,
+  getDeliveryInfo,
 }
