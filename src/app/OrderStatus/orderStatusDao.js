@@ -71,18 +71,18 @@ async function getUserOrderInfoArr(connection, userIdx, startItemIdx, itemsPerPa
 //orderCraft 정보 가져오기
 async function getOrderCraftInfoArr(connection, orderIdx){
   const query = `
-  SELECT OC.orderCraftIdx                                     AS orderDetailIdx,
-        OC.orderStatusIdx,
+  SELECT OC.orderCraftIdx                                                  AS orderDetailIdx,
+        OC.orderStatusIdx                                                 AS status,
         OC.craftIdx,
         C.mainImageUrl,
         C.name,
         C.artistIdx,
-        U.nickname                                           AS artistName,
-        OC.totalCraftPrice                                   AS price,
+        U.nickname                                                        AS artistName,
+        OC.totalCraftPrice                                                AS price,
         OC.amount,
         IF(orderStatusIdx = ${ORDER_STATUS.READY_FOR_DELIVERY}, 'Y', 'N') AS canReqCancel,
         IF(orderStatusIdx = ${ORDER_STATUS.DELIVERY_COMPLETED}, 'Y', 'N') AS canReqReturn,
-        IF(orderStatusIdx = ${ORDER_STATUS.DELIVERY_COMPLETED}, 'Y','N') AS canWriteComment
+        IF(orderStatusIdx = ${ORDER_STATUS.DELIVERY_COMPLETED}, 'Y', 'N') AS canWriteComment
   FROM OrderCraft OC
           JOIN Craft C ON OC.craftIdx = C.craftIdx
           JOIN Artist A ON C.artistIdx = A.artistIdx
