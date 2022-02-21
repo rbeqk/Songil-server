@@ -27,6 +27,7 @@ exports.getOrderList = async (req, res) => {
   const {page} = req.query;
 
   if (!page) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (page < 1) return res.send(errResponse(baseResponse.INVALID_PAGE));
 
   const getOrderList = await orderStatusProvider.getOrderList(userIdx, page);
 
