@@ -82,6 +82,7 @@ exports.getTrackingInfo = async (userIdx, orderCraftIdx) => {
 
       const isEnteredDeliveryInfo = await deliveryDao.isEnteredDeliveryInfo(connection, orderCraftIdx);
       if (!isEnteredDeliveryInfo){
+        connection.release();
         return errResponse(baseResponse.NOT_ENTER_DELIVERY_INFO);
       }
 
