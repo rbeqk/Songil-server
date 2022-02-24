@@ -5,6 +5,8 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
+const {pageInfo, getTotalPage} = require("../../../modules/pageUtil");
+const {ITEMS_PER_PAGE} = require('../../../modules/constants');
 
 //주문자 정보 확인
 exports.getOrderCraftUserInfo = async (userIdx, orderCraftIdx) => {
@@ -44,6 +46,47 @@ exports.getOrderCraftUserInfo = async (userIdx, orderCraftIdx) => {
     }
   }catch(err){
     logger.error(`getOrderCraftUserInfo DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}
+
+//주문 현황 조회 및 반품/취소 요청 현황 페이지 조회
+exports.getOrderList = async (userIdx, type) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+      const isArtist = await artistAskDao.isArtist(connection, userIdx);
+      if (!isArtist){
+        connection.release();
+        return errResponse(baseResponse.NO_PERMISSION);
+      }
+
+      const artistIdx = await artistAskDao.getArtistIdx(connection, userIdx);
+      let result;
+
+      //주문현황 조회
+      if (type === 'basic'){
+        const totalCnt = await artistPageDao.getBasicOrderListCnt(connection, artistIdx);
+        const totalPages = getTotalPage(totalCnt, ITEMS_PER_PAGE.ARTIST_PAGE_ORDER_LIST_PER_PAGE);
+        result = new pageInfo(totalPages, ITEMS_PER_PAGE.ARTIST_PAGE_ORDER_LIST_PER_PAGE);
+      }
+      //반품/취소 요청 현황 조회
+      else if (type === 'cancelOrReturn'){
+        const totalCnt = await artistPageDao.getCancelOrReturnList(connection, artistIdx);
+        const totalPages = getTotalPage(totalCnt, ITEMS_PER_PAGE.ARTIST_PAGE_CANCEL_OR_RETURN_LIST_PER_PAGE);
+        result = new pageInfo(totalPages, ITEMS_PER_PAGE.ARTIST_PAGE_CANCEL_OR_RETURN_LIST_PER_PAGE);
+      }
+
+      connection.release();
+      return response(baseResponse.SUCCESS, result);
+
+    }catch(err){
+      connection.release();
+      logger.error(`getOrderList DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`getOrderList DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }

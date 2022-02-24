@@ -1,3 +1,5 @@
+const {ORDER_STATUS} = require("../../../modules/constants");
+
 //작가 craft 관한 orderCraftIdx인지
 async function isArtistOrderCraftIdx(connection, artistIdx, orderCraftIdx){
   const query = `
@@ -35,7 +37,37 @@ async function getOrderCraftUserInfo(connection, orderCraftIdx){
   return rows[0];
 }
 
+//작가관련 주문현황 총 개수(=날짜 개수) 가져오기
+async function getBasicOrderListCnt(connection, artistIdx){
+  const query = `
+  SELECT COUNT(DISTINCT DATE_FORMAT(O.createdAt, '%Y-%m-%d')) AS totalCnt
+  FROM OrderCraft OC
+          JOIN OrderT O ON O.orderIdx = OC.orderIdx
+          JOIN Craft C ON C.craftIdx = OC.craftIdx
+  WHERE C.artistIdx = ${artistIdx} &&
+        OC.orderCraftIdx NOT IN (${ORDER_STATUS.REQUEST_CANCEL}, ${ORDER_STATUS.REQUEST_RETURN});
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['totalCnt'];
+}
+
+///반품/취소 요청 현황 총 개수(=날짜 개수) 가져오기
+async function getCancelOrReturnList(connection, artistIdx){
+  const query = `
+  SELECT COUNT(DISTINCT DATE_FORMAT(O.createdAt, '%Y-%m-%d')) AS totalCnt
+  FROM OrderCraft OC
+          JOIN OrderT O ON O.orderIdx = OC.orderIdx
+          JOIN Craft C ON C.craftIdx = OC.craftIdx
+  WHERE C.artistIdx = ${artistIdx} &&
+        OC.orderCraftIdx IN (${ORDER_STATUS.REQUEST_CANCEL}, ${ORDER_STATUS.REQUEST_RETURN});
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['totalCnt'];
+}
+
 module.exports = {
   isArtistOrderCraftIdx,
   getOrderCraftUserInfo,
+  getBasicOrderListCnt,
+  getCancelOrReturnList,
 }
