@@ -52,10 +52,10 @@ exports.reqOrderCraftCancel = async (userIdx, orderCraftIdx, reasonIdx, etcReaso
   }
 }
 
-//주문취소 거부 시
+//주문취소 거부 시 => 주문현황은 배송준바중으로
 async function orderCraftCancelRejection(connection, orderCraftIdx){
   const resStatusIdx = RES_STATUS.REJECTION;
-  const orderStatusIdx = ORDER_STATUS.REJECT_CANCEL;
+  const orderStatusIdx = ORDER_STATUS.READY_FOR_DELIVERY;
 
   await connection.beginTransaction();
   await orderCancelDao.resOrderCraftCancel(connection, orderCraftIdx, resStatusIdx);
