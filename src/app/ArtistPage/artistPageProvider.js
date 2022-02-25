@@ -51,7 +51,7 @@ exports.getOrderCraftUserInfo = async (userIdx, orderCraftIdx) => {
 }
 
 //주문 현황 조회 및 반품/취소 요청 현황 페이지 조회
-exports.getOrderList = async (userIdx, type) => {
+exports.getOrderListPage = async (userIdx, type) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
@@ -75,6 +75,72 @@ exports.getOrderList = async (userIdx, type) => {
         const totalCnt = await artistPageDao.getCancelOrReturnList(connection, artistIdx);
         const totalPages = getTotalPage(totalCnt, ITEMS_PER_PAGE.ARTIST_PAGE_CANCEL_OR_RETURN_LIST_PER_PAGE);
         result = new pageInfo(totalPages, ITEMS_PER_PAGE.ARTIST_PAGE_CANCEL_OR_RETURN_LIST_PER_PAGE);
+      }
+
+      connection.release();
+      return response(baseResponse.SUCCESS, result);
+
+    }catch(err){
+      connection.release();
+      logger.error(`getOrderListPage DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`getOrderListPage DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}
+
+//주문 현황 조회 및 반품/취소 요청 현황 조회
+exports.getOrderList = async (userIdx, type, page) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+      const isArtist = await artistAskDao.isArtist(connection, userIdx);
+      if (!isArtist){
+        connection.release();
+        return errResponse(baseResponse.NO_PERMISSION);
+      }
+
+      const artistIdx = await artistAskDao.getArtistIdx(connection, userIdx);
+      let result = [];
+
+      //주문현황 조회
+      if (type === 'basic'){
+        const startItemIdx = (page - 1) * ITEMS_PER_PAGE.ARTIST_PAGE_ORDER_LIST_PER_PAGE;
+        const basicOrderCreatedAtArr = await artistPageDao.getBasicOrderCreatedAtArr(
+          connection, artistIdx, startItemIdx, ITEMS_PER_PAGE.ARTIST_PAGE_ORDER_LIST_PER_PAGE);
+        
+        for (let createdAt of basicOrderCreatedAtArr){
+          const basicOrderInfo = await artistPageDao.getBasicOrderInfo(connection, artistIdx, createdAt);
+        
+          result.push({
+            'createdAt': createdAt,
+            'order': basicOrderInfo
+          });
+        }
+
+        result.reverse();
+      }
+      //반품/취소 요청 현황 조회
+      else if (type === 'cancelOrReturn'){
+        const startItemIdx = (page - 1) * ITEMS_PER_PAGE.ARTIST_PAGE_CANCEL_OR_RETURN_LIST_PER_PAGE;
+        const cancelOrReturnOrderCreatedAtArr = await artistPageDao.getcancelOrReturnOrderCreatedAtArr(
+          connection, artistIdx, startItemIdx, ITEMS_PER_PAGE.ARTIST_PAGE_CANCEL_OR_RETURN_LIST_PER_PAGE);
+
+          for (let createdAt of cancelOrReturnOrderCreatedAtArr){
+            const cancelOrReturnOrderInfo = await artistPageDao.getcancelOrReturnOrderInfo(connection, artistIdx, createdAt);
+          
+            result.push({
+              'createdAt': createdAt,
+              'order': cancelOrReturnOrderInfo.map(item => {
+                delete item.compareCreatedAt;
+                return item;
+              })
+            });
+          }
+  
+          result.reverse();
       }
 
       connection.release();

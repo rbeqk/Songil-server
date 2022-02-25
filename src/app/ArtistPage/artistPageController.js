@@ -23,12 +23,30 @@ exports.getOrderCraftUserInfo = async (req, res) => {
   [GET] /artist-page/orders/page
   query: type
 */
-exports.getOrderList = async (req, res) => {
+exports.getOrderListPage = async (req, res) => {
   const {userIdx} = req.verifiedToken;
   const {type} = req.query;
+  if (!type) return res.send(errResponse(baseResponse.IS_EMPTY));
   if (!['basic', 'cancelOrReturn'].includes(type)) return res.send(errResponse(baseResponse.INVALID_TYPE_NAME));
 
-  const getOrderList = await artistPageProvider.getOrderList(userIdx, type);
+  const getOrderListPage = await artistPageProvider.getOrderListPage(userIdx, type);
+
+  return res.send(getOrderListPage);
+}
+
+/*
+  API No. 10.7
+  API Name: 주문 현황 조회 및 반품/취소 요청 현황 조회 API
+  [GET] /artist-page/orders
+  query: type, page
+*/
+exports.getOrderList = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {type, page} = req.query;
+  if (!(type && page)) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (!['basic', 'cancelOrReturn'].includes(type)) return res.send(errResponse(baseResponse.INVALID_TYPE_NAME));
+
+  const getOrderList = await artistPageProvider.getOrderList(userIdx, type, page);
 
   return res.send(getOrderList);
 }

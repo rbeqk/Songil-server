@@ -1,4 +1,4 @@
-const {ORDER_STATUS} = require("../../../modules/constants");
+const {ORDER_STATUS, ORDER_CANCEL_REASON, ORDER_CANCEL_RETURN_STATUS} = require("../../../modules/constants");
 
 //작가 craft 관한 orderCraftIdx인지
 async function isArtistOrderCraftIdx(connection, artistIdx, orderCraftIdx){
@@ -65,9 +65,117 @@ async function getCancelOrReturnList(connection, artistIdx){
   return rows[0]['totalCnt'];
 }
 
+//작가관련 주문현황 날짜 가져오기
+async function getBasicOrderCreatedAtArr(connection, artistIdx, startItemIdx, itemsPerPage){
+  const query = `
+  SELECT DISTINCT DATE_FORMAT(O.createdAt, '%Y.%m.%d') AS date
+  FROM OrderCraft OC
+          JOIN OrderT O ON O.orderIdx = OC.orderIdx
+          JOIN Craft C ON C.craftIdx = OC.craftIdx
+  WHERE C.artistIdx = ${artistIdx} &&
+        OC.orderCraftIdx NOT IN (${ORDER_STATUS.REQUEST_CANCEL}, ${ORDER_STATUS.REQUEST_RETURN})
+  ORDER BY date
+  LIMIT ${startItemIdx}, ${itemsPerPage};
+  `;
+  const [rows] = await connection.query(query);
+  return rows.map(item => item.date);
+}
+
+//주문현황 날짜 별 정보 가져오기
+async function getBasicOrderInfo(connection, artistIdx, createdAt){
+  const query = `
+  SELECT OC.orderCraftIdx     AS orderDetailIdx,
+        OC.deliveryStatusIdx AS status,
+        OC.craftIdx,
+        C.mainImageUrl,
+        C.name,
+        O.userIdx,
+        U.nickname AS userName
+  FROM OrderCraft OC
+          JOIN OrderT O ON O.orderIdx = OC.orderIdx
+          JOIN Craft C ON C.craftIdx = OC.craftIdx
+          JOIN User U ON U.userIdx = O.userIdx
+  WHERE DATE(O.createdAt) = ? && OC.orderCraftIdx IN (SELECT OC.orderCraftIdx
+                                                                FROM OrderCraft OC
+                                                                          JOIN OrderT O ON O.orderIdx = OC.orderIdx
+                                                                          JOIN Craft C ON C.craftIdx = OC.craftIdx
+                                                                WHERE C.artistIdx = ${artistIdx} &&
+                                                                      OC.orderCraftIdx NOT IN
+                                                                      (${ORDER_STATUS.REQUEST_CANCEL}, ${ORDER_STATUS.REQUEST_RETURN}))
+  ORDER BY OC.orderCraftIdx DESC;
+  `;
+  const [rows] = await connection.query(query, createdAt);
+  return rows;
+}
+
+//작가관련 반품/취소 요청 현황 날짜 가져오기
+async function getcancelOrReturnOrderCreatedAtArr(connection, artistIdx, startItemIdx, itemsPerPage){
+  const query = `
+  SELECT DISTINCT DATE_FORMAT(OCAN.reqCreatedAt, '%Y.%m.%d') AS date
+  FROM OrderCancel OCAN
+          JOIN OrderCraft OC ON OC.orderCraftIdx = OCAN.orderCraftIdx
+          JOIN Craft C ON C.craftIdx = OC.craftIdx
+  WHERE C.artistIdx = ${artistIdx}
+  ORDER BY date
+  LIMIT ${startItemIdx}, ${itemsPerPage};
+  `;
+  const [rows] = await connection.query(query);
+  return rows.map(item => item.date);
+}
+
+//작가관련 반품/취소 날짜 별 정보 가져오기
+async function getcancelOrReturnOrderInfo(connection, artistIdx, createdAt){
+  const query = `
+  SELECT OCAN.orderCraftIdx                                                      AS orderDetailIdx,
+        IFNULL(OCAN.resStatusIdx, ${ORDER_CANCEL_RETURN_STATUS.REQUEST_CANCEL}) AS status,
+        C.craftIdx,
+        C.mainImageUrl,
+        C.name,
+        O.userIdx,
+        U.nickname                                                              AS userName,
+        IF(OCAN.orderCancelReasonIdx = ${ORDER_CANCEL_REASON.ETC_REASON}, OCAN.etcReason,
+            OCR.reason)                                                          AS reason,
+        IF(OCAN.resStatusIdx, 'N', 'Y')                                         AS canChangeStatus,
+        OCAN.reqCreatedAt                                                       AS compareCreatedAt
+  FROM OrderCancel OCAN
+          JOIN OrderCraft OC ON OC.orderCraftIdx = OCAN.orderCraftIdx
+          JOIN OrderT O ON O.orderIdx = OC.orderIdx
+          JOIN Craft C ON C.craftIdx = OC.craftIdx
+          JOIN User U ON U.userIdx = O.userIdx
+          JOIN OrderCancelReason OCR ON OCR.orderCancelReasonIdx = OCAN.orderCancelReasonIdx
+  WHERE C.artistIdx = ${artistIdx} && DATE(OCAN.reqCreatedAt) = ?
+  UNION
+  SELECT ORE.orderCraftIdx                                                      AS orderDetailIdx,
+        IFNULL(ORE.resStatusIdx, ${ORDER_CANCEL_RETURN_STATUS.REQUEST_RETURN}) AS status,
+        C.craftIdx,
+        C.mainImageUrl,
+        C.name,
+        O.userIdx,
+        U.nickname                                                             AS userName,
+        IF(ORE.orderReturnReasonIdx = ${ORDER_CANCEL_REASON.ETC_REASON}, ORE.etcReason,
+            ORE.etcReason)                                                      AS reason,
+        IF(ORE.resStatusIdx, 'N', 'Y')                                         AS canChangeStatus,
+        ORE.reqCreatedAt                                                       AS compareCreatedAt
+  FROM OrderReturn ORE
+          JOIN OrderCraft OC ON OC.orderCraftIdx = ORE.orderCraftIdx
+          JOIN OrderT O ON O.orderIdx = OC.orderIdx
+          JOIN Craft C ON C.craftIdx = OC.craftIdx
+          JOIN User U ON U.userIdx = O.userIdx
+          JOIN OrderReturnReason ORR on ORE.orderReturnReasonIdx = ORR.orderReturnReasonIdx
+  WHERE C.artistIdx = ${artistIdx} && DATE(ORE.reqCreatedAt) = ?
+  ORDER BY compareCreatedAt DESC;
+  `;
+  const [rows] = await connection.query(query, [createdAt, createdAt]);
+  return rows;
+}
+
 module.exports = {
   isArtistOrderCraftIdx,
   getOrderCraftUserInfo,
   getBasicOrderListCnt,
   getCancelOrReturnList,
+  getBasicOrderCreatedAtArr,
+  getBasicOrderInfo,
+  getcancelOrReturnOrderCreatedAtArr,
+  getcancelOrReturnOrderInfo,
 }
