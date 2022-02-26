@@ -46,7 +46,7 @@ async function getBasicOrderListCnt(connection, artistIdx){
   FROM OrderCraft OC
           JOIN OrderT O ON O.orderIdx = OC.orderIdx
           JOIN Craft C ON C.craftIdx = OC.craftIdx
-  WHERE C.artistIdx = ${artistIdx} &&
+  WHERE C.artistIdx = ${artistIdx} && O.isPaid = 'Y' &&
         OC.orderCraftIdx NOT IN (${ORDER_STATUS.REQUEST_CANCEL}, ${ORDER_STATUS.REQUEST_RETURN}, ${ORDER_STATUS.CALCEL_COMPLETED});
   `;
   const [rows] = await connection.query(query);
@@ -80,7 +80,7 @@ async function getBasicOrderCreatedAtArr(connection, artistIdx, startItemIdx, it
   FROM OrderCraft OC
           JOIN OrderT O ON O.orderIdx = OC.orderIdx
           JOIN Craft C ON C.craftIdx = OC.craftIdx
-  WHERE C.artistIdx = ${artistIdx} &&
+  WHERE C.artistIdx = ${artistIdx} && O.isPaid = 'Y' &&
         OC.orderCraftIdx NOT IN (${ORDER_STATUS.REQUEST_CANCEL}, ${ORDER_STATUS.REQUEST_RETURN})
   ORDER BY date
   LIMIT ${startItemIdx}, ${itemsPerPage};
@@ -98,18 +98,20 @@ async function getBasicOrderInfo(connection, artistIdx, createdAt){
         C.mainImageUrl,
         C.name,
         O.userIdx,
-        U.nickname AS userName
+        U.nickname           AS userName
   FROM OrderCraft OC
           JOIN OrderT O ON O.orderIdx = OC.orderIdx
           JOIN Craft C ON C.craftIdx = OC.craftIdx
           JOIN User U ON U.userIdx = O.userIdx
   WHERE DATE(O.createdAt) = ? && OC.orderCraftIdx IN (SELECT OC.orderCraftIdx
-                                                                FROM OrderCraft OC
-                                                                          JOIN OrderT O ON O.orderIdx = OC.orderIdx
-                                                                          JOIN Craft C ON C.craftIdx = OC.craftIdx
-                                                                WHERE C.artistIdx = ${artistIdx} &&
-                                                                      OC.orderCraftIdx NOT IN
-                                                                      (${ORDER_STATUS.REQUEST_CANCEL}, ${ORDER_STATUS.REQUEST_RETURN}))
+                                                      FROM OrderCraft OC
+                                                              JOIN OrderT O ON O.orderIdx = OC.orderIdx
+                                                              JOIN Craft C ON C.craftIdx = OC.craftIdx
+                                                      WHERE C.artistIdx = ${artistIdx} && O.isPaid = 'Y' &&
+                                                            OC.orderCraftIdx NOT IN
+                                                            (${ORDER_STATUS.REQUEST_CANCEL},
+                                                            ${ORDER_STATUS.REQUEST_RETURN},
+                                                            ${ORDER_STATUS.CALCEL_COMPLETED}))
   ORDER BY OC.orderCraftIdx DESC;
   `;
   const [rows] = await connection.query(query, createdAt);
