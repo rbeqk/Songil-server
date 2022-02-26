@@ -44,6 +44,7 @@ exports.getOrderList = async (req, res) => {
   const {userIdx} = req.verifiedToken;
   const {type, page} = req.query;
   if (!(type && page)) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (page < 1) return res.send(errResponse(baseResponse.INVALID_PAGE));
   if (!['basic', 'cancelOrReturn'].includes(type)) return res.send(errResponse(baseResponse.INVALID_TYPE_NAME));
 
   const getOrderList = await artistPageProvider.getOrderList(userIdx, type, page);
