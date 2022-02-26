@@ -3,9 +3,10 @@ const {ORDER_STATUS} = require("../../../modules/constants");
 //존재하는 orderCraftIdx인지
 async function isExistOrderCraftIdx(connection, orderCraftIdx){
   const query = `
-  SELECT EXISTS(SELECT orderCraftIdx
-    FROM OrderCraft
-    WHERE orderCraftIdx = ${orderCraftIdx}) as isExist;
+  SELECT EXISTS(SELECT *
+    FROM OrderCraft OC
+            JOIN OrderT O ON O.orderIdx = OC.orderIdx
+    WHERE OC.orderCraftIdx = ${orderCraftIdx} && O.isPaid = 'Y') AS isExist;
   `;
   const [rows] = await connection.query(query);
   return rows[0]['isExist'];

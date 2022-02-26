@@ -1,16 +1,5 @@
 const {ORDER_STATUS} = require('../../../modules/constants');
 
-//존재하는 orderCraftIdx인지
-async function isExistOrderCraftIdx(connection, orderCraftIdx){
-  const query = `
-  SELECT EXISTS(SELECT orderCraftIdx
-    FROM OrderCraft
-    WHERE orderCraftIdx = ${orderCraftIdx}) as isExist;
-  `;
-  const [rows] = await connection.query(query);
-  return rows[0]['isExist'];
-}
-
 //작가의 orderCraftIdx인지
 async function isArtistOrderCraftIdx(connection, artistIdx, orderCraftIdx){
   const query = `
@@ -121,7 +110,6 @@ async function getDeliveryInfo(connection, orderCraftIdx){
 }
 
 module.exports = {
-  isExistOrderCraftIdx,
   isArtistOrderCraftIdx,
   canCreateSendingInfo,
   createSendingInfo,

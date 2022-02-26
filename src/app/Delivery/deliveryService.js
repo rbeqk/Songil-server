@@ -1,5 +1,6 @@
 const deliveryDao = require('./deliveryDao');
 const artistAskDao = require('../ArtistAsk/artistAskDao');
+const orderStatusDao = require('../OrderStatus/orderStatusDao');
 const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
@@ -13,7 +14,7 @@ exports.createSendingInfo = async (userIdx, orderCraftIdx, sentAt, tCode, tInvoi
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
-      const isExistOrderCraftIdx = await deliveryDao.isExistOrderCraftIdx(connection, orderCraftIdx);
+      const isExistOrderCraftIdx = await orderStatusDao.isExistOrderCraftIdx(connection, orderCraftIdx);
       if (!isExistOrderCraftIdx){
         connection.release();
         return errResponse(baseResponse.INVALID_ORDER_CRAFT_IDX);
