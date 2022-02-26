@@ -72,7 +72,7 @@ exports.getOrderListPage = async (userIdx, type) => {
       }
       //반품/취소 요청 현황 조회
       else if (type === 'cancelOrReturn'){
-        const totalCnt = await artistPageDao.getCancelOrReturnList(connection, artistIdx);
+        const totalCnt = await artistPageDao.getCancelOrReturnListCnt(connection, artistIdx);
         const totalPages = getTotalPage(totalCnt, ITEMS_PER_PAGE.ARTIST_PAGE_CANCEL_OR_RETURN_LIST_PER_PAGE);
         result = new pageInfo(totalPages, ITEMS_PER_PAGE.ARTIST_PAGE_CANCEL_OR_RETURN_LIST_PER_PAGE);
       }

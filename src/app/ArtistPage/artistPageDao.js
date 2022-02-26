@@ -1,4 +1,6 @@
-const {ORDER_STATUS, ORDER_CANCEL_REASON, ORDER_CANCEL_RETURN_STATUS} = require("../../../modules/constants");
+const {
+  ORDER_STATUS, ORDER_CANCEL_REASON, ORDER_RETURN_REASON, ORDER_CANCEL_RETURN_STATUS
+} = require("../../../modules/constants");
 
 //작가 craft 관한 orderCraftIdx인지
 async function isArtistOrderCraftIdx(connection, artistIdx, orderCraftIdx){
@@ -40,26 +42,32 @@ async function getOrderCraftUserInfo(connection, orderCraftIdx){
 //작가관련 주문현황 총 개수(=날짜 개수) 가져오기
 async function getBasicOrderListCnt(connection, artistIdx){
   const query = `
-  SELECT COUNT(DISTINCT DATE_FORMAT(O.createdAt, '%Y-%m-%d')) AS totalCnt
+  SELECT COUNT(DISTINCT DATE(O.createdAt)) AS totalCnt
   FROM OrderCraft OC
           JOIN OrderT O ON O.orderIdx = OC.orderIdx
           JOIN Craft C ON C.craftIdx = OC.craftIdx
   WHERE C.artistIdx = ${artistIdx} &&
-        OC.orderCraftIdx NOT IN (${ORDER_STATUS.REQUEST_CANCEL}, ${ORDER_STATUS.REQUEST_RETURN});
+        OC.orderCraftIdx NOT IN (${ORDER_STATUS.REQUEST_CANCEL}, ${ORDER_STATUS.REQUEST_RETURN}, ${ORDER_STATUS.CALCEL_COMPLETED});
   `;
   const [rows] = await connection.query(query);
   return rows[0]['totalCnt'];
 }
 
 ///반품/취소 요청 현황 총 개수(=날짜 개수) 가져오기
-async function getCancelOrReturnList(connection, artistIdx){
+async function getCancelOrReturnListCnt(connection, artistIdx){
   const query = `
-  SELECT COUNT(DISTINCT DATE_FORMAT(O.createdAt, '%Y-%m-%d')) AS totalCnt
-  FROM OrderCraft OC
-          JOIN OrderT O ON O.orderIdx = OC.orderIdx
-          JOIN Craft C ON C.craftIdx = OC.craftIdx
-  WHERE C.artistIdx = ${artistIdx} &&
-        OC.orderCraftIdx IN (${ORDER_STATUS.REQUEST_CANCEL}, ${ORDER_STATUS.REQUEST_RETURN});
+  SELECT COUNT(T.date) AS totalCnt
+  FROM (SELECT DISTINCT DATE(OCAN.reqCreatedAt) AS date
+        FROM OrderCancel OCAN
+                JOIN OrderCraft OC ON OC.orderCraftIdx = OCAN.orderCraftIdx
+                JOIN Craft C ON C.craftIdx = OC.craftIdx
+        WHERE C.artistIdx = ${artistIdx}
+        UNION
+        SELECT DISTINCT DATE(ORE.reqCreatedAt) AS date
+        FROM OrderReturn ORE
+                JOIN OrderCraft OC ON OC.orderCraftIdx = ORE.orderCraftIdx
+                JOIN Craft C ON C.craftIdx = OC.craftIdx
+        WHERE C.artistIdx = ${artistIdx}) T;
   `;
   const [rows] = await connection.query(query);
   return rows[0]['totalCnt'];
@@ -111,12 +119,19 @@ async function getBasicOrderInfo(connection, artistIdx, createdAt){
 //작가관련 반품/취소 요청 현황 날짜 가져오기
 async function getcancelOrReturnOrderCreatedAtArr(connection, artistIdx, startItemIdx, itemsPerPage){
   const query = `
-  SELECT DISTINCT DATE_FORMAT(OCAN.reqCreatedAt, '%Y.%m.%d') AS date
-  FROM OrderCancel OCAN
-          JOIN OrderCraft OC ON OC.orderCraftIdx = OCAN.orderCraftIdx
-          JOIN Craft C ON C.craftIdx = OC.craftIdx
-  WHERE C.artistIdx = ${artistIdx}
-  ORDER BY date
+  SELECT T.date
+  FROM (SELECT DISTINCT DATE_FORMAT(OCAN.reqCreatedAt, '%Y.%m.%d') AS date
+        FROM OrderCancel OCAN
+                JOIN OrderCraft OC ON OC.orderCraftIdx = OCAN.orderCraftIdx
+                JOIN Craft C ON C.craftIdx = OC.craftIdx
+        WHERE C.artistIdx = ${artistIdx}
+        UNION
+        SELECT DISTINCT DATE_FORMAT(ORE.reqCreatedAt, '%Y.%m.%d') AS date
+        FROM OrderReturn ORE
+                JOIN OrderCraft OC ON OC.orderCraftIdx = ORE.orderCraftIdx
+                JOIN Craft C ON C.craftIdx = OC.craftIdx
+        WHERE C.artistIdx = ${artistIdx}) T
+  ORDER BY T.date
   LIMIT ${startItemIdx}, ${itemsPerPage};
   `;
   const [rows] = await connection.query(query);
@@ -144,7 +159,7 @@ async function getcancelOrReturnOrderInfo(connection, artistIdx, createdAt){
           JOIN User U ON U.userIdx = O.userIdx
           JOIN OrderCancelReason OCR ON OCR.orderCancelReasonIdx = OCAN.orderCancelReasonIdx
   WHERE C.artistIdx = ${artistIdx} && DATE(OCAN.reqCreatedAt) = ?
-  UNION
+  UNION ALL
   SELECT ORE.orderCraftIdx                                                      AS orderDetailIdx,
         IFNULL(ORE.resStatusIdx, ${ORDER_CANCEL_RETURN_STATUS.REQUEST_RETURN}) AS status,
         C.craftIdx,
@@ -152,8 +167,8 @@ async function getcancelOrReturnOrderInfo(connection, artistIdx, createdAt){
         C.name,
         O.userIdx,
         U.nickname                                                             AS userName,
-        IF(ORE.orderReturnReasonIdx = ${ORDER_CANCEL_REASON.ETC_REASON}, ORE.etcReason,
-            ORE.etcReason)                                                      AS reason,
+        IF(ORE.orderReturnReasonIdx = ${ORDER_RETURN_REASON.ETC_REASON}, ORE.etcReason,
+            ORR.reason)                                                      AS reason,
         IF(ORE.resStatusIdx, 'N', 'Y')                                         AS canChangeStatus,
         ORE.reqCreatedAt                                                       AS compareCreatedAt
   FROM OrderReturn ORE
@@ -173,7 +188,7 @@ module.exports = {
   isArtistOrderCraftIdx,
   getOrderCraftUserInfo,
   getBasicOrderListCnt,
-  getCancelOrReturnList,
+  getCancelOrReturnListCnt,
   getBasicOrderCreatedAtArr,
   getBasicOrderInfo,
   getcancelOrReturnOrderCreatedAtArr,
