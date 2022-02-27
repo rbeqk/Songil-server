@@ -10,4 +10,7 @@ module.exports = function (app){
 
   //사용자 최근 검색어 삭제 API
   app.delete('/search', jwtMiddleware, searchController.deleteUserRecentlySearch);
+
+  //검색 페이지 개수 조회 API
+  app.get('/search/page', searchController.getSearchPage);
 }

@@ -50,3 +50,19 @@ exports.deleteAllUserRecentlySearch = async (req, res) => {
 
   return res.send(deleteAllUserRecentlySearch);
 }
+
+/*
+  API No. 3.6
+  API Name: 검색 페이지 개수 조회 API
+  [GET] /search/page
+  query: keyword, category
+*/
+exports.getSearchPage = async (req, res) => {
+  const {keyword, category} = req.query;
+
+  if (!(keyword && category)) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (!['shop', 'with', 'article'].includes(category)) return res.send(errResponse(baseResponse.INVALID_CATEGORY_NAME));
+
+  const getSearchPage = await searchProvider.getSearchPage(keyword, category);
+  return res.send(getSearchPage);
+}

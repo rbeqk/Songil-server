@@ -77,6 +77,21 @@ async function deleteAllUserRecentlySearch(connection, userIdx){
   return rows;
 }
 
+//작가명, 상품명, 상품 설명, 스토어 카테고리에 해당 키워드 들어가있는 상품 가져오기
+async function getCraftCorrespondToBasic(connection, keyword){
+  const query = `
+  SELECT C.craftIdx
+  FROM Craft C
+          JOIN CraftCategory CC ON CC.craftCategoryIdx = C.craftCategoryIdx
+          JOIN Artist A ON A.artistIdx = C.artistIdx
+          JOIN User U ON U.userIdx = A.userIdx
+  WHERE C.name LIKE CONCAT('%', ?, '%') || U.nickname LIKE CONCAT('%', ?, '%')
+            || C.content LIKE CONCAT('%', ?, '%') || CC.name LIKE CONCAT('%', ?, '%');
+  `;
+  const [rows] = await connection.query(query, [keyword, keyword, keyword]);
+  return rows.map(item => item.craftIdx); 
+}
+
 module.exports = {
   getRecentlySearch,
   getPopularSearch,
@@ -85,4 +100,5 @@ module.exports = {
   deleteUserRecentlySearch,
   isExistUserSearchs,
   deleteAllUserRecentlySearch,
+  getCraftCorrespondToBasic,
 }
