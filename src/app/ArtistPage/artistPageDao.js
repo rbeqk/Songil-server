@@ -47,7 +47,7 @@ async function getBasicOrderListCnt(connection, artistIdx){
           JOIN OrderT O ON O.orderIdx = OC.orderIdx
           JOIN Craft C ON C.craftIdx = OC.craftIdx
   WHERE C.artistIdx = ${artistIdx} && O.isPaid = 'Y' &&
-        OC.orderCraftIdx NOT IN (${ORDER_STATUS.REQUEST_CANCEL}, ${ORDER_STATUS.REQUEST_RETURN}, ${ORDER_STATUS.CALCEL_COMPLETED});
+        OC.orderStatusIdx NOT IN (${ORDER_STATUS.REQUEST_CANCEL}, ${ORDER_STATUS.REQUEST_RETURN}, ${ORDER_STATUS.CALCEL_COMPLETED});
   `;
   const [rows] = await connection.query(query);
   return rows[0]['totalCnt'];
