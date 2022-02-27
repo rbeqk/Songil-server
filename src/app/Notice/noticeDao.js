@@ -8,6 +8,17 @@ async function getNotice(connection){
   return rows;
 }
 
+async function getFAQ(connection){
+  const query = `
+  SELECT title, content FROM FAQ
+  WHERE isDeleted = 'N'
+  ORDER BY faqIdx DESC;
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   getNotice,
+  getFAQ,
 }

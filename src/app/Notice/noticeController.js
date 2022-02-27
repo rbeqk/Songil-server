@@ -13,3 +13,14 @@ exports.getNotice = async (req, res) => {
 
   return res.send(getNotice);
 }
+
+/*
+  API No. 13.3
+  API Name: F&Q 조회 API
+  [GET] /faq
+*/
+exports.getFAQ = async (req, res) => {
+  const getFAQ = await noticeProvider.getFAQ();
+
+  return res.send(getFAQ);
+}

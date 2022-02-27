@@ -10,7 +10,7 @@ exports.getNotice = async () => {
     const connection = await pool.getConnection(async conn => conn);
     try{
       const notice = await noticeDao.getNotice(connection);
-      
+
       connection.release();
       return response(baseResponse.SUCCESS, notice);
 
@@ -21,6 +21,27 @@ exports.getNotice = async () => {
     }
   }catch(err){
     logger.error(`getNotice DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}
+
+//F&Q
+exports.getFAQ = async () => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+      const faq = await noticeDao.getFAQ(connection);
+
+      connection.release();
+      return response(baseResponse.SUCCESS, faq);
+
+    }catch(err){
+      connection.release();
+      logger.error(`getFAQ DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`getFAQ DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }

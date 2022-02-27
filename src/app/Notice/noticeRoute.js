@@ -4,4 +4,7 @@ module.exports  = function(app){
 
   //공지사항 조회 API
   app.get('/notice', noticeController.getNotice);
+
+  //F&Q 조회 API
+  app.get('/faq', noticeController.getFAQ);
 }
