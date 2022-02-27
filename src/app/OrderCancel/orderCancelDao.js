@@ -56,7 +56,7 @@ async function canResCancelOrderCraft(connection, orderCraftIdx, type){
   }
   else if (type === 'approval'){
     query = `
-    SELECT IF(orderStatusIdx = ${ORDER_STATUS.REQUEST_CANCEL} || orderStatusIdx = ${ORDER_STATUS.REJECT_CANCEL}, 1, 0) AS canRes
+    SELECT IF(orderStatusIdx = ${ORDER_STATUS.REQUEST_CANCEL}, 1, 0) AS canRes
     FROM OrderCraft
     WHERE orderCraftIdx = ${orderCraftIdx};
     `;

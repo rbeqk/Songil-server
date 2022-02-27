@@ -81,7 +81,7 @@ async function getBasicOrderCreatedAtArr(connection, artistIdx, startItemIdx, it
           JOIN OrderT O ON O.orderIdx = OC.orderIdx
           JOIN Craft C ON C.craftIdx = OC.craftIdx
   WHERE C.artistIdx = ${artistIdx} && O.isPaid = 'Y' &&
-        OC.orderCraftIdx NOT IN (${ORDER_STATUS.REQUEST_CANCEL}, ${ORDER_STATUS.REQUEST_RETURN})
+        OC.orderStatusIdx NOT IN (${ORDER_STATUS.REQUEST_CANCEL}, ${ORDER_STATUS.REQUEST_RETURN}, ${ORDER_STATUS.CALCEL_COMPLETED})
   ORDER BY date
   LIMIT ${startItemIdx}, ${itemsPerPage};
   `;
@@ -108,7 +108,7 @@ async function getBasicOrderInfo(connection, artistIdx, createdAt){
                                                               JOIN OrderT O ON O.orderIdx = OC.orderIdx
                                                               JOIN Craft C ON C.craftIdx = OC.craftIdx
                                                       WHERE C.artistIdx = ${artistIdx} && O.isPaid = 'Y' &&
-                                                            OC.orderCraftIdx NOT IN
+                                                            OC.orderStatusIdx NOT IN
                                                             (${ORDER_STATUS.REQUEST_CANCEL},
                                                             ${ORDER_STATUS.REQUEST_RETURN},
                                                             ${ORDER_STATUS.CALCEL_COMPLETED}))
