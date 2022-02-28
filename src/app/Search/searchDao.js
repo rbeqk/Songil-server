@@ -85,10 +85,10 @@ async function getCraftCorrespondToBasic(connection, keyword){
   SELECT C.craftIdx
   FROM Craft C
           JOIN CraftCategory CC ON CC.craftCategoryIdx = C.craftCategoryIdx
-          JOIN Artist A ON A.artistIdx = C.artistIdx
-          JOIN User U ON U.userIdx = A.userIdx
+          JOIN Artist A ON A.artistIdx = C.artistIdx && A.isDeleted = 'N'
+          JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
   WHERE C.name LIKE CONCAT('%', ?, '%') || U.nickname LIKE CONCAT('%', ?, '%')
-            || C.content LIKE CONCAT('%', ?, '%') || CC.name LIKE CONCAT('%', ?, '%');
+            || C.content LIKE CONCAT('%', ?, '%') || CC.name LIKE CONCAT('%', ?, '%') && C.isDeleted = 'N';
   `;
   const [rows] = await connection.query(query, [keyword, keyword, keyword, keyword]);
   return rows.map(item => item.craftIdx); 
@@ -97,9 +97,12 @@ async function getCraftCorrespondToBasic(connection, keyword){
 //소재에 해당 키워드 들어가있는 상품 가져오기
 async function getCraftCorrespondToMaterial(connection, keyword){
   const query = `
-  SELECT DISTINCT C.craftIdx FROM Craft C
-  JOIN CraftMaterial CM on C.craftIdx = CM.craftIdx
-  WHERE CM.material LIKE CONCAT('%', ?, '%');
+  SELECT DISTINCT C.craftIdx
+  FROM Craft C
+          JOIN CraftMaterial CM on C.craftIdx = CM.craftIdx
+          JOIN Artist A ON A.artistIdx = C.artistIdx && A.isDeleted = 'N'
+          JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
+  WHERE CM.material LIKE CONCAT('%', ?, '%') && C.isDeleted = 'N';
   `;
   const [rows] = await connection.query(query, [keyword]);
   return rows.map(item => item.craftIdx);
@@ -109,14 +112,17 @@ async function getCraftCorrespondToMaterial(connection, keyword){
 async function getCraftCorrespondToUsage(connection, keyword){
   const query = `
   SELECT DISTINCT C.craftIdx,
-        CU.craftUsageItemIdx,
-        CUC.name                      AS craftUsageCategory,
-        IFNULL(CU.etcUsage, CUI.name) AS craftUsage
+                  CU.craftUsageItemIdx,
+                  CUC.name                      AS craftUsageCategory,
+                  IFNULL(CU.etcUsage, CUI.name) AS craftUsage
   FROM Craft C
           JOIN CraftUsage CU ON CU.craftIdx = C.craftIdx
           JOIN CraftUsageItem CUI ON CUI.craftUsageItemIdx = CU.craftUsageItemIdx
           JOIN CraftUsageCategory CUC on CUC.craftUsageCategoryIdx = CUI.craftUsageCategoryIdx
-  WHERE CUC.name LIKE CONCAT('%', ?, '%') || CU.etcUsage LIKE CONCAT('%', ?, '%') || CUI.name LIKE CONCAT('%', ?, '%');
+          JOIN Artist A ON A.artistIdx = C.artistIdx && A.isDeleted = 'N'
+          JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
+  WHERE CUC.name LIKE CONCAT('%', ?, '%') || CU.etcUsage LIKE CONCAT('%', ?, '%') ||
+        CUI.name LIKE CONCAT('%', ?, '%') && C.isDeleted = 'N';
   `;
   const [rows] = await connection.query(query, [keyword, keyword, keyword]);
   return rows.map(item => item.craftIdx);
@@ -128,8 +134,7 @@ async function getQnACorrespond(connection, keyword){
   SELECT ${CATEGORY.QNA} AS categoryIdx, Q.qnaIdx
   FROM QnA Q
           JOIN User U ON U.userIdx = Q.userIdx && U.isDeleted = 'N'
-  WHERE Q.title LIKE CONCAT('%', ?, '%') || Q.content LIKE CONCAT('%', ?, '%') && Q.isDeleted = 'N'
-  ORDER BY Q.qnaIdx;
+  WHERE Q.title LIKE CONCAT('%', ?, '%') || Q.content LIKE CONCAT('%', ?, '%') && Q.isDeleted = 'N';
   `;
   const [rows] = await connection.query(query, [keyword, keyword, keyword]);
   return rows;
@@ -141,8 +146,7 @@ async function getStoryCorrespond(connection, keyword){
   SELECT ${CATEGORY.STORY} AS categoryIdx, S.storyIdx
   FROM Story S
           JOIN User U ON U.userIdx = S.userIdx && U.isDeleted = 'N'
-  WHERE S.title LIKE CONCAT('%', ?, '%') || S.content LIKE CONCAT('%', ?, '%') && S.isDeleted = 'N'
-  ORDER BY S.storyIdx;
+  WHERE S.title LIKE CONCAT('%', ?, '%') || S.content LIKE CONCAT('%', ?, '%') && S.isDeleted = 'N';
   `;
   const [rows] = await connection.query(query, [keyword, keyword, keyword]);
   return rows;
@@ -155,8 +159,7 @@ async function getAbTewstCorrespond(connection, keyword){
   FROM ABTest AB
           JOIN Artist A ON A.artistIdx = AB.artistIdx && A.isDeleted = 'N'
           JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
-  WHERE AB.isDeleted = 'N' && AB.content LIKE CONCAT('%', ?, '%') || U.nickname LIKE CONCAT('%', ?, '%')
-  ORDER BY AB.abTestIdx;
+  WHERE AB.isDeleted = 'N' && AB.content LIKE CONCAT('%', ?, '%') || U.nickname LIKE CONCAT('%', ?, '%');
   `;
   const [rows] = await connection.query(query, [keyword, keyword]);
   return rows;
