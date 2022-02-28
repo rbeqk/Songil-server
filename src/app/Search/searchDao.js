@@ -111,10 +111,7 @@ async function getCraftCorrespondToMaterial(connection, keyword){
 //용도 아이템에 해당 키워드 들어가있는 상품 가져오기
 async function getCraftCorrespondToUsage(connection, keyword){
   const query = `
-  SELECT DISTINCT C.craftIdx,
-                  CU.craftUsageItemIdx,
-                  CUC.name                      AS craftUsageCategory,
-                  IFNULL(CU.etcUsage, CUI.name) AS craftUsage
+  SELECT DISTINCT C.craftIdx
   FROM Craft C
           JOIN CraftUsage CU ON CU.craftIdx = C.craftIdx
           JOIN CraftUsageItem CUI ON CUI.craftUsageItemIdx = CU.craftUsageItemIdx
@@ -165,6 +162,56 @@ async function getAbTewstCorrespond(connection, keyword){
   return rows;
 }
 
+//제목, 요약, 카테고리명, 에디터 이름으로 아티클 검색
+async function getArticleCorrspondToBasic(connection, keyword){
+  const query = `
+  SELECT A.articleIdx, A.title, A.summary, AC.name, E.nickname
+  FROM Article A
+          JOIN ArticleCategory AC ON A.articleCategoryIdx = AC.articleCategoryIdx
+          JOIN Editor E on E.editorIdx = A.editorIdx
+  WHERE A.isDeleted = 'N' && A.title LIKE CONCAT('%', ?, '%') || A.summary LIKE CONCAT('%', ?, '%') ||
+        AC.name LIKE CONCAT('%', ?, '%') || E.nickname LIKE CONCAT('%', ?, '%');
+  `;
+  const [rows] = await connection.query(query, [keyword, keyword, keyword, keyword]);
+  return rows.map(item => item.articleIdx);
+}
+
+//태그로 아티클 검색
+async function getArticleCorrespondToTag(connection, keyword){
+  const query = `
+  SELECT DISTINCT A.articleIdx
+  FROM Article A
+          LEFT JOIN ArticleTag AT ON AT.articleIdx = A.articleIdx
+  WHERE A.isDeleted = 'N' && AT.tag LIKE CONCAT('%', ?, '%');
+  `;
+  const [rows] = await connection.query(query, [keyword]);
+  return rows.map(item => item.articleIdx);
+}
+
+//상품 포함하고 있는 아티클 검색
+async function getArticleCorrespondToCraft(connection, craftCorrespond){
+  const query = `
+  SELECT DISTINCT A.articleIdx
+  FROM Article A
+          LEFT JOIN ArticleCraft AC ON AC.articleIdx = A.articleIdx
+  WHERE A.isDeleted = 'N' && AC.craftIdx IN (?);
+  `;
+  const [rows] = await connection.query(query, [craftCorrespond]);
+  return rows.map(item => item.articleIdx);
+}
+
+//내용으로 아티클 검색
+async function getArticleCorrespondToContent(connection, keyword){
+  const query = `
+  SELECT DISTINCT A.articleIdx
+    FROM Article A
+            LEFT JOIN ArticleContent AC on A.articleIdx = AC.articleIdx
+    WHERE A.isDeleted = 'N' && AC.content LIKE CONCAT('%', ?, '%');
+  `;
+  const [rows] = await connection.query(query, [keyword]);
+  return rows.map(item => item.articleIdx);
+}
+
 module.exports = {
   getRecentlySearch,
   getPopularSearch,
@@ -179,4 +226,8 @@ module.exports = {
   getQnACorrespond,
   getStoryCorrespond,
   getAbTewstCorrespond,
+  getArticleCorrspondToBasic,
+  getArticleCorrespondToTag,
+  getArticleCorrespondToCraft,
+  getArticleCorrespondToContent,
 }
