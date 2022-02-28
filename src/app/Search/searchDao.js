@@ -1,3 +1,5 @@
+const {CATEGORY} = require('../../../modules/constants');
+
 //사용자 별 최근 검색어 가져오기(15개)
 async function getRecentlySearch(connection, userIdx){
   const query = `
@@ -120,6 +122,46 @@ async function getCraftCorrespondToUsage(connection, keyword){
   return rows.map(item => item.craftIdx);
 }
 
+//qna 검색
+async function getQnACorrespond(connection, keyword){
+  const query = `
+  SELECT ${CATEGORY.QNA} AS categoryIdx, Q.qnaIdx
+  FROM QnA Q
+          JOIN User U ON U.userIdx = Q.userIdx && U.isDeleted = 'N'
+  WHERE Q.title LIKE CONCAT('%', ?, '%') || Q.content LIKE CONCAT('%', ?, '%') && Q.isDeleted = 'N'
+  ORDER BY Q.qnaIdx;
+  `;
+  const [rows] = await connection.query(query, [keyword, keyword, keyword]);
+  return rows;
+}
+
+//story 검색
+async function getStoryCorrespond(connection, keyword){
+  const query = `
+  SELECT ${CATEGORY.STORY} AS categoryIdx, S.storyIdx
+  FROM Story S
+          JOIN User U ON U.userIdx = S.userIdx && U.isDeleted = 'N'
+  WHERE S.title LIKE CONCAT('%', ?, '%') || S.content LIKE CONCAT('%', ?, '%') && S.isDeleted = 'N'
+  ORDER BY S.storyIdx;
+  `;
+  const [rows] = await connection.query(query, [keyword, keyword, keyword]);
+  return rows;
+}
+
+//abtest 검색
+async function getAbTewstCorrespond(connection, keyword){
+  const query = `
+  SELECT ${CATEGORY.ABTEST} AS categoryIdx, AB.abTestIdx
+  FROM ABTest AB
+          JOIN Artist A ON A.artistIdx = AB.artistIdx && A.isDeleted = 'N'
+          JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
+  WHERE AB.isDeleted = 'N' && AB.content LIKE CONCAT('%', ?, '%') || U.nickname LIKE CONCAT('%', ?, '%')
+  ORDER BY AB.abTestIdx;
+  `;
+  const [rows] = await connection.query(query, [keyword, keyword]);
+  return rows;
+}
+
 module.exports = {
   getRecentlySearch,
   getPopularSearch,
@@ -131,4 +173,7 @@ module.exports = {
   getCraftCorrespondToBasic,
   getCraftCorrespondToMaterial,
   getCraftCorrespondToUsage,
+  getQnACorrespond,
+  getStoryCorrespond,
+  getAbTewstCorrespond,
 }

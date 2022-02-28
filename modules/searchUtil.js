@@ -25,10 +25,14 @@ const getCorrespondIdxArr = async (connection, keyword, category) => {
       );
     }
     else if (category === 'with'){
+      const storyCorrespond = await searchDao.getStoryCorrespond(connection, keyword);
+      const qnaCorrespond = await searchDao.getQnACorrespond(connection, keyword);
+      const abTestCorrespond = await searchDao.getAbTewstCorrespond(connection, keyword);
 
+      correspondIdxArr = [...storyCorrespond, ...qnaCorrespond, ...abTestCorrespond];
     }
     else if (category === 'article'){
-
+    
     }
 
     return correspondIdxArr;
