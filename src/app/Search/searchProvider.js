@@ -49,7 +49,7 @@ exports.getSearchPage = async (keyword, category) => {
 
       const correspondIdxArr = await getCorrespondIdxArr(connection, keyword, category);
 
-      const totalCnt = len(correspondIdxArr);
+      const totalCnt = correspondIdxArr.length;
       const totalPages = getTotalPage(totalCnt, ITEMS_PER_PAGE.SEARCH_PER_PAGE);
 
       const result = new pageInfo(totalPages, ITEMS_PER_PAGE.SEARCH_PER_PAGE);

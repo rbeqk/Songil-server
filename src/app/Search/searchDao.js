@@ -88,8 +88,36 @@ async function getCraftCorrespondToBasic(connection, keyword){
   WHERE C.name LIKE CONCAT('%', ?, '%') || U.nickname LIKE CONCAT('%', ?, '%')
             || C.content LIKE CONCAT('%', ?, '%') || CC.name LIKE CONCAT('%', ?, '%');
   `;
-  const [rows] = await connection.query(query, [keyword, keyword, keyword]);
+  const [rows] = await connection.query(query, [keyword, keyword, keyword, keyword]);
   return rows.map(item => item.craftIdx); 
+}
+
+//소재에 해당 키워드 들어가있는 상품 가져오기
+async function getCraftCorrespondToMaterial(connection, keyword){
+  const query = `
+  SELECT DISTINCT C.craftIdx FROM Craft C
+  JOIN CraftMaterial CM on C.craftIdx = CM.craftIdx
+  WHERE CM.material LIKE CONCAT('%', ?, '%');
+  `;
+  const [rows] = await connection.query(query, [keyword]);
+  return rows.map(item => item.craftIdx);
+}
+
+//용도 아이템에 해당 키워드 들어가있는 상품 가져오기
+async function getCraftCorrespondToUsage(connection, keyword){
+  const query = `
+  SELECT DISTINCT C.craftIdx,
+        CU.craftUsageItemIdx,
+        CUC.name                      AS craftUsageCategory,
+        IFNULL(CU.etcUsage, CUI.name) AS craftUsage
+  FROM Craft C
+          JOIN CraftUsage CU ON CU.craftIdx = C.craftIdx
+          JOIN CraftUsageItem CUI ON CUI.craftUsageItemIdx = CU.craftUsageItemIdx
+          JOIN CraftUsageCategory CUC on CUC.craftUsageCategoryIdx = CUI.craftUsageCategoryIdx
+  WHERE CUC.name LIKE CONCAT('%', ?, '%') || CU.etcUsage LIKE CONCAT('%', ?, '%') || CUI.name LIKE CONCAT('%', ?, '%');
+  `;
+  const [rows] = await connection.query(query, [keyword, keyword, keyword]);
+  return rows.map(item => item.craftIdx);
 }
 
 module.exports = {
@@ -101,4 +129,6 @@ module.exports = {
   isExistUserSearchs,
   deleteAllUserRecentlySearch,
   getCraftCorrespondToBasic,
+  getCraftCorrespondToMaterial,
+  getCraftCorrespondToUsage,
 }

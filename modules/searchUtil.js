@@ -2,31 +2,32 @@ const searchDao = require('../src/app/Search/searchDao');
 const {pool} = require('../config/database');
 const {logger} = require('../config/winston');
 
-const getCorrespondIdxArr = async () => {
+const getCorrespondIdxArr = async (connection, keyword, category) => {
   try{
     let correspondIdxArr = [];
     
-    if (keyword === 'shop'){
+    if (category === 'shop'){
       //작가명, 상품명, 상품 설명, 스토리 카테고리
       const craftCorrespondToBasic = await searchDao.getCraftCorrespondToBasic(connection, keyword);
 
       //소재
       const craftCorrespondToMaterial = await searchDao.getCraftCorrespondToMaterial(connection, keyword);
 
-      //용도
-      const craftCorrespondToUsage = await searchDao.getCraftCorrespondToUsageCraft(connection, keyword);
+      //용도 아이템
+      const craftCorrespondToUsage = await searchDao.getCraftCorrespondToUsage(connection, keyword);
 
-      correspondIdxArr = [
-        new Set(
+      correspondIdxArr = Array.from(
+        new Set([
         ...craftCorrespondToBasic,
         ...craftCorrespondToMaterial,
-        ...craftCorrespondToUsage)
-      ];
+        ...craftCorrespondToUsage
+        ])
+      );
     }
-    else if (keyword === 'with'){
+    else if (category === 'with'){
 
     }
-    else if (keyword === 'article'){
+    else if (category === 'article'){
 
     }
 
