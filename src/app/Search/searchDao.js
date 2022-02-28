@@ -190,6 +190,10 @@ async function getArticleCorrespondToTag(connection, keyword){
 
 //상품 포함하고 있는 아티클 검색
 async function getArticleCorrespondToCraft(connection, craftCorrespond){
+  
+  //상품 arr없을 경우 유효하지 않은 값으로 변경
+  if (craftCorrespond.length === 0) craftCorrespond = [-1];
+
   const query = `
   SELECT DISTINCT A.articleIdx
   FROM Article A
