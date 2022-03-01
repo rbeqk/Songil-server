@@ -216,6 +216,42 @@ async function getArticleCorrespondToContent(connection, keyword){
   return rows.map(item => item.articleIdx);
 }
 
+//상품 정보 가져오기
+async function getCraftInfo(connection, userIdx, sort, correspondIdxArr, startItemIdx, itemsPerPage){
+  
+  if (correspondIdxArr.length === 0) correspondIdxArr = [-1];
+
+  const query = `
+  SELECT C.craftIdx,
+        C.mainImageUrl,
+        C.name,
+        C.artistIdx,
+        U.nickname                                                                          as artistName,
+        C.price,
+        IF(TIMESTAMPDIFF(DAY, C.createdAt, NOW()) > 3, 'N', 'Y')                            as isNew,
+        C.isSoldOut,
+        (SELECT COUNT(*)
+          FROM CraftLike CL
+          WHERE CL.craftIdx = C.craftIdx)                                                    as totalLikeCnt,
+        IF(${userIdx} = -1, 'N',
+            IF(EXISTS(SELECT *
+                      FROM CraftLike CL
+                      WHERE CL.userIdx = ${userIdx} && CL.craftIdx = C.craftIdx), 'Y', 'N')) as isLike,
+        (SELECT COUNT(*)
+          FROM CraftComment CC
+          WHERE CC.craftIdx = C.craftIdx && CC.isDeleted = 'N')                              as totalCommentCnt
+  FROM Craft C
+          JOIN Artist A ON A.artistIdx = C.artistIdx && A.isDeleted = 'N'
+          JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
+  WHERE C.isDeleted = 'N' && C.craftIdx IN (?)
+  ORDER BY (CASE WHEN ? = 'new' THEN C.createdAt END) ASC,
+          (CASE WHEN ? = 'popular' THEN totalLikeCnt END) ASC
+  LIMIT ${startItemIdx}, ${itemsPerPage};
+  `;
+  const [rows] = await connection.query(query, [correspondIdxArr, sort, sort]);
+  return rows;
+}
+
 module.exports = {
   getRecentlySearch,
   getPopularSearch,
@@ -234,4 +270,5 @@ module.exports = {
   getArticleCorrespondToTag,
   getArticleCorrespondToCraft,
   getArticleCorrespondToContent,
+  getCraftInfo,
 }

@@ -66,3 +66,26 @@ exports.getSearchPage = async (req, res) => {
   const getSearchPage = await searchProvider.getSearchPage(keyword, category);
   return res.send(getSearchPage);
 }
+
+/*
+  API No. 3.5
+  API Name: 검색 API
+  [GET] /search
+  query: keyword, category, sort, page
+*/
+exports.getSearch = async (req ,res) => {
+  const {keyword, category, sort, page} = req.query;
+  const token = req.headers['x-access-token'];
+
+  if (!(keyword && category && sort && page)) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (!['shop', 'with', 'article'].includes(category)) return res.send(errResponse(baseResponse.INVALID_CATEGORY_NAME));
+  if (page < 1) return res.send(baseResponse.INVALID_PAGE);
+  if (!['popular', 'new'].includes(sort)) return res.send(errResponse(baseResponse.INVALID_SORT_NAME));
+
+  const userIdx = getUserIdx(token);
+  if (userIdx === false) return res.send(errResponse(baseResponse.TOKEN_VERIFICATION_FAILURE));
+
+  const getSearch = await searchProvider.getSearch(userIdx, keyword, category, sort, page);
+
+  return res.send(getSearch);
+}

@@ -54,6 +54,7 @@ exports.getSearchPage = async (keyword, category) => {
 
       const result = new pageInfo(totalPages, ITEMS_PER_PAGE.SEARCH_PER_PAGE);
 
+      connection.release();
       return response(baseResponse.SUCCESS, result);
       
     }catch(err){
@@ -63,6 +64,55 @@ exports.getSearchPage = async (keyword, category) => {
     }
   }catch(err){
     logger.error(`getSearchPage DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}
+
+//검색
+exports.getSearch = async (userIdx, keyword, category, sort, page) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+      const categoryArr = ['shop', 'with', 'article'];
+
+      let idxByCategory = [];
+      for (let item of categoryArr){
+        const correspondIdxArr = await getCorrespondIdxArr(connection, keyword, item);
+        idxByCategory.push(correspondIdxArr);
+      }
+
+      let result = {};
+      result.shopCnt = idxByCategory[0].length;
+      result.withCnt = idxByCategory[1].length;
+      result.articleCnt = idxByCategory[2].length;
+
+      const startItemIdx = (page-1) * ITEMS_PER_PAGE.SEARCH_PER_PAGE;
+
+      if (category === categoryArr[0]){
+        const correspondIdxArr = idxByCategory[0];
+        const craft = await searchDao.getCraftInfo(
+          connection, userIdx, sort, correspondIdxArr, startItemIdx, ITEMS_PER_PAGE.SEARCH_PER_PAGE
+        );
+
+        result.craft = craft.reverse();
+      }
+      else if (category === categoryArr[1]){
+
+      }
+      else if (category === categoryArr[2]){
+
+      }
+      
+      connection.release();
+      return response(baseResponse.SUCCESS, result);
+      
+    }catch(err){
+      connection.release();
+      logger.error(`getSearch DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`getSearch DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }

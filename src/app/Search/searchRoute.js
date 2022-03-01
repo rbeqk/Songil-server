@@ -13,4 +13,7 @@ module.exports = function (app){
 
   //검색 페이지 개수 조회 API
   app.get('/search/page', searchController.getSearchPage);
+
+  //검색 API
+  app.get('/search', searchController.getSearch);
 }
