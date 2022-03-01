@@ -4,4 +4,7 @@ module.exports  = function(app){
 
   //반품 요청 API
   app.post('/my-page/orders/:orderDetailIdx/return', jwtMiddleware, orderReturnController.reqOrderCraftReturn);
+
+  //반품 승인 및 거부 API
+  app.post('/artist-page/orders/:orderDetailIdx/return', jwtMiddleware, orderReturnController.resOrderCraftReturn);
 }

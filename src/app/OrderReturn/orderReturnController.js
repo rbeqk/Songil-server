@@ -30,3 +30,21 @@ exports.reqOrderCraftReturn = async (req, res) => {
   
   return res.send(reqOrderCraftReturn);
 }
+
+/*
+  API No. 8.17
+  API Name: 반품 승인 및 거부 API
+  [POST] /artist-page/orders/:orderDetailIdx/return
+  body: type
+*/
+exports.resOrderCraftReturn = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {orderDetailIdx: orderCraftIdx} = req.params;
+  const {type} = req.body;
+
+  if (!['approval', 'rejection'].includes(type)) return res.send(errResponse(baseResponse.INVALID_TYPE_NAME));
+
+  const resOrderCraftReturn = await orderReturnService.resOrderCraftReturn(userIdx, orderCraftIdx, type);
+
+  return res.send(resOrderCraftReturn);
+}
