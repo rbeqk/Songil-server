@@ -5,9 +5,8 @@ const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
-const {ORDER_STATUS, RES_STATUS} = require('../../../modules/constants');
-const RestClient = require('@bootpay/server-rest-client').RestClient;
-require('dotenv').config();
+const {ORDER_STATUS, RES_STATUS, BOOTPAY_RETURN_TYPE} = require('../../../modules/constants');
+const { bootPayRefund } = require('../../../modules/refundUtil');
 
 //주문취소 요청
 exports.reqOrderCraftCancel = async (userIdx, orderCraftIdx, reasonIdx, etcReason) => {
@@ -65,57 +64,9 @@ async function orderCraftCancelRejection(connection, orderCraftIdx){
 
 //주문취소 승인 시
 async function orderCraftCancelApproval(connection, orderCraftIdx){
-  const resStatusIdx = RES_STATUS.APPROVAL;
-  const orderStatusIdx = ORDER_STATUS.CALCEL_COMPLETED;
-
-  const cancelInfo = await orderCancelDao.getCancelInfo(connection, orderCraftIdx);
-
-  RestClient.setConfig(
-    process.env.BOOTPAY_APPLICATION_ID,
-    process.env.BOOTPAY_PRIVATE_KEY
-  );
-
-  try{
-    const response = await RestClient.getAccessToken();
-    if (response.status === 200 && response.data.token !== undefined){
-      const cancel = await RestClient.cancel({
-        receiptId: cancelInfo.receiptId,
-        price: cancelInfo.finalRefundPrice,
-        name: cancelInfo.nickname,
-        reason: cancelInfo.reason
-      });
-
-      if (cancel.status === 200){
-        console.log(cancel.data);
-        const cancelReceiptId = cancel.data.receipt_id;
-        await connection.beginTransaction();
-
-        await orderCancelDao.resOrderCraftCancel(connection, orderCraftIdx, resStatusIdx);
-        //TODO: orderCraft의 deliveryStatus도 변경
-        await orderCancelDao.updateOrderCraftStatus(connection, orderCraftIdx, orderStatusIdx);
-        await orderCancelDao.createRefundInfo(connection, cancelInfo.orderCancelIdx, cancelReceiptId, cancelInfo.finalRefundPrice);
-
-        if (cancelInfo.pointDiscount > 0){
-          await orderCancelDao.updateUserPointByCancel(connection, cancelInfo.userIdx, cancelInfo.pointDiscount);
-        }
-
-        if (cancelInfo.benefitDiscount > 0){
-          await orderCancelDao.updateBenefitStatus(connection, orderCraftIdx);
-        }
-
-        await connection.commit();
-
-        return [true, null];
-      }
-      else{
-        console.log(err);
-        return [false, err.message];
-      }
-    }
-  }catch(err){
-    console.log(err);
-    return [false, err.message];
-  }
+  const refundInfo = await orderCancelDao.getCancelInfo(connection, orderCraftIdx);
+  const result = await bootPayRefund(connection, orderCraftIdx, BOOTPAY_RETURN_TYPE.CANCEL, refundInfo);
+  return result;
 }
 
 //주문취소 승인 및 거부
