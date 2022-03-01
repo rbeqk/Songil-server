@@ -252,6 +252,36 @@ async function getCraftInfo(connection, userIdx, sort, correspondIdxArr, startIt
   return rows;
 }
 
+//아티클 정보 가져오기
+async function getArticleInfo(connection, userIdx, sort, correspondIdxArr, startItemIdx, itemsPerPage){
+
+  if (correspondIdxArr.length === 0) correspondIdxArr = [-1];
+
+  const query = `
+  SELECT A.articleIdx,
+        A.title,
+        A.mainImageUrl,
+        A.editorIdx,
+        E.nickname                                                                              as editorName,
+        DATE_FORMAT(A.createdAt, '%Y.%m.%d')                                                    as createdAt,
+        IF(${userIdx} = -1, 'N',
+            IF(EXISTS(SELECT *
+                      FROM ArticleLike AL
+                      WHERE AL.userIdx = ${userIdx} && AL.articleIdx = A.articleIdx), 'Y', 'N')) as isLike,
+        (SELECT COUNT(*)
+          FROM ArticleLike
+          WHERE articleIdx = A.articleIdx)                                                       AS totalLikeCnt
+  FROM Article A
+          JOIN Editor E on A.editorIdx = E.editorIdx && E.isDeleted = 'N'
+  WHERE A.isDeleted = 'N' && A.articleIdx IN (?)
+  ORDER BY (CASE WHEN ? = 'new' THEN A.articleIdx END) ASC,
+          (CASE WHEN ? = 'popular' THEN totalLikeCnt END) ASC
+  LIMIT ${startItemIdx}, ${itemsPerPage};
+  `;
+  const [rows] = await connection.query(query, [correspondIdxArr, sort, sort]);
+  return rows;
+}
+
 module.exports = {
   getRecentlySearch,
   getPopularSearch,
@@ -271,4 +301,5 @@ module.exports = {
   getArticleCorrespondToCraft,
   getArticleCorrespondToContent,
   getCraftInfo,
+  getArticleInfo,
 }

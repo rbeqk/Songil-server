@@ -97,10 +97,15 @@ exports.getSearch = async (userIdx, keyword, category, sort, page) => {
         result.craft = craft.reverse();
       }
       else if (category === categoryArr[1]){
-
+      
       }
       else if (category === categoryArr[2]){
+        const correspondIdxArr = idxByCategory[2];
+        const article = await searchDao.getArticleInfo(
+          connection, userIdx, sort, correspondIdxArr, startItemIdx, ITEMS_PER_PAGE.SEARCH_PER_PAGE
+        );
 
+        result.article = article.reverse();
       }
       
       connection.release();
