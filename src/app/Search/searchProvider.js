@@ -5,7 +5,7 @@ const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 const {getCorrespondIdxArr} = require('../../../modules/searchUtil');
 const {pageInfo, getTotalPage} = require('../../../modules/pageUtil');
-const {ITEMS_PER_PAGE} = require('../../../modules/constants');
+const {ITEMS_PER_PAGE, CATEGORY} = require('../../../modules/constants');
 
 exports.getSearchKeywords = async (userIdx) => {
   try{
@@ -97,7 +97,32 @@ exports.getSearch = async (userIdx, keyword, category, sort, page) => {
         result.craft = craft.reverse();
       }
       else if (category === categoryArr[1]){
-      
+        const correspondIdxArrByCategory = idxByCategory[1];
+        const storyIdxArr = correspondIdxArrByCategory.filter(item => item.categoryIdx === CATEGORY.STORY).map(item => item.storyIdx);
+        const qnaIdxArr = correspondIdxArrByCategory.filter(item => item.categoryIdx === CATEGORY.QNA).map(item => item.qnaIdx);
+        const abTestIdxArr = correspondIdxArrByCategory.filter(item => item.categoryIdx === CATEGORY.ABTEST).map(item => item.abTestIdx);
+
+        const withInfo = await searchDao.getWithInfo(
+          connection, userIdx, sort, storyIdxArr, qnaIdxArr, abTestIdxArr, startItemIdx, ITEMS_PER_PAGE.SEARCH_PER_PAGE
+        );
+
+        result.with = [];
+        withInfo.forEach(item => 
+          result.with.push({
+            'idx': item.idx,
+            'categoryIdx': item.categoryIdx,
+            'mainImageUrl': item.mainImageUrl,
+            'title': item.title,
+            'content': item.content,
+            'name': item.name,
+            'createdAt': item.createdAt,
+            'totalLikeCnt': item.totalLikeCnt,
+            'isLike': item.isLike,
+            'totalCommentCnt': item.totalCommentCnt
+          })
+        )
+        
+        result.with.reverse();
       }
       else if (category === categoryArr[2]){
         const correspondIdxArr = idxByCategory[2];

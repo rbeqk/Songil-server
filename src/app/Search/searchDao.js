@@ -87,8 +87,8 @@ async function getCraftCorrespondToBasic(connection, keyword){
           JOIN CraftCategory CC ON CC.craftCategoryIdx = C.craftCategoryIdx
           JOIN Artist A ON A.artistIdx = C.artistIdx && A.isDeleted = 'N'
           JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
-  WHERE C.name LIKE CONCAT('%', ?, '%') || U.nickname LIKE CONCAT('%', ?, '%')
-            || C.content LIKE CONCAT('%', ?, '%') || CC.name LIKE CONCAT('%', ?, '%') && C.isDeleted = 'N';
+  WHERE C.isDeleted = 'N' && (C.name LIKE CONCAT('%', ?, '%') || U.nickname LIKE CONCAT('%', ?, '%')
+            || C.content LIKE CONCAT('%', ?, '%') || CC.name LIKE CONCAT('%', ?, '%'));
   `;
   const [rows] = await connection.query(query, [keyword, keyword, keyword, keyword]);
   return rows.map(item => item.craftIdx); 
@@ -118,8 +118,8 @@ async function getCraftCorrespondToUsage(connection, keyword){
           JOIN CraftUsageCategory CUC on CUC.craftUsageCategoryIdx = CUI.craftUsageCategoryIdx
           JOIN Artist A ON A.artistIdx = C.artistIdx && A.isDeleted = 'N'
           JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
-  WHERE CUC.name LIKE CONCAT('%', ?, '%') || CU.etcUsage LIKE CONCAT('%', ?, '%') ||
-        CUI.name LIKE CONCAT('%', ?, '%') && C.isDeleted = 'N';
+  WHERE C.isDeleted = 'N' && (CUC.name LIKE CONCAT('%', ?, '%') || CU.etcUsage LIKE CONCAT('%', ?, '%') ||
+        CUI.name LIKE CONCAT('%', ?, '%'));
   `;
   const [rows] = await connection.query(query, [keyword, keyword, keyword]);
   return rows.map(item => item.craftIdx);
@@ -131,7 +131,7 @@ async function getQnACorrespond(connection, keyword){
   SELECT ${CATEGORY.QNA} AS categoryIdx, Q.qnaIdx
   FROM QnA Q
           JOIN User U ON U.userIdx = Q.userIdx && U.isDeleted = 'N'
-  WHERE Q.title LIKE CONCAT('%', ?, '%') || Q.content LIKE CONCAT('%', ?, '%') && Q.isDeleted = 'N';
+  WHERE Q.isDeleted = 'N' && (Q.title LIKE CONCAT('%', ?, '%') || Q.content LIKE CONCAT('%', ?, '%'));
   `;
   const [rows] = await connection.query(query, [keyword, keyword, keyword]);
   return rows;
@@ -143,7 +143,7 @@ async function getStoryCorrespond(connection, keyword){
   SELECT ${CATEGORY.STORY} AS categoryIdx, S.storyIdx
   FROM Story S
           JOIN User U ON U.userIdx = S.userIdx && U.isDeleted = 'N'
-  WHERE S.title LIKE CONCAT('%', ?, '%') || S.content LIKE CONCAT('%', ?, '%') && S.isDeleted = 'N';
+  WHERE S.isDeleted = 'N' && (S.title LIKE CONCAT('%', ?, '%') || S.content LIKE CONCAT('%', ?, '%'));
   `;
   const [rows] = await connection.query(query, [keyword, keyword, keyword]);
   return rows;
@@ -156,7 +156,7 @@ async function getAbTewstCorrespond(connection, keyword){
   FROM ABTest AB
           JOIN Artist A ON A.artistIdx = AB.artistIdx && A.isDeleted = 'N'
           JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
-  WHERE AB.isDeleted = 'N' && AB.content LIKE CONCAT('%', ?, '%') || U.nickname LIKE CONCAT('%', ?, '%');
+  WHERE AB.isDeleted = 'N' && (AB.content LIKE CONCAT('%', ?, '%') || U.nickname LIKE CONCAT('%', ?, '%'));
   `;
   const [rows] = await connection.query(query, [keyword, keyword]);
   return rows;
@@ -169,8 +169,8 @@ async function getArticleCorrspondToBasic(connection, keyword){
   FROM Article A
           JOIN ArticleCategory AC ON A.articleCategoryIdx = AC.articleCategoryIdx
           JOIN Editor E on E.editorIdx = A.editorIdx
-  WHERE A.isDeleted = 'N' && A.title LIKE CONCAT('%', ?, '%') || A.summary LIKE CONCAT('%', ?, '%') ||
-        AC.name LIKE CONCAT('%', ?, '%') || E.nickname LIKE CONCAT('%', ?, '%');
+  WHERE A.isDeleted = 'N' && (A.title LIKE CONCAT('%', ?, '%') || A.summary LIKE CONCAT('%', ?, '%') ||
+        AC.name LIKE CONCAT('%', ?, '%') || E.nickname LIKE CONCAT('%', ?, '%'));
   `;
   const [rows] = await connection.query(query, [keyword, keyword, keyword, keyword]);
   return rows.map(item => item.articleIdx);
@@ -282,6 +282,89 @@ async function getArticleInfo(connection, userIdx, sort, correspondIdxArr, start
   return rows;
 }
 
+//with 정보 가져오기
+async function getWithInfo(connection, userIdx, sort, storyIdxArr, qnaIdxArr, abTestIdxArr, startItemIdx, itemsPerPage){
+  
+  if (storyIdxArr.length === 0) storyIdxArr = [-1];
+  if (qnaIdxArr.length === 0) qnaIdxArr = [-1];
+  if (abTestIdxArr.length === 0) abTestIdxArr = [-1];
+
+  const query = `
+  SELECT *
+  FROM (
+          SELECT S.storyIdx                                                                          as idx,
+                  ${CATEGORY.STORY}                                                                   as categoryIdx,
+                  (SELECT imageUrl
+                  FROM StoryImage SI
+                  WHERE SI.storyIdx = S.storyIdx && SI.isDeleted = 'N'
+                  LIMIT 1)                                                                           as mainImageUrl,
+                  S.title,
+                  S.content,
+                  U.nickname                                                                          as name,
+                  DATE_FORMAT(S.createdAt, '%Y.%m.%d. %H:%i')                                         as createdAt,
+                  S.createdAt                                                                         as originalCreatedAt,
+                  (SELECT COUNT(*)
+                  FROM StoryLike SL
+                  WHERE SL.storyIdx = S.storyIdx)                                                    as totalLikeCnt,
+                  IF(${userIdx} = -1, 'N',
+                    IF(EXISTS(SELECT *
+                              FROM StoryLike SL
+                              WHERE SL.userIdx = ${userIdx} && SL.storyIdx = S.storyIdx), 'Y', 'N')) as isLike,
+                  (SELECT COUNT(*)
+                  FROM StoryComment SC
+                  WHERE SC.storyIdx = S.storyIdx && SC.isDeleted = 'N')                              as totalCommentCnt
+          FROM Story S
+                    JOIN User U ON U.userIdx = S.userIdx && U.isDeleted = 'N'
+          WHERE S.isDeleted = 'N' && S.storyIdx IN (?)
+          UNION ALL
+          SELECT Q.qnaIdx                                                                        as idx,
+                  ${CATEGORY.QNA}                                                                 as categoryIdx,
+                  NULL                                                                            as mainImageUrl,
+                  Q.title,
+                  Q.content,
+                  U.nickname                                                                      as name,
+                  DATE_FORMAT(Q.createdAt, '%Y.%m.%d. %H:%i')                                     as createdAt,
+                  Q.createdAt                                                                     as originalCreatedAt,
+                  (SELECT COUNT(*)
+                  FROM QnALike QL
+                  WHERE QL.qnaIdx = Q.qnaIdx)                                                    as totalLikeCnt,
+                  IF(${userIdx} = -1, 'N',
+                    IF(EXISTS(SELECT *
+                              FROM QnALike QL
+                              WHERE QL.qnaIdx = Q.qnaIdx && QL.userIdx = ${userIdx}), 'Y', 'N')) as isLike,
+                  (SELECT COUNT(*)
+                  FROM QnAComment QC
+                  WHERE QC.qnaIdx = Q.qnaIdx && QC.isDeleted = 'N')                              as totalCommentCnt
+          FROM QnA Q
+                    JOIN User U ON U.userIdx = Q.userIdx && U.isDeleted = 'N'
+          WHERE Q.isDeleted = 'N' && Q.qnaIdx IN (?)
+          UNION ALL
+          SELECT AB.abTestIdx                                                as idx,
+                  ${CATEGORY.ABTEST}                                          as categoryIdx,
+                  NULL                                                        as mainImageUrl,
+                  NULL                                                        as title,
+                  AB.content,
+                  U.nickname                                                  as name,
+                  DATE_FORMAT(AB.createdAt, '%Y.%m.%d. %H:%i')                as createdAt,
+                  AB.createdAt                                                as originalCreatedAt,
+                  NULL                                                        as totalLikeCnt,
+                  NULL                                                        as isLike,
+                  (SELECT COUNT(*)
+                  FROM ABTestComment ABC
+                  WHERE ABC.isDeleted = 'N' && ABC.abTestIdx = AB.abTestIdx) as totalCommentCnt
+          FROM ABTest AB
+                    JOIN Artist A ON A.artistIdx = AB.artistIdx && A.isDeleted = 'N'
+                    JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
+          WHERE AB.isDeleted = 'N' && AB.abTestIdx IN (?)
+      ) R
+  ORDER BY (CASE WHEN ? = 'new' THEN R.originalCreatedAt END) ASC,
+          (CASE WHEN ? = 'popular' THEN totalLikeCnt END) ASC
+  LIMIT ${startItemIdx}, ${itemsPerPage};
+  `;
+  const [rows] = await connection.query(query, [storyIdxArr, qnaIdxArr, abTestIdxArr, sort, sort]);
+  return rows;
+}
+
 module.exports = {
   getRecentlySearch,
   getPopularSearch,
@@ -302,4 +385,5 @@ module.exports = {
   getArticleCorrespondToContent,
   getCraftInfo,
   getArticleInfo,
+  getWithInfo,
 }
