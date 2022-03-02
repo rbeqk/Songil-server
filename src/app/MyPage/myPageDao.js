@@ -340,9 +340,11 @@ async function getUserOrderCnt(connection, userIdx){
 //유저 내 코멘트(=상품 댓글) 개수 가져오기
 async function getUserCommentCnt(connection, userIdx){
   const query = `
-  SELECT COUNT(craftCommentIdx) AS totalCnt
-  FROM CraftComment
-  WHERE userIdx = ${userIdx} && isDeleted = 'N';
+  SELECT COUNT(CC.craftCommentIdx) AS totalCnt
+  FROM CraftComment CC
+          JOIN OrderCraft OC ON OC.orderCraftIdx = CC.orderCraftIdx
+          JOIN OrderT O ON O.orderIdx = OC.orderIdx
+  WHERE CC.isDeleted = 'N' && O.userIdx = ${userIdx};
   `;
   const [rows] = await connection.query(query);
   return rows[0]['totalCnt'];
