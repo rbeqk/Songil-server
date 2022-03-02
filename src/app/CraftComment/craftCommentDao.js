@@ -27,15 +27,17 @@ async function getCommentCnt(connection, craftIdx){
 //상품 포토 댓글 전체 가져오기
 async function getCommentInfoOnlyPhoto(connection, craftIdx, startItemIdx, pageItemCnt){
   const query = `
-  SELECT CC.craftCommentIdx as commentIdx,
+  SELECT CC.craftCommentIdx                    AS commentIdx,
         U.userIdx,
         U.nickname,
         DATE_FORMAT(CC.createdAt, '%Y.%m.%d') as createdAt,
         CC.content,
         CC.isReported
   FROM CraftComment CC
-          JOIN User U ON U.userIdx = CC.userIdx
-  WHERE CC.craftIdx = ${craftIdx} && CC.isDeleted = 'N' && CC.isPhotoComment = 'Y'
+          JOIN OrderCraft OC ON OC.orderCraftIdx = CC.orderCraftIdx
+          JOIN OrderT O ON O.orderIdx = OC.orderIdx
+          JOIN User U ON O.userIdx = U.userIdx && U.isDeleted = 'N'
+  WHERE CC.isDeleted = 'N' && OC.craftIdx = ${craftIdx} && CC.isPhotoComment = 'Y'
   ORDER BY CC.craftCommentIdx
   LIMIT ${startItemIdx}, ${pageItemCnt};
   `;
@@ -46,15 +48,17 @@ async function getCommentInfoOnlyPhoto(connection, craftIdx, startItemIdx, pageI
 //상품 댓글 전체 가져오기
 async function getCommentInfo(connection, craftIdx, startItemIdx, pageItemCnt){
   const query = `
-  SELECT CC.craftCommentIdx as commentIdx,
+  SELECT CC.craftCommentIdx                    AS commentIdx,
         U.userIdx,
         U.nickname,
         DATE_FORMAT(CC.createdAt, '%Y.%m.%d') as createdAt,
         CC.content,
         CC.isReported
   FROM CraftComment CC
-          JOIN User U ON U.userIdx = CC.userIdx
-  WHERE CC.craftIdx = ${craftIdx} && CC.isDeleted = 'N'
+          JOIN OrderCraft OC ON OC.orderCraftIdx = CC.orderCraftIdx
+          JOIN OrderT O ON O.orderIdx = OC.orderIdx
+          JOIN User U ON O.userIdx = U.userIdx && U.isDeleted = 'N'
+  WHERE CC.isDeleted = 'N' && OC.craftIdx = ${craftIdx}
   ORDER BY CC.craftCommentIdx
   LIMIT ${startItemIdx}, ${pageItemCnt};
   `;
@@ -63,14 +67,14 @@ async function getCommentInfo(connection, craftIdx, startItemIdx, pageItemCnt){
 }
 
 //댓글 별 사진 가져오기
-async function getCommentPhoto(connection, commentIdx){
+async function getCommentImageUrlArr(connection, commentIdx){
   const query = `
   SELECT imageUrl
   FROM CraftCommentImage
-  WHERE craftCommentIdx = ${commentIdx} && isDeleted = 'N';
+  WHERE craftCommentIdx = ${commentIdx};
   `;
   const [rows] = await connection.query(query);
-  return rows;
+  return rows.map(item => item.imageUrl);
 }
 
 //존재하는 상품 댓글 idx인지
@@ -174,7 +178,7 @@ module.exports = {
   getCommentCnt,
   getCommentInfoOnlyPhoto,
   getCommentInfo,
-  getCommentPhoto,
+  getCommentImageUrlArr,
   isExistCraftCommentIdx,
   isAlreadyReportedCraftComment,
   isUserCraftComment,

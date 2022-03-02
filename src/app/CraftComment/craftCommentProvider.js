@@ -48,7 +48,7 @@ exports.getCommentTotalPage = async (craftIdx, type) => {
   }
 }
 
-
+//상품 댓글 조회
 exports.getComment = async (craftIdx, page, type) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
@@ -94,21 +94,16 @@ exports.getComment = async (craftIdx, page, type) => {
           );
         }
 
-        let commentIdx;
-        let commentPhoto;
         for (let item of commentInfo){
-          commentIdx = item.commentIdx;
-          commentPhoto = await craftCommentDao.getCommentPhoto(connection, commentIdx);
-
           result.comments.push({
             'commentIdx': item.commentIdx,
             'userIdx': item.userIdx,
             'nickname': item.nickname,
             'createdAt': item.createdAt,
-            'imageUrl': commentPhoto ? commentPhoto.map(item => item.imageUrl) : [],
+            'imageUrl': await craftCommentDao.getCommentImageUrlArr(connection, item.commentIdx),
             'content': item.content,
             'isReported': item.isReported
-          })
+          });
         }
         
         result.comments.reverse();
