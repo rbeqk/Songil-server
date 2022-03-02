@@ -79,8 +79,13 @@ exports.getSearch = async (req ,res) => {
 
   if (!(keyword && category && sort && page)) return res.send(errResponse(baseResponse.IS_EMPTY));
   if (!['shop', 'with', 'article'].includes(category)) return res.send(errResponse(baseResponse.INVALID_CATEGORY_NAME));
+  if (['with', 'article'].includes(category)){
+    if (!['popular', 'new'].includes(sort)) return res.send(errResponse(baseResponse.INVALID_SORT_NAME));
+  }
+  else if (category === 'shop'){
+    if (!['popular', 'new', 'comment', 'price'].includes(sort)) return res.send(errResponse(baseResponse.INVALID_SORT_NAME));
+  }
   if (page < 1) return res.send(baseResponse.INVALID_PAGE);
-  if (!['popular', 'new'].includes(sort)) return res.send(errResponse(baseResponse.INVALID_SORT_NAME));
 
   const userIdx = getUserIdx(token);
   if (userIdx === false) return res.send(errResponse(baseResponse.TOKEN_VERIFICATION_FAILURE));

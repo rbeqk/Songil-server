@@ -240,16 +240,18 @@ async function getCraftInfo(connection, userIdx, sort, correspondIdxArr, startIt
         (SELECT COUNT(CC.craftCommentIdx)
           FROM CraftComment CC
                   JOIN OrderCraft OC ON OC.orderCraftIdx = CC.orderCraftIdx
-          WHERE CC.isDeleted = 'N' && OC.craftIdx = C.craftIdx)                             as totalCommentCnt
+          WHERE CC.isDeleted = 'N' && OC.craftIdx = C.craftIdx)                              as totalCommentCnt
   FROM Craft C
           JOIN Artist A ON A.artistIdx = C.artistIdx && A.isDeleted = 'N'
           JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
   WHERE C.isDeleted = 'N' && C.craftIdx IN (?)
   ORDER BY (CASE WHEN ? = 'new' THEN C.createdAt END) ASC,
-          (CASE WHEN ? = 'popular' THEN totalLikeCnt END) ASC
+          (CASE WHEN ? = 'popular' THEN totalLikeCnt END) ASC,
+          (CASE WHEN ? = 'comment' THEN totalCommentCnt END) ASC,
+          (CASE WHEN ? = 'price' THEN price END) DESC
   LIMIT ${startItemIdx}, ${itemsPerPage};
   `;
-  const [rows] = await connection.query(query, [correspondIdxArr, sort, sort]);
+  const [rows] = await connection.query(query, [correspondIdxArr, sort, sort, sort, sort]);
   return rows;
 }
 
