@@ -102,14 +102,15 @@ async function isAlreadyReportedCraftComment(connection, userIdx, craftCommentId
 //자기 댓글인지
 async function isUserCraftComment(connection, userIdx, craftCommentIdx){
   const query = `
-  SELECT IF(O.userIdx = ${userIdx}, 1, 0) AS isUserComment
-  FROM CraftComment CC
-          JOIN OrderCraft OC ON OC.orderCraftIdx = CC.orderCraftIdx
-          JOIN OrderT O ON O.orderIdx = OC.orderIdx
-  WHERE CC.craftCommentIdx = ${craftCommentIdx};
+  SELECT EXISTS(SELECT CC.craftCommentIdx
+    FROM CraftComment CC
+            JOIN OrderCraft OC ON OC.orderCraftIdx = CC.orderCraftIdx
+            JOIN OrderT O ON O.orderIdx = OC.orderIdx
+    WHERE CC.craftCommentIdx = ${craftCommentIdx} && O.userIdx = ${userIdx} &&
+          CC.isDeleted = 'N') AS isExists;
   `;
   const [rows] = await connection.query(query);
-  return rows[0]['isUserComment'];
+  return rows[0]['isExists'];
 }
 
 //댓글 신고
@@ -175,6 +176,17 @@ async function isPossibleToWriteComment(connection, orderCraftIdx){
   return rows[0]['canWrite'];
 }
 
+//상품 댓글 삭제
+async function deleteCraftComment(connection, craftCommentIdx){
+  const query = `
+  UPDATE CraftComment
+  SET isDeleted = 'Y'
+  WHERE craftCommentIdx = ${craftCommentIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   getOnlyPhotoCommentCnt,
   getCommentCnt,
@@ -190,4 +202,5 @@ module.exports = {
   createCraftCommentImage,
   isAlreadyWrittenComment,
   isPossibleToWriteComment,
+  deleteCraftComment,
 }

@@ -124,3 +124,42 @@ exports.createCraftComment = async (userIdx, orderCraftIdx, comment, imageArr) =
     return errResponse(baseResponse.DB_ERROR);
   }
 }
+
+//상품 댓글 삭제
+exports.deleteCraftComment = async (userIdx, craftCommentIdx) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+      
+      //존재하는 상품 댓글 idx인지
+      const isExistCraftCommentIdx = await craftCommentDao.isExistCraftCommentIdx(connection, craftCommentIdx);
+      if (!isExistCraftCommentIdx){
+        connection.release();
+        return errResponse(baseResponse.INVALD_CRAFT_COMMENT_IDX);
+      }
+
+      //자기 댓글인지
+      const isUserCraftComment = await craftCommentDao.isUserCraftComment(connection, userIdx, craftCommentIdx);
+      if (!isUserCraftComment){
+        connection.release();
+        return errResponse(baseResponse.NO_PERMISSION);
+      }
+
+      await connection.beginTransaction();
+      await craftCommentDao.deleteCraftComment(connection, craftCommentIdx);
+      await connection.commit();
+
+      connection.release();
+      return response(baseResponse.SUCCESS);
+      
+    }catch(err){
+      await connection.rollback();
+      connection.release();
+      logger.error(`deleteCraftComment DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`deleteCraftComment DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}

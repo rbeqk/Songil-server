@@ -89,3 +89,17 @@ exports.createCraftComment = async (req, res) => {
 
   return res.send(createCraftComment);
 }
+
+/*
+  API No. 3.16
+  API Name: 상품 댓글 삭제 API
+  [DELETE] /shop/crafts/comments/:commentIdx
+*/
+exports.deleteCraftComment = async (req, res) => {
+  const {commentIdx: craftCommentIdx} = req.params;
+  const {userIdx} = req.verifiedToken;
+
+  const deleteCraftComment = await craftCommentService.deleteCraftComment(userIdx, craftCommentIdx);
+
+  return res.send(deleteCraftComment);
+}
