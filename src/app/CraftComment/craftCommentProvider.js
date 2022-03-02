@@ -7,6 +7,7 @@ const baseResponse = require('../../../config/baseResponseStatus');
 const {getTotalPage, pageInfo} = require("../../../modules/pageUtil");
 const {ITEMS_PER_PAGE} = require("../../../modules/constants");
 
+//상품 댓글 페이지 개수 조회
 exports.getCommentTotalPage = async (craftIdx, type) => {
   try{
     const connection = await pool.getConnection(async conn => conn);

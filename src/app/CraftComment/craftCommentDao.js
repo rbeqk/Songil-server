@@ -3,23 +3,25 @@ const {ORDER_STATUS} = require('../../../modules/constants');
 //총 포토 댓글 개수
 async function getOnlyPhotoCommentCnt(connection, craftIdx){
   const query = `
-  SELECT COUNT(craftCommentIdx) as totalCommentCnt
-  FROM CraftComment
-  WHERE craftIdx = ${craftIdx} && isDeleted = 'N' && isPhotoComment = 'Y';
+  SELECT COUNT(CC.craftCommentIdx) AS totalCnt
+  FROM CraftComment CC
+          JOIN OrderCraft OC ON OC.orderCraftIdx = CC.orderCraftIdx
+  WHERE CC.isDeleted = 'N' && CC.isPhotoComment = 'Y' && OC.craftIdx = ${craftIdx};
   `;
   const [rows] = await connection.query(query);
-  return rows[0]['totalCommentCnt'];
+  return rows[0]['totalCnt'];
 }
 
 //총 댓글 개수
 async function getCommentCnt(connection, craftIdx){
   const query = `
-  SELECT COUNT(craftCommentIdx) as totalCommentnt
-  FROM CraftComment
-  WHERE craftIdx = ${craftIdx} && isDeleted = 'N';
+  SELECT COUNT(CC.craftCommentIdx) AS totalCnt
+  FROM CraftComment CC
+          JOIN OrderCraft OC ON OC.orderCraftIdx = CC.orderCraftIdx
+  WHERE CC.isDeleted = 'N' && OC.craftIdx = ${craftIdx};
   `;
   const [rows] = await connection.query(query);
-  return rows[0]['totalCommentnt'];
+  return rows[0]['totalCnt'];
 }
 
 //상품 포토 댓글 전체 가져오기
