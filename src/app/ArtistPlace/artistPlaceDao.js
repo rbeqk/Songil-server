@@ -63,9 +63,10 @@ async function getArtistCraft(connection, artistIdx, sort, startItemIdx, pageIte
         C.price,
         IF(TIMESTAMPDIFF(DAY, C.createdAt, NOW()) > 3, 'N', 'Y') as isNew,
         C.isSoldOut,
-        (SELECT COUNT(craftCommentIdx)
+        (SELECT COUNT(CC.craftCommentIdx)
           FROM CraftComment CC
-          WHERE CC.isDeleted = 'N' && CC.craftIdx = C.craftIdx)   as totalCommentCnt,
+                  JOIN OrderCraft OC ON OC.orderCraftIdx = CC.orderCraftIdx
+          WHERE CC.isDeleted = 'N' && OC.craftIdx = C.craftIdx)   as totalCommentCnt,
         (SELECT COUNT(userIdx) as totalLikeCnt
           FROM CraftLike CL
           WHERE CL.craftIdx = C.craftIdx)                         as totalLikeCnt
@@ -73,13 +74,13 @@ async function getArtistCraft(connection, artistIdx, sort, startItemIdx, pageIte
           JOIN Artist A ON A.artistIdx = C.artistIdx && A.isDeleted = 'N'
           JOIN User U ON A.userIdx = U.userIdx && U.isDeleted = 'N'
   WHERE C.isDeleted = 'N' && C.artistIdx = ${artistIdx}
-  ORDER BY (CASE WHEN '${sort}' = 'new' THEN C.createdAt END) ASC,
-          (CASE WHEN '${sort}' = 'price' THEN C.price END) DESC,
-          (CASE WHEN '${sort}' = 'comment' THEN totalCommentCnt END) ASC,
-          (CASE WHEN '${sort}' = 'popular' THEN totalLikeCnt END) ASC
+  ORDER BY (CASE WHEN ? = 'new' THEN C.createdAt END) ASC,
+          (CASE WHEN ? = 'price' THEN C.price END) DESC,
+          (CASE WHEN ? = 'comment' THEN totalCommentCnt END) ASC,
+          (CASE WHEN ? = 'popular' THEN totalLikeCnt END) ASC
   LIMIT ${startItemIdx}, ${pageItemCnt};
   `;
-  const [rows] = await connection.query(query);
+  const [rows] = await connection.query(query, [sort, sort, sort, sort]);
   return rows;
 }
 
@@ -99,9 +100,9 @@ async function getArticleWithArtistTag(connection, artistName){
   const query = `
   SELECT articleIdx
   FROM ArticleTag
-  WHERE tag LIKE CONCAT('%', '${artistName}', '%');
+  WHERE tag LIKE CONCAT('%', ?, '%');
   `;
-  const [rows] = await connection.query(query);
+  const [rows] = await connection.query(query, [artistName]);
   return rows;
 }
 
@@ -135,11 +136,11 @@ async function getArtistArticle(connection, articleList, sort, startItemIdx, pag
                       FROM ArticleLike
                       GROUP BY articleIdx) as AL ON AL.articleIdx = A.articleIdx
   WHERE A.isDeleted = 'N' && A.articleIdx IN (${articleList})
-  ORDER BY (CASE WHEN '${sort}' = 'new' THEN A.createdAt END) ASC,
-          (CASE WHEN '${sort}' = 'popular' THEN totalLikeCnt END) ASC
+  ORDER BY (CASE WHEN ? = 'new' THEN A.createdAt END) ASC,
+          (CASE WHEN ? = 'popular' THEN totalLikeCnt END) ASC
   LIMIT ${startItemIdx}, ${pageItemCnt}
   `;
-  const [rows] = await connection.query(query);
+  const [rows] = await connection.query(query, [sort, sort]);
   return rows;
 }
 

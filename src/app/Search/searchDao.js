@@ -29,9 +29,9 @@ async function getPopularSearch(connection){
 async function getSearchIdx(connection, word){
   const query = `
   SELECT searchIdx FROM Search
-  WHERE word = '${word}';
+  WHERE word = ?;
   `;
-  const [rows] = await connection.query(query);
+  const [rows] = await connection.query(query, [word]);
   return rows[0];
 }
 

@@ -139,17 +139,18 @@ async function getCraftByCategory(connection, userIdx, craftCategoryIdx, startIt
             IF(EXISTS(SELECT *
                       FROM CraftLike CL2
                       WHERE CL2.userIdx = ${userIdx} && CL2.craftIdx = C.craftIdx), 'Y', 'N')) as isLike,
-        (SELECT COUNT(*)
+        (SELECT COUNT(CC.craftCommentIdx)
           FROM CraftComment CC
-          WHERE CC.craftIdx = C.craftIdx && CC.isDeleted = 'N')                                as totalCommentCnt
+                  JOIN OrderCraft OC ON OC.orderCraftIdx = CC.orderCraftIdx
+          WHERE CC.isDeleted = 'N' && OC.craftIdx = C.craftIdx)                                as totalCommentCnt
   FROM Craft C
           JOIN Artist A ON A.artistIdx = C.artistIdx && A.isDeleted = 'N'
           JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
   WHERE C.craftCategoryIdx = ${craftCategoryIdx} && C.isDeleted = 'N'
-  ORDER BY (CASE WHEN '${sort}' = 'new' THEN C.createdAt END) ASC,
-          (CASE WHEN '${sort}' = 'price' THEN C.price END) DESC,
-          (CASE WHEN '${sort}' = 'comment' THEN totalCommentCnt END) ASC,
-          (CASE WHEN '${sort}' = 'popular' THEN totalLikeCnt END) ASC
+  ORDER BY (CASE WHEN ? = 'new' THEN C.createdAt END) ASC,
+          (CASE WHEN ? = 'price' THEN C.price END) DESC,
+          (CASE WHEN ? = 'comment' THEN totalCommentCnt END) ASC,
+          (CASE WHEN ? = 'popular' THEN totalLikeCnt END) ASC
   LIMIT ${startItemIdx}, ${itemsPerPage};
   `;
   const [rows] = await connection.query(query, [sort, sort, sort, sort]);
@@ -174,9 +175,10 @@ async function getAllCraft(connection, userIdx, startItemIdx, itemsPerPage, sort
             IF(EXISTS(SELECT *
                       FROM CraftLike CL2
                       WHERE CL2.userIdx = ${userIdx} && CL2.craftIdx = C.craftIdx), 'Y', 'N')) as isLike,
-        (SELECT COUNT(*)
+        (SELECT COUNT(CC.craftCommentIdx)
           FROM CraftComment CC
-          WHERE CC.craftIdx = C.craftIdx && CC.isDeleted = 'N')                                as totalCommentCnt
+                  JOIN OrderCraft OC ON OC.orderCraftIdx = CC.orderCraftIdx
+          WHERE CC.isDeleted = 'N' && OC.craftIdx = C.craftIdx)                                as totalCommentCnt
   FROM Craft C
           JOIN Artist A ON A.artistIdx = C.artistIdx && A.isDeleted = 'N'
           JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'

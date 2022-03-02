@@ -83,11 +83,11 @@ async function getStory(connection, userIdx, sort, startItemIdx, pageItemCnt){
   FROM Story S
           JOIN User U on S.userIdx = U.useridx && U.isDeleted = 'N'
   WHERE S.isDeleted = 'N'
-  ORDER BY (CASE WHEN '${sort}' = 'new' THEN S.createdAt END) ASC,
-          (CASE WHEN '${sort}' = 'popular' THEN totalLikeCnt END) ASC
+  ORDER BY (CASE WHEN ? = 'new' THEN S.createdAt END) ASC,
+          (CASE WHEN ? = 'popular' THEN totalLikeCnt END) ASC
   LIMIT ${startItemIdx}, ${pageItemCnt};
   `;
-  const [rows] = await connection.query(query);
+  const [rows] = await connection.query(query, [sort, sort]);
   return rows;
 }
 
@@ -114,11 +114,11 @@ async function getQnA(connection, userIdx, sort, startItemIdx, pageItemCnt){
   FROM QnA Q
           JOIN User U on U.userIdx = Q.userIdx && U.isDeleted = 'N'
   WHERE Q.isDeleted = 'N'
-  ORDER BY (CASE WHEN '${sort}' = 'new' THEN Q.createdAt END) ASC,
-          (CASE WHEN '${sort}' = 'popular' THEN totalLikeCnt END) ASC
+  ORDER BY (CASE WHEN ? = 'new' THEN Q.createdAt END) ASC,
+          (CASE WHEN ? = 'popular' THEN totalLikeCnt END) ASC
   LIMIT ${startItemIdx}, ${pageItemCnt};
   `;
-  const [rows] = await connection.query(query);
+  const [rows] = await connection.query(query, [sort, sort]);
   return rows;
 }
 

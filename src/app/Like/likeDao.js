@@ -118,9 +118,10 @@ async function getLikedCraftInfo(connection, userIdx, startItemIdx, LIKED_CRAFT_
         C.artistIdx,
         U.nickname                                                  as artistName,
         IF(TIMESTAMPDIFF(DAY, C.createdAt, NOW()) > 3, 'N', 'Y')    as isNew,
-        (SELECT COUNT(craftCommentIdx)
+        (SELECT COUNT(CC.craftCommentIdx)
           FROM CraftComment CC
-          WHERE CC.craftIdx = C.craftIdx && CC.isDeleted = 'N')      as totalCommentCnt,
+                  JOIN OrderCraft OC ON OC.orderCraftIdx = CC.orderCraftIdx
+          WHERE CC.isDeleted = 'N' && OC.craftIdx = C.craftIdx)      as totalCommentCnt,
         (SELECT COUNT(*)
           FROM CraftLike TCL
           WHERE TCL.craftIdx = C.craftIdx)                           as totalLikeCnt,

@@ -63,7 +63,7 @@ exports.getLikedCraft = async (userIdx, page) => {
           'isSoldOut': item.isSoldOut,
           'totalLikeCnt': item.totalLikeCnt,
           'totalCommentCnt': item.totalCommentCnt,
-        })
+        });
       });
 
       connection.release();
