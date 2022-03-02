@@ -42,9 +42,10 @@ exports.getComment = async (req, res) => {
 }
 
 /*
-  API No. 3.18
+  API No. 3.15
   API Name: 상품 댓글 신고 API
-  [POST] /comments/:commentIdx/reported
+  [POST] /shop/crafts/comments/:commentIdx/reported
+  body: reportedReasonIdx, etcReason
 */
 exports.reportComment = async (req, res) => {
   const {userIdx} = req.verifiedToken;

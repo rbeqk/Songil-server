@@ -102,12 +102,14 @@ async function isAlreadyReportedCraftComment(connection, userIdx, craftCommentId
 //자기 댓글인지
 async function isUserCraftComment(connection, userIdx, craftCommentIdx){
   const query = `
-  SELECT EXISTS(SELECT craftCommentIdx
-    FROM CraftComment
-    WHERE userIdx = ${userIdx} && craftCommentIdx = ${craftCommentIdx} && isDeleted = 'N') as isExist;
+  SELECT IF(O.userIdx = ${userIdx}, 1, 0) AS isUserComment
+  FROM CraftComment CC
+          JOIN OrderCraft OC ON OC.orderCraftIdx = CC.orderCraftIdx
+          JOIN OrderT O ON O.orderIdx = OC.orderIdx
+  WHERE CC.craftCommentIdx = ${craftCommentIdx};
   `;
   const [rows] = await connection.query(query);
-  return rows[0]['isExist'];
+  return rows[0]['isUserComment'];
 }
 
 //댓글 신고
