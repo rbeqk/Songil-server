@@ -1,21 +1,48 @@
 const {CATEGORY} = require('../../../modules/constants');
 
-//작성한 코멘트
-async function getWrittenComment(connection, userIdx, startItemIdx, pageItemCnt){
+//작성 가능한 코멘트
+async function getAvailableComment(connection, userIdx, startItemIdx, itemsPerPage){
   const query = `
-  SELECT CC.craftCommentIdx                    as commentIdx,
-        CC.craftIdx,
-        A.artistIdx,
-        U.nickname                            as artistName,
-        CC.content,
-        DATE_FORMAT(CC.createdAt, '%Y.%m.%d') as createdAt
-  FROM CraftComment CC
-          JOIN Craft C ON C.craftIdx = CC.craftIdx
-          JOIN Artist A ON C.artistIdx = A.artistIdx
+  SELECT OC.orderCraftIdx AS orderDetailIdx,
+        OC.craftIdx,
+        C.name,
+        C.mainImageUrl,
+        C.artistIdx,
+        U.nickname       AS artistName
+  FROM OrderCraft OC
+          JOIN OrderT O ON O.orderIdx = OC.orderIdx && O.isPaid = 'Y'
+          JOIN Craft C ON C.craftIdx = OC.craftIdx
+          JOIN Artist A ON A.artistIdx = C.artistIdx
           JOIN User U ON U.userIdx = A.userIdx
-  WHERE CC.isDeleted = 'N' && CC.userIdx = ${userIdx}
-  ORDER BY CC.craftCommentIdx DESC
-  LIMIT ${startItemIdx}, ${pageItemCnt};
+  WHERE OC.orderCraftIdx NOT IN (SELECT CC.orderCraftIdx
+                                FROM CraftComment CC
+                                WHERE CC.isDeleted = 'N') && O.userIdx = ${userIdx}
+  ORDER BY OC.orderCraftIdx DESC
+  LIMIT ${startItemIdx}, ${itemsPerPage};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
+//작성한 코멘트
+async function getWrittenComment(connection, userIdx, startItemIdx, itemsPerPage){
+  const query = `
+  SELECT CC.craftCommentIdx AS commentIdx,
+        OC.craftIdx,
+        C.name,
+        C.artistIdx,
+        U.nickname         AS artistName,
+        DATE_FORMAT(CC.createdAt, '%Y.%m.%d') AS createdAt,
+        CC.content
+  FROM CraftComment CC
+          JOIN OrderCraft OC ON OC.orderCraftIdx = CC.orderCraftIdx
+          JOIN OrderT O ON O.orderIdx = OC.orderIdx
+          JOIN Craft C ON C.craftIdx = OC.craftIdx
+          JOIN Artist A ON A.artistIdx = C.artistIdx
+          JOIN User U ON U.userIdx = A.userIdx
+  WHERE O.userIdx = ${userIdx} && CC.isDeleted = 'N'
+  ORDER BY commentIdx DESC
+  LIMIT ${startItemIdx}, ${itemsPerPage};
   `;
   const [rows] = await connection.query(query);
   return rows;
@@ -362,6 +389,7 @@ async function getUserAskCnt(connection, userIdx){
 }
 
 module.exports = {
+  getAvailableComment,
   getWrittenComment,
   getArtistIdx,
   getUserWrittenWith,

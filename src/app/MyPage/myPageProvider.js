@@ -17,21 +17,10 @@ exports.getMyComment = async (userIdx, type, page) => {
 
       //작성 가능한 코멘트
       if (type === 'available'){
-        //TODO
-        // const availableComment = await myPageDao.getAvailableComment(connection, userIdx, page, pageItemCnt);
+        const availableComment = await myPageDao.getAvailableComment(
+          connection, userIdx, startItemIdx, ITEMS_PER_PAGE.MY_PAGE_CAN_WRITE_CRAFT_COMMENT_PER_PAGE);
 
-        // for (let item of availableComment){
-        //   availableComment.forEach(async item => {
-        //     result.push({
-        //       'commentIdx': item.commentIdx,
-        //       'craftIdx': itme.craftIdx,
-        //       'name': item.name,
-        //       'mainImageUrl': item.mainImageUrl,
-        //       'artistIdx': item.artistIdx,
-        //       'artistName': item.artistName
-        //     })
-        //   });
-        // }
+          result = availableComment;
       }
       //작성한 코멘트
       else if (type === 'written'){
@@ -40,8 +29,6 @@ exports.getMyComment = async (userIdx, type, page) => {
         );
         
         for (let item of writtenComment){
-          const imageArr = await craftCommentDao.getCommentPhoto(connection, item.commentIdx);
-
           result.push({
             'commentIdx': item.commentIdx,
             'craftIdx': item.craftIdx,
@@ -49,7 +36,7 @@ exports.getMyComment = async (userIdx, type, page) => {
             'artistIdx': item.artistIdx,
             'artistName': item.artistName,
             'createdAt': item.createdAt,
-            'imageUrl': imageArr ? imageArr.map(item => item.imageUrl) : [],
+            'imageUrl':  await craftCommentDao.getCommentImageUrlArr(connection, item.commentIdx),
             'content': item.content
           });
         }
