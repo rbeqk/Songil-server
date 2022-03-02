@@ -1,5 +1,6 @@
 const craftCommentDao = require('./craftCommentDao');
 const craftDao = require('../Craft/craftDao');
+const orderStatusDao = require('../OrderStatus/orderStatusDao');
 const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
@@ -57,26 +58,43 @@ exports.reportComment = async (userIdx, craftCommentIdx, reportedReasonIdx, etcR
 }
 
 //댓글 작성
-exports.createCraftComment = async (craftIdx, userIdx, comment, imageArr) => {
+exports.createCraftComment = async (userIdx, orderCraftIdx, comment, imageArr) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
       
-      //존재하는 상품 댓글 idx인지
-      const isExistCraftIdx = await craftDao.isExistCraftIdx(connection, craftIdx);
-      if (!isExistCraftIdx){
+      //존재하는 orderCraftIdx인지
+      const isExistOrderCraftIdx = await orderStatusDao.isExistOrderCraftIdx(connection, orderCraftIdx);
+      if (!isExistOrderCraftIdx){
         connection.release();
-        return errResponse(baseResponse.INVALID_CRAFT_IDX);
+        return errResponse(baseResponse.INVALID_ORDER_CRAFT_IDX);
       }
 
-      //TODO: 구매한 상품인지
+      //유저의 orderCraftIdx인지
+      const isUserOrderCraftIdx = await orderStatusDao.isUserOrderOrderCraftIdx(connection, userIdx, orderCraftIdx);
+      if (!isUserOrderCraftIdx){
+        connection.release();
+        return errResponse(baseResponse.NO_PERMISSION);
+      }
 
-      //TODO: 댓글 작성 횟수를 초과했는지
+      //댓글을 작성할 수 있는 상태의 orderCraftIdx인지
+      const isPossibleToWriteComment = await craftCommentDao.isPossibleToWriteComment(connection, orderCraftIdx);
+      if (!isPossibleToWriteComment){
+        connection.release();
+        return errResponse(baseResponse.IMPOSSIBLE_TO_WRITE_COMMENT_STATUS);
+      }
+
+      //이미 댓글 작성한 orderCraftIdx인지
+      const isAlreadyWrittenComment = await craftCommentDao.isAlreadyWrittenComment(connection, orderCraftIdx);
+      if (isAlreadyWrittenComment){
+        connection.release();
+        return errResponse(baseResponse.ALREADY_WRITTEN_COMMENT);
+      }
 
       await connection.beginTransaction();
       
       //댓글 내용 추가
-      const createCraftComment = await craftCommentDao.createCraftComment(connection, craftIdx, userIdx, comment);
+      const createCraftComment = await craftCommentDao.createCraftComment(connection, orderCraftIdx, comment);
       const craftCommentIdx = createCraftComment.insertId;
 
       //댓글 사진 추가

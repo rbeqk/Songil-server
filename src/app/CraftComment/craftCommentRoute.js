@@ -13,5 +13,5 @@ module.exports = function (app){
   app.post('/shop/crafts/comments/:commentIdx/reported', jwtMiddleware, craftCommentController.reportComment);
 
   //상품 댓글 작성 API
-  app.post('/shop/crafts/:craftIdx/comments', jwtMiddleware, craftCommentUpload.array('image'), craftCommentController.createCraftComment);
+  app.post('/my-page/crafts/comments', jwtMiddleware, craftCommentUpload.array('image'), craftCommentController.createCraftComment);
 }

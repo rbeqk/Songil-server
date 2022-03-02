@@ -1,3 +1,5 @@
+const {ORDER_STATUS} = require('../../../modules/constants');
+
 //총 포토 댓글 개수
 async function getOnlyPhotoCommentCnt(connection, craftIdx){
   const query = `
@@ -113,12 +115,12 @@ async function reportCraftComment(connection, userIdx, craftCommentIdx, reported
 }
 
 //상품 댓글 내용 추가
-async function createCraftComment(connection, craftIdx, userIdx, comment){
+async function createCraftComment(connection, orderCraftIdx, comment){
   const query = `
-  INSERT INTO CraftComment (craftIdx, userIdx, content)
-  VALUES (${craftIdx}, ${userIdx}, '${comment}');
+  INSERT INTO CraftComment (orderCraftIdx, content)
+  VALUES (${orderCraftIdx}, ?);
   `;
-  const [rows] = await connection.query(query);
+  const [rows] = await connection.query(query, [comment]);
   return rows;
 }
 
@@ -137,10 +139,32 @@ async function updatePhotoCraftComment(connection, craftCommentIdx){
 async function createCraftCommentImage(connection, craftCommentIdx, image){
   const query = `
   INSERT INTO CraftCommentImage(craftCommentIdx, imageUrl)
-  VALUES (${craftCommentIdx}, '${image}');
+  VALUES (${craftCommentIdx}, ?);
+  `;
+  const [rows] = await connection.query(query, [image]);
+  return rows;
+}
+
+//이미 댓글 작성한 orderCraftIdx인지
+async function isAlreadyWrittenComment(connection, orderCraftIdx){
+  const query = `
+  SELECT EXISTS(SELECT craftCommentIdx
+    FROM CraftComment
+    WHERE orderCraftIdx = ${orderCraftIdx} && isDeleted = 'N') AS isExists;
   `;
   const [rows] = await connection.query(query);
-  return rows;
+  return rows[0]['isExists'];
+}
+
+//댓글을 작성할 수 있는 상태의 orderCraftIdx인지
+async function isPossibleToWriteComment(connection, orderCraftIdx){
+  const query = `
+  SELECT IF(orderStatusIdx = ${ORDER_STATUS.DELIVERY_COMPLETED}, 1, 0) AS canWrite
+  FROM OrderCraft
+  WHERE orderCraftIdx = ${orderCraftIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]['canWrite'];
 }
 
 module.exports = {
@@ -156,4 +180,6 @@ module.exports = {
   createCraftComment,
   updatePhotoCraftComment,
   createCraftCommentImage,
+  isAlreadyWrittenComment,
+  isPossibleToWriteComment,
 }

@@ -69,23 +69,22 @@ exports.reportComment = async (req, res) => {
 }
 
 /*
-  API No. 3.19
+  API No. 8.17
   API Name: 상품 댓글 작성 API
-  [POST] /shop/crafts/:craftdx/comments
-  body: comment, image
+  [POST] /my-page/crafts/comments
+  body: orderDetailIdx, comment, image
 */
 exports.createCraftComment = async (req, res) => {
-  const {craftIdx} = req.params;
-  const {comment} = req.body;
+  const {orderDetailIdx: orderCraftIdx, comment} = req.body;
   const {userIdx} = req.verifiedToken;
 
-  if (!comment) return res.send(errResponse(baseResponse.IS_EMPTY));
+  if (!(comment && orderCraftIdx)) return res.send(errResponse(baseResponse.IS_EMPTY));
   if (comment.length > 500) return res.send(errResponse(baseResponse.EXCEED_CRAFT_COMMENT));
 
   const imageArr = req.files.map(item => item.location);
   if (imageArr.length > 3) return res.send(errResponse(baseResponse.EXCEED_IMAGE_QUANTITY));
 
-  const createCraftComment = await craftCommentService.createCraftComment(craftIdx, userIdx, comment, imageArr);
+  const createCraftComment = await craftCommentService.createCraftComment(userIdx, orderCraftIdx, comment, imageArr);
 
   return res.send(createCraftComment);
 }

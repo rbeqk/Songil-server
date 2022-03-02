@@ -88,6 +88,7 @@ module.exports = {
   ALREADY_FINISHED_ABTEST_IDX: {"isSuccess": false, "code": 3203, "message": "이미 마감된 투표입니다"},
   ALREADY_VOTE_ABTEST_IDX: {"isSuccess": false, "code": 3204, "message": "이미 투표 완료한 abTest입니다"},
   ALREADY_PAYMENT_ORDER_IDX: {"isSuccess": false, "code": 3205, "message": "이미 결제한 orderIdx입니다"},
+  ALREADY_WRITTEN_COMMENT: {"isSuccess": false, "code": 3206, "message": "이미 댓글을 작성한 orderDetailIdx입니다"},
 
   EMPTY_USER_SEARCH: {"isSuccess": false, "code": 3300, "message": "사용자의 최근 검색어가 없습니다"},
   NO_VOTE_DATA: {"isSuccess": false, "code": 3301, "message": "투표 이력이 없습니다"},
@@ -102,6 +103,7 @@ module.exports = {
   CAN_NOT_CREATE_SENDING_INFO: {"isSuccess": false, "code": 3503, "message": "발송정보 입력이 불가능합니다"},
   CAN_NOT_RETURN_STATUS: {"isSuccess": false, "code": 3504, "message": "반품요청이 불가능합니다"},
   CAN_NOT_RES_RETURN: {"isSuccess": false, "code": 3505, "message": "반품 승인 및 거부가 불가능합니다"},
+  IMPOSSIBLE_TO_WRITE_COMMENT_STATUS: {"isSuccess": false, "code": 3506, "message": "댓글 작성이 불가능한 상태입니다"},
 
   DB_ERROR: {"isSuccess": false, "code": 4000, "message": "DB 에러"},
   SERVER_ERROR: {"isSuccess": false, "code": 4001, "message": "Server 에러"},
