@@ -237,9 +237,10 @@ async function getCraftInfo(connection, userIdx, sort, correspondIdxArr, startIt
             IF(EXISTS(SELECT *
                       FROM CraftLike CL
                       WHERE CL.userIdx = ${userIdx} && CL.craftIdx = C.craftIdx), 'Y', 'N')) as isLike,
-        (SELECT COUNT(*)
+        (SELECT COUNT(CC.craftCommentIdx)
           FROM CraftComment CC
-          WHERE CC.craftIdx = C.craftIdx && CC.isDeleted = 'N')                              as totalCommentCnt
+                  JOIN OrderCraft OC ON OC.orderCraftIdx = CC.orderCraftIdx
+          WHERE CC.isDeleted = 'N' && OC.craftIdx = C.craftIdx)                             as totalCommentCnt
   FROM Craft C
           JOIN Artist A ON A.artistIdx = C.artistIdx && A.isDeleted = 'N'
           JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
