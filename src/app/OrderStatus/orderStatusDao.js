@@ -1,4 +1,4 @@
-const {ORDER_STATUS} = require("../../../modules/constants");
+const {ORDER_STATUS, COMMENT_BTN_STATUS} = require("../../../modules/constants");
 
 //존재하는 orderCraftIdx인지
 async function isExistOrderCraftIdx(connection, orderCraftIdx){
@@ -83,7 +83,12 @@ async function getOrderCraftInfoArr(connection, orderIdx){
         OC.amount,
         IF(orderStatusIdx = ${ORDER_STATUS.READY_FOR_DELIVERY}, 'Y', 'N') AS canReqCancel,
         IF(orderStatusIdx = ${ORDER_STATUS.DELIVERY_COMPLETED}, 'Y', 'N') AS canReqReturn,
-        IF(orderStatusIdx = ${ORDER_STATUS.DELIVERY_COMPLETED}, 'Y', 'N') AS canWriteComment
+        IF(orderStatusIdx = ${ORDER_STATUS.DELIVERY_COMPLETED},
+            IF((SELECT EXISTS(SELECT CC.craftCommentIdx
+                              FROM CraftComment CC
+                              WHERE CC.orderCraftIdx = OC.orderCraftIdx && CC.isDeleted = 'N')),
+              ${COMMENT_BTN_STATUS.COMPLETED_COMMENT}, ${COMMENT_BTN_STATUS.COMMENT_ACTIVATED}),
+            ${COMMENT_BTN_STATUS.COMMENT_DISABLED})                        AS commentBtnStatus
   FROM OrderCraft OC
           JOIN Craft C ON OC.craftIdx = C.craftIdx
           JOIN Artist A ON C.artistIdx = A.artistIdx
