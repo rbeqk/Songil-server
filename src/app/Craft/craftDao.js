@@ -22,9 +22,10 @@ async function getCraftBasicInfo(connection, craftIdx){
         A.introduction                                           as artistIntroduction,
         U.imageUrl                                               as artistImageUrl,
         IF(TIMESTAMPDIFF(DAY, C.createdAt, NOW()) > 3, 'N', 'Y') as isNew,
-        (SELECT COUNT(craftCommentIdx)
+        (SELECT COUNT(CC.craftCommentIdx) AS totalCnt
           FROM CraftComment CC
-          WHERE CC.craftIdx = ${craftIdx} && CC.isDeleted = 'N')          as totalCommentCnt
+                  JOIN OrderCraft OC ON OC.orderCraftIdx = CC.orderCraftIdx
+          WHERE CC.isDeleted = 'N' && OC.craftIdx = ${craftIdx})  as totalCommentCnt
   FROM Craft C
           JOIN Artist A ON A.artistIdx = C.artistIdx && A.isDeleted = 'N'
           JOIN User U ON A.userIdx = U.userIdx && U.isDeleted = 'N'
