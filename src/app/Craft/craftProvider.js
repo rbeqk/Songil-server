@@ -24,11 +24,6 @@ exports.getCraftDetail = async (userIdx, craftIdx) => {
       const usage = await craftDao.getCraftUsage(connection, craftIdx);  //용도
       const shippingFee = await craftDao.getCraftShippingFee(connection, craftIdx);
 
-      const detailImageList = detailImage.map(item => item.detailImageUrl);
-      const cautionsList = cautions.map(item => item.cautions);
-      const materialList = material.map(item => item.material);
-      const usageList = usage.map(item => item.usage);
-
       let result = {
         'craftIdx': basicInfo.craftIdx,
         'isNew': basicInfo.isNew,
@@ -37,12 +32,12 @@ exports.getCraftDetail = async (userIdx, craftIdx) => {
         'mainImageUrl': basicInfo.mainImageUrl,
         'price': basicInfo.price,
         'shippingFee': [shippingFee.basicShippingFee, shippingFee.toFreeShippingFee, shippingFee.extraShippingFee],
-        'material': materialList,
-        'usage' : usageList,
+        'material': material,
+        'usage' : usage,
         'content': basicInfo.content,
         'size': basicInfo.size,
-        'cautions': cautionsList,
-        'detailImageUrls': detailImageList,
+        'cautions': cautions,
+        'detailImageUrls': detailImage,
         'artistIdx': basicInfo.artistIdx,
         'artistName': basicInfo.artistName,
         'artistIntroduction': basicInfo.artistIntroduction,

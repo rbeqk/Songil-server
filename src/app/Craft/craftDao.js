@@ -46,7 +46,7 @@ async function getCraftDetailImage(connection, craftIdx){
   WHERE C.craftIdx = ${craftIdx} && C.isDeleted = 'N';
   `;
   const [rows] = await connection.query(query);
-  return rows;
+  return rows.map(item => item.detailImageUrl);
 }
 
 //상품 유의사항
@@ -58,7 +58,7 @@ async function getCraftCautions(connection, craftIdx){
   WHERE C.craftIdx = ${craftIdx} && C.isDeleted = 'N';
   `;
   const [rows] = await connection.query(query);
-  return rows;
+  return rows.map(item => item.cautions);
 }
 
 //상품 소재
@@ -70,7 +70,7 @@ async function getCraftMaterial(connection, craftIdx){
   WHERE C.craftIdx = ${craftIdx} && C.isDeleted = 'N';
   `;
   const [rows] = await connection.query(query);
-  return rows;
+  return rows.map(item => item.material);;
 }
 
 //상품 용도
@@ -86,7 +86,7 @@ async function getCraftUsage(connection, craftIdx){
   WHERE C.craftIdx = ${craftIdx} && C.isDeleted = 'N';
   `;
   const [rows] = await connection.query(query);
-  return rows;
+  return rows.map(item => item.usage);
 }
 
 //배송비 관련 정보
