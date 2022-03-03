@@ -26,10 +26,11 @@ const bootPayRefund = async (connection, orderCraftIdx, type, refundInfo) => {
       if (refund.status === 200){
         console.log(refund.data);
         const refundReceiptId = refund.data.receipt_id;
-        await connection.beginTransaction();
 
         if (type === BOOTPAY_RETURN_TYPE.CANCEL){
           const orderStatusIdx = ORDER_STATUS.CALCEL_COMPLETED;
+
+          await connection.beginTransaction();
 
           await orderCancelDao.resOrderCraftCancel(connection, orderCraftIdx, resStatusIdx);
           await orderCancelDao.updateOrderCraftStatus(connection, orderCraftIdx, orderStatusIdx);
@@ -42,11 +43,14 @@ const bootPayRefund = async (connection, orderCraftIdx, type, refundInfo) => {
           if (refundInfo.benefitDiscount > 0){
             await orderCancelDao.updateBenefitStatus(connection, orderCraftIdx);
           }
-  
+
+          await connection.commit();
           return [true, null];
         }
         else if (type === BOOTPAY_RETURN_TYPE.RETURN){
           const orderStatusIdx = ORDER_STATUS.RETURN_COMPLELTED;
+
+          await connection.beginTransaction();
 
           await orderReturnDao.resOrderCraftReturn(connection, orderCraftIdx, resStatusIdx);
           await orderReturnDao.updateOrderCraftStatus(connection, orderCraftIdx, orderStatusIdx);
@@ -60,10 +64,9 @@ const bootPayRefund = async (connection, orderCraftIdx, type, refundInfo) => {
             await orderReturnDao.updateBenefitStatus(connection, orderCraftIdx);
           }
 
+          await connection.commit();
           return [true, null];
         }
-
-        await connection.commit();
       }
       else{
         console.log(err);
