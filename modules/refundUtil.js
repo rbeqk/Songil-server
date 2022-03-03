@@ -33,7 +33,7 @@ const bootPayRefund = async (connection, orderCraftIdx, type, refundInfo) => {
           await connection.beginTransaction();
 
           await orderCancelDao.resOrderCraftCancel(connection, orderCraftIdx, resStatusIdx);
-          await orderCancelDao.updateOrderCraftStatus(connection, orderCraftIdx, orderStatusIdx);
+          await orderCancelDao.updateOrderCraftStatus(connection, orderCraftIdx, orderStatusIdx, resStatusIdx);
           await orderCancelDao.createRefundInfo(connection, refundInfo.orderCancelIdx, refundReceiptId, refundInfo.finalRefundPrice);
   
           if (refundInfo.pointDiscount > 0){
@@ -53,7 +53,7 @@ const bootPayRefund = async (connection, orderCraftIdx, type, refundInfo) => {
           await connection.beginTransaction();
 
           await orderReturnDao.resOrderCraftReturn(connection, orderCraftIdx, resStatusIdx);
-          await orderReturnDao.updateOrderCraftStatus(connection, orderCraftIdx, orderStatusIdx);
+          await orderReturnDao.updateOrderCraftStatus(connection, orderCraftIdx, orderStatusIdx, resStatusIdx);
           await orderReturnDao.createRefundInfo(connection, refundInfo.orderReturnIdx, refundReceiptId, refundInfo.finalRefundPrice);
 
           if (refundInfo.pointDiscount > 0){

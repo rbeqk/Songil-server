@@ -22,10 +22,11 @@ async function reqOrderCraftReturn(connection, orderCraftIdx, reasonIdx, etcReas
 }
 
 //orderCraft 상태 변경
-async function updateOrderCraftStatus(connection, orderCraftIdx, orderStatusIdx){
+async function updateOrderCraftStatus(connection, orderCraftIdx, orderStatusIdx, resStatusIdx){
   const query = `
   UPDATE OrderCraft
-  SET orderStatusIdx = ${orderStatusIdx}
+  SET orderStatusIdx = ${orderStatusIdx},
+      resStatusIdx   = ${resStatusIdx}
   WHERE orderCraftIdx = ${orderCraftIdx};
   `;
   const [rows] = await connection.query(query);

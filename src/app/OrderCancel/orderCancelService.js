@@ -58,7 +58,7 @@ async function orderCraftCancelRejection(connection, orderCraftIdx){
 
   await connection.beginTransaction();
   await orderCancelDao.resOrderCraftCancel(connection, orderCraftIdx, resStatusIdx);
-  await orderCancelDao.updateOrderCraftStatus(connection, orderCraftIdx, orderStatusIdx);
+  await orderCancelDao.updateOrderCraftStatus(connection, orderCraftIdx, orderStatusIdx, resStatusIdx);
   await connection.commit();
 }
 
