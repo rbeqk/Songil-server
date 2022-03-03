@@ -36,14 +36,7 @@ exports.createABTest = async (req, res) => {
   if (!(content && year && month && day)) return res.send(errResponse(baseResponse.IS_EMPTY));
   if (content.length > 3000) return res.send(errResponse(baseResponse.EXCEED_ABTEST_CONTENT));
 
-  if (month < 1 || month > 12) return res.send(errResponse(baseResponse.EXCEED_DATE));
-
-  if ([1, 3, 5, 7, 8, 10, 12].includes(year)){
-    if (day < 1 ||  day > 31) return res.send(errResponse(baseResponse.EXCEED_DATE));
-  }
-  else{
-    if (day < 1 || day > 30) return res.send(errResponse(baseResponse.EXCEED_DATE));
-  }
+  if (!moment(`${year}-${month}-${day}`, "YYYY-MM-DD").isValid()) return res.send(errResponse(baseResponse.EXCEED_DATE));
 
   const imageArr = req.files.map(item => item.location);
   if (imageArr.length != 2) return res.send(errResponse(baseResponse.INVALID_IMAGE_QUANTITY));
