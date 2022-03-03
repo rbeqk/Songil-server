@@ -188,6 +188,46 @@ async function getcancelOrReturnOrderInfo(connection, artistIdx, createdAt){
   return rows;
 }
 
+//작가 정보 가져오기
+async function getArtistInfo(connection, userIdx){
+  const query = `
+  SELECT A.artistIdx, U.nickname AS name, U.imageUrl
+  FROM Artist A
+          JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
+  WHERE A.userIdx = ${userIdx} && A.isDeleted = 'N';
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0];
+}
+
+//누적판매액 가져오기
+async function getAccumulatedSales(connection, artistIdx){
+  const query = `
+  SELECT IFNULL(SUM(OC.totalCraftPrice - (OC.benefitDiscount + OC.pointDiscount)), 0) AS accumulatedSales
+  FROM OrderCraft OC
+          JOIN Craft C ON C.craftIdx = OC.craftIdx
+          JOIN OrderT O ON O.orderIdx = OC.orderIdx && O.isPaid = 'Y'
+  WHERE C.artistIdx = ${artistIdx} && OC.orderStatusIdx = ${ORDER_STATUS.DELIVERY_COMPLETED} &&
+        DATEDIFF(NOW(), OC.deliveryCompltedTime) > 7;
+  `;
+  const [rows] = await connection.query(query);
+  return parseInt(rows[0]['accumulatedSales']);
+}
+
+//1일판매액 가져오기
+async function getDailySales(connection, artistIdx){
+  const query = `
+  SELECT IFNULL(SUM(OC.totalCraftPrice - (OC.benefitDiscount + OC.pointDiscount)), 0) AS daliySales
+  FROM OrderCraft OC
+          JOIN Craft C ON C.craftIdx = OC.craftIdx
+          JOIN OrderT O ON O.orderIdx = OC.orderIdx && O.isPaid = 'Y'
+  WHERE C.artistIdx = ${artistIdx} && OC.orderStatusIdx = ${ORDER_STATUS.DELIVERY_COMPLETED} &&
+        DATEDIFF(NOW(), OC.deliveryCompltedTime) = 8
+  `;
+  const [rows] = await connection.query(query);
+  return parseInt(rows[0]['daliySales']);
+}
+
 module.exports = {
   isArtistOrderCraftIdx,
   getOrderCraftUserInfo,
@@ -197,4 +237,7 @@ module.exports = {
   getBasicOrderInfo,
   getcancelOrReturnOrderCreatedAtArr,
   getcancelOrReturnOrderInfo,
+  getArtistInfo,
+  getAccumulatedSales,
+  getDailySales,
 }

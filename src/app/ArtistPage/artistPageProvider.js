@@ -156,3 +156,40 @@ exports.getOrderList = async (userIdx, type, page) => {
     return errResponse(baseResponse.DB_ERROR);
   }
 }
+
+//작가 페이지 조회
+exports.getArtistPage = async (userIdx) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+      const isArtist = await artistAskDao.isArtist(connection, userIdx);
+      if (!isArtist){
+        connection.release();
+        return errResponse(baseResponse.NO_PERMISSION);
+      }
+
+      const artistInfo = await artistPageDao.getArtistInfo(connection, userIdx);
+      const {artistIdx, name, imageUrl} = artistInfo;
+      const accumulatedSales = await artistPageDao.getAccumulatedSales(connection, artistIdx);
+      const daliySales = await artistPageDao.getDailySales(connection, artistIdx);
+
+      const result = {
+        name,
+        imageUrl,
+        accumulatedSales,
+        daliySales
+      };
+
+      connection.release();
+      return response(baseResponse.SUCCESS, result);
+
+    }catch(err){
+      connection.release();
+      logger.error(`getArtistPage DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`getArtistPage DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}

@@ -10,4 +10,7 @@ module.exports = function(app){
   
   //주문자 정보 확인 API
   app.get('/artist-page/orders/:orderDetailIdx', jwtMiddleware, artistPageController.getOrderCraftUserInfo);
+
+  //작가페이지 조회 API
+  app.get('/artist-page', jwtMiddleware, artistPageController.getArtistPage);
 }

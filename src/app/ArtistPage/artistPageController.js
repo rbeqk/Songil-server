@@ -51,3 +51,16 @@ exports.getOrderList = async (req, res) => {
 
   return res.send(getOrderList);
 }
+
+/*
+  API No. 10.1
+  API Name: 작가페이지 조회 API
+  [GET] /artist-page
+*/
+exports.getArtistPage = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+
+  const getArtistPage = await artistPageProvider.getArtistPage(userIdx);
+
+  return res.send(getArtistPage);
+}

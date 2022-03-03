@@ -33,14 +33,15 @@ const addTrackingInfo = async (connection, orderCraftIdx, time, where, kind) => 
   await connection.query(query, [where, kind, time]);
 }
 
-const updateOrderCraftDeliveryStatus = async (connection, orderCraftIdx) => {
+const updateOrderCraftDeliveryStatus = async (connection, orderCraftIdx, deliveryCompltedTime) => {
   const query = `
   UPDATE OrderCraft
   SET orderStatusIdx    = ${ORDER_STATUS.DELIVERY_COMPLETED},
-      deliveryStatusIdx = ${DELIVERY_STATUS.DELIVERY_COMPLETED}
+      deliveryStatusIdx = ${DELIVERY_STATUS.DELIVERY_COMPLETED},
+      deliveryCompltedTime = ?
   WHERE orderCraftIdx = ${orderCraftIdx};
   `;
-  await connection.query(query);
+  await connection.query(query, [deliveryCompltedTime]);
 }
 
 const TrackingSchedule = schedule.scheduleJob('0 0-15/1 * * 1-6', async () => {
@@ -75,7 +76,8 @@ const TrackingSchedule = schedule.scheduleJob('0 0-15/1 * * 1-6', async () => {
 
         if (trackingDetails.length > orderCraftDeliveryLen){
           if (completeYN === 'Y'){
-            await updateOrderCraftDeliveryStatus(connection, orderCraftIdx);
+            const deliveryCompltedTime = trackingDetails[trackingDetails.length - 1].timsString;
+            await updateOrderCraftDeliveryStatus(connection, orderCraftIdx, deliveryCompltedTime);
           }
 
           for (let i = orderCraftDeliveryLen; i < trackingDetails.length; i++){
