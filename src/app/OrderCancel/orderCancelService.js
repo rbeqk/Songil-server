@@ -96,7 +96,7 @@ exports.resOrderCraftCancel = async (userIdx, orderCraftIdx, type) => {
       const canResCancelOrderCraft = await orderCancelDao.canResCancelOrderCraft(connection, orderCraftIdx, type);
       if (!canResCancelOrderCraft){
         connection.release();
-        return errResponse(baseResponse.CAN_NOT_CANCEL_STATUS);
+        return errResponse(baseResponse.CAN_NOT_RES_CANCEL);
       }
 
       //주문취소 거부 시

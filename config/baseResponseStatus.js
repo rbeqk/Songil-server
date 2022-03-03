@@ -103,7 +103,8 @@ module.exports = {
   CAN_NOT_CREATE_SENDING_INFO: {"isSuccess": false, "code": 3503, "message": "발송정보 입력이 불가능합니다"},
   CAN_NOT_RETURN_STATUS: {"isSuccess": false, "code": 3504, "message": "반품요청이 불가능합니다"},
   CAN_NOT_RES_RETURN: {"isSuccess": false, "code": 3505, "message": "반품 승인 및 거부가 불가능합니다"},
-  IMPOSSIBLE_TO_WRITE_COMMENT_STATUS: {"isSuccess": false, "code": 3506, "message": "댓글 작성이 불가능한 상태입니다"},
+  CAN_NOT_RES_CANCEL: {"isSuccess": false, "code": 3506, "message": "취소 승인 및 거부가 불가능합니다"},
+  IMPOSSIBLE_TO_WRITE_COMMENT_STATUS: {"isSuccess": false, "code": 3507, "message": "댓글 작성이 불가능한 상태입니다"},
 
   DB_ERROR: {"isSuccess": false, "code": 4000, "message": "DB 에러"},
   SERVER_ERROR: {"isSuccess": false, "code": 4001, "message": "Server 에러"},
