@@ -1,3 +1,5 @@
+const {CRAFT_USAGE_CATEGORY} = require('../../../modules/constants');
+
 //유효한 craftIdx인지
 async function isExistCraftIdx(connection, craftIdx){
   const query = `
@@ -74,10 +76,13 @@ async function getCraftMaterial(connection, craftIdx){
 //상품 용도
 async function getCraftUsage(connection, craftIdx){
   const query = `
-  SELECT CUI.name as 'usage'
+  SELECT IF(CUI.craftUsageItemIdx IN (${CRAFT_USAGE_CATEGORY.TABLE_WARE_ETC}, ${CRAFT_USAGE_CATEGORY.HOME_DECO_ETC},
+    ${CRAFT_USAGE_CATEGORY.JEWELRY_ETC}, ${CRAFT_USAGE_CATEGORY.ETC_ETC}),
+  CU.etcUsage,
+  CUI.name) as 'usage'
   FROM Craft C
-          JOIN CraftUsage CU on CU.craftIdx = C.craftIdx && CU.isDeleted = 'N'
-          JOIN CraftUsageItem CUI on CUI.craftUsageItemIdx = CU.craftUsageItemIdx && CUI.isDeleted = 'N'
+  JOIN CraftUsage CU on CU.craftIdx = C.craftIdx
+  JOIN CraftUsageItem CUI on CUI.craftUsageItemIdx = CU.craftUsageItemIdx
   WHERE C.craftIdx = ${craftIdx} && C.isDeleted = 'N';
   `;
   const [rows] = await connection.query(query);
