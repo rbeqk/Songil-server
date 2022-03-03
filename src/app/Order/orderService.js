@@ -192,11 +192,20 @@ applyNewOrderBenefit = async (connection, userIdx, orderIdx, benefitIdx) => {
     else if (benefitCategoryIdx == 3){
     }
 
+    let restBeneiftDiscount = benefitDiscount;
+
     //부분적(각각 상품 별) 베네핏 적용
     for (let item of rateInfo){
       const orderCraftIdx = item.orderCraftIdx;
       const orderCraftIdxBenefitDiscount = parseInt(item.rate * benefitDiscount);
       await orderDao.applyOrderCraftBenefit(connection, orderCraftIdx, orderCraftIdxBenefitDiscount);
+
+      restBeneiftDiscount -= orderCraftIdxBenefitDiscount;
+    }
+
+    //비율 별 딱 떨어지지 않을 때를 위한 로직
+    if (restBeneiftDiscount > 0){
+      await orderDao.applyRestBeneiftDiscount(connection, rateInfo[0].orderCraftIdx, restBeneiftDiscount);
     }
 
     const finalPrice = await orderDao.getFinalPrice(connection, orderIdx);
@@ -424,11 +433,20 @@ exports.validatePayment = async (userIdx, orderIdx, receiptId) => {
 //orderCraftIdx 별 사용 포인트 저장
 applyOrderCraftPoint = async (connection, orderIdx, pointDiscount) => {
   try{
+    let restPointDiscount = pointDiscount;
+
     const rateInfo = await orderDao.getOrderCraftAllRateInfo(connection, orderIdx);
     for (let item of rateInfo){
       const orderCraftIdx = item.orderCraftIdx;
       const orderCraftIdxPointDiscount = parseInt(item.rate * pointDiscount);
       await orderDao.applyOrderCraftPoint(connection, orderCraftIdx, orderCraftIdxPointDiscount);
+
+      restPointDiscount -= orderCraftIdxPointDiscount;
+    }
+
+    //비율 딱 떨어지지 않을 때를 위한 로직
+    if (restPointDiscount > 0){
+      await orderDao.applyRestPointDiscount(connection, rateInfo[0].orderCraftIdx, restPointDiscount);
     }
 
     return true;

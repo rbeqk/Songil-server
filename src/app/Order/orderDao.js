@@ -509,6 +509,28 @@ async function getCraftIdxByOrderIdx(connection, orderIdx){
   return rows.map(item => item.craftIdx);
 }
 
+//남은 beneiftDiscount 첫번째 요소에 적용
+async function applyRestBeneiftDiscount(connection, firstOrderCraftIdx, restBeneiftDiscount){
+  const query = `
+  UPDATE OrderCraft
+  SET benefitDiscount = benefitDiscount + ${restBeneiftDiscount}
+  WHERE orderCraftIdx = ${firstOrderCraftIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
+//남은 pointDiscount 첫번째 요소에 적용
+async function applyRestPointDiscount(connection, firstOrderCraftIdx, restPointDiscount){
+  const query = `
+  UPDATE OrderCraft
+  SET pointDiscount = pointDiscount + ${restPointDiscount}
+  WHERE orderCraftIdx = ${firstOrderCraftIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   deleteUserNotPaidOrderSheet,
   getExistCraftIdxLen,
@@ -549,4 +571,6 @@ module.exports = {
   getOrderCraftRateInfoByArtist,
   applyOrderCraftPoint,
   getCraftIdxByOrderIdx,
+  applyRestBeneiftDiscount,
+  applyRestPointDiscount,
 }
