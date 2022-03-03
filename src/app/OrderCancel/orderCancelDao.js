@@ -1,4 +1,4 @@
-const {ORDER_STATUS, POINT_INFO} = require('../../../modules/constants');
+const {ORDER_STATUS} = require('../../../modules/constants');
 
 //주문취소할 수 있는 상태인지
 async function canCancelOrderCraft(connection, orderCraftIdx){
@@ -117,75 +117,6 @@ async function createRefundInfo(connection, orderCancelIdx, receiptId, finalRefu
   return rows;
 }
 
-//주문취소로 인한 포인트 정보 업데이트
-async function updateUserPointByCancel(connection, userIdx, pointDiscount){
-  const pointStatusQuery = `
-  INSERT INTO PointStatus(userIdx, point, pointInfoIdx)
-  VALUES (${userIdx}, ${pointDiscount}, ${POINT_INFO.RETURNED_POINT_BY_CANCEL});
-  `;
-  await connection.query(pointStatusQuery);
-
-  const getPointQuery = `
-  SELECT SUM(point) AS totalPoint
-  FROM PointStatus
-  WHERE userIdx = ${userIdx};
-  `;
-  const [getPoint] = await connection.query(getPointQuery);
-  const totalPoint = getPoint[0]['totalPoint'];
-
-  const userPointQuery = `
-  UPDATE User
-  SET point = ${totalPoint}
-  WHERE userIdx = ${userIdx};
-  `;
-  await connection.query(userPointQuery);
-}
-
-//주문취소로 인한 베네핏 정보 업데이트
-async function updateBenefitStatus(connection, orderCraftIdx){
-  const getOrderCntQuery = `
-  SELECT COUNT(orderCraftIdx) AS totalOrderCnt
-  FROM OrderCraft
-  WHERE orderIdx = (SELECT orderIdx
-                    FROM OrderCraft
-                    WHERE orderCraftIdx = ${orderCraftIdx});
-  `;
-
-  let [rows] = await connection.query(getOrderCntQuery);
-  const totalOrderCnt = rows[0]['totalOrderCnt'];
-
-  //결제 시 해당 orderCraftIdx만 결제했을 경우 => 베네핏 돌려주기
-  if (totalOrderCnt === 1){
-    const getBenefitIdxQuery = `
-    SELECT benefitIdx
-    FROM OrderT
-    WHERE orderIdx = (SELECT orderIdx
-                      FROM OrderCraft
-                      WHERE orderCraftIdx = ${orderCraftIdx});
-    `;
-    [rows] = await connection.query(getBenefitIdxQuery);
-    const benefitIdx = rows[0]['benefitIdx'];
-
-    const getUserIdxQuery = `
-    SELECT O.userIdx
-    FROM OrderCraft OC
-            JOIN OrderT O ON OC.orderIdx = O.orderIdx
-    WHERE OC.orderCraftIdx = ${orderCraftIdx};
-    `;
-    [rows] = await connection.query(getUserIdxQuery);
-    const userIdx = rows[0]['userIdx'];
-
-    const updateBenefitQuery = `
-    UPDATE UserBenefit
-    SET isUsed = 'N',
-        usedAt = NULL
-    WHERE userIdx = ${userIdx} && benefitIdx = ${benefitIdx} && isDeleted = 'N';
-    `;
-    await connection.query(updateBenefitQuery);
-  }
-
-}
-
 module.exports = {
   canCancelOrderCraft,
   reqOrderCraftCancel,
@@ -195,6 +126,4 @@ module.exports = {
   resOrderCraftCancel,
   getCancelInfo,
   createRefundInfo,
-  updateUserPointByCancel,
-  updateBenefitStatus,
 }

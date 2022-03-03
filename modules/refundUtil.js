@@ -3,9 +3,24 @@ require('dotenv').config();
 const {RES_STATUS, ORDER_STATUS, BOOTPAY_RETURN_TYPE} = require('./constants');
 const orderCancelDao = require('../src/app/OrderCancel/orderCancelDao');
 const orderReturnDao = require('../src/app/OrderReturn/orderReturnDao');
+const orderStatusDao = require('../src/app/OrderStatus/orderStatusDao');
+
+const pointDiscountInfoUpdate = async (connection, userIdx, pointDiscount) => {
+  if (pointDiscount > 0){
+    await orderStatusDao.updateUserPointByCancel(connection, userIdx, pointDiscount);
+  }
+}
+
+const benefitDiscountInfoUpdate = async (connection, orderCraftIdx, benefitDiscount) => {
+  if (benefitDiscount > 0){
+    const isUpdateBenefitInfo = await orderStatusDao.isUpdateBenefitInfo(connection, orderCraftIdx);
+    if (isUpdateBenefitInfo){
+      await orderStatusDao.updateBenefitInfo(connection, orderCraftIdx);
+    }
+  }
+}
 
 const bootPayRefund = async (connection, orderCraftIdx, type, refundInfo) => {
-  console.log(refundInfo.finalRefundPrice)
   RestClient.setConfig(
     process.env.BOOTPAY_APPLICATION_ID,
     process.env.BOOTPAY_PRIVATE_KEY
@@ -35,14 +50,9 @@ const bootPayRefund = async (connection, orderCraftIdx, type, refundInfo) => {
           await orderCancelDao.resOrderCraftCancel(connection, orderCraftIdx, resStatusIdx);
           await orderCancelDao.updateOrderCraftStatus(connection, orderCraftIdx, orderStatusIdx, resStatusIdx);
           await orderCancelDao.createRefundInfo(connection, refundInfo.orderCancelIdx, refundReceiptId, refundInfo.finalRefundPrice);
-  
-          if (refundInfo.pointDiscount > 0){
-            await orderCancelDao.updateUserPointByCancel(connection, refundInfo.userIdx, refundInfo.pointDiscount);
-          }
-  
-          if (refundInfo.benefitDiscount > 0){
-            await orderCancelDao.updateBenefitStatus(connection, orderCraftIdx);
-          }
+
+          await pointDiscountInfoUpdate(connection, refundInfo.userIdx, refundInfo.pointDiscount);
+          await benefitDiscountInfoUpdate(connection, orderCraftIdx, refundInfo.benefitDiscount);
 
           await connection.commit();
           return [true, null];
@@ -56,13 +66,8 @@ const bootPayRefund = async (connection, orderCraftIdx, type, refundInfo) => {
           await orderReturnDao.updateOrderCraftStatus(connection, orderCraftIdx, orderStatusIdx, resStatusIdx);
           await orderReturnDao.createRefundInfo(connection, refundInfo.orderReturnIdx, refundReceiptId, refundInfo.finalRefundPrice);
 
-          if (refundInfo.pointDiscount > 0){
-            await orderReturnDao.updateUserPointByReturn(connection, refundInfo.userIdx, refundInfo.pointDiscount);
-          }
-
-          if (refundInfo.benefitDiscount > 0){
-            await orderReturnDao.updateBenefitStatus(connection, orderCraftIdx);
-          }
+          await pointDiscountInfoUpdate(connection, refundInfo.userIdx, refundInfo.pointDiscount);
+          await benefitDiscountInfoUpdate(connection, orderCraftIdx, refundInfo.benefitDiscount);
 
           await connection.commit();
           return [true, null];

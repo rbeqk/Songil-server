@@ -33,7 +33,7 @@ exports.reqOrderCraftCancel = async (userIdx, orderCraftIdx, reasonIdx, etcReaso
 
       await connection.beginTransaction();
       await orderCancelDao.reqOrderCraftCancel(connection, orderCraftIdx, reasonIdx, etcReason);
-      await orderCancelDao.updateOrderCraftStatus(connection, orderCraftIdx, ORDER_STATUS.REQUEST_CANCEL);
+      await orderCancelDao.updateOrderCraftStatus(connection, orderCraftIdx, ORDER_STATUS.REQUEST_CANCEL, null);
       await connection.commit();
       
       connection.release();

@@ -33,7 +33,7 @@ exports.reqOrderCraftReturn = async (userIdx, orderCraftIdx, reasonIdx, etcReaso
 
       await connection.beginTransaction();
       await orderReturnDao.reqOrderCraftReturn(connection, orderCraftIdx, reasonIdx, etcReason);
-      await orderReturnDao.updateOrderCraftStatus(connection, orderCraftIdx, ORDER_STATUS.REQUEST_RETURN);
+      await orderReturnDao.updateOrderCraftStatus(connection, orderCraftIdx, ORDER_STATUS.REQUEST_RETURN, null);
       await connection.commit();
       
       connection.release();
