@@ -1,4 +1,4 @@
-const {CATEGORY} = require('../../../modules/constants');
+const {CATEGORY, ORDER_STATUS} = require('../../../modules/constants');
 
 //작성 가능한 코멘트
 async function getAvailableComment(connection, userIdx, startItemIdx, itemsPerPage){
@@ -16,7 +16,8 @@ async function getAvailableComment(connection, userIdx, startItemIdx, itemsPerPa
           JOIN User U ON U.userIdx = A.userIdx
   WHERE OC.orderCraftIdx NOT IN (SELECT CC.orderCraftIdx
                                 FROM CraftComment CC
-                                WHERE CC.isDeleted = 'N') && O.userIdx = ${userIdx}
+                                WHERE CC.isDeleted = 'N') && O.userIdx = ${userIdx} &&
+        OC.orderStatusIdx = ${ORDER_STATUS.DELIVERY_COMPLETED}
   ORDER BY OC.orderCraftIdx DESC
   LIMIT ${startItemIdx}, ${itemsPerPage};
   `;
