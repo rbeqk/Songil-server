@@ -68,11 +68,11 @@ exports.getArtistInfo = async (artistIdx) => {
 
       //작가 약력 가져오기
       const artistProfile = await artistPlaceDao.getArtistProfile(connection, artistIdx);
-      result.profile = artistProfile ? artistProfile.map(item => item.content) : [];
+      result.profile = artistProfile;
 
       //작가 전시정보 가져오기
       const artistExhibition = await artistPlaceDao.getArtistExhibition(connection, artistIdx);
-      result.exhibition = artistExhibition ? artistExhibition.map(item => item.content) : [];
+      result.exhibition = artistExhibition;
 
       //총 상품 개수 가져오기
       const totalCraftCnt = await artistPlaceDao.getArtistCraftCnt(connection, artistIdx);

@@ -54,7 +54,7 @@ async function getCraftCautions(connection, craftIdx){
   const query = `
   SELECT CC.caution as cautions
   FROM Craft C
-          JOIN CraftCaution CC on C.craftIdx = CC.craftIdx && CC.isDeleted = 'N'
+          JOIN CraftCaution CC on C.craftIdx = CC.craftIdx
   WHERE C.craftIdx = ${craftIdx} && C.isDeleted = 'N';
   `;
   const [rows] = await connection.query(query);
@@ -66,7 +66,7 @@ async function getCraftMaterial(connection, craftIdx){
   const query = `
   SELECT CM.material
   FROM Craft C
-          JOIN CraftMaterial CM on C.craftIdx = CM.craftIdx && CM.isDeleted = 'N'
+          JOIN CraftMaterial CM on C.craftIdx = CM.craftIdx
   WHERE C.craftIdx = ${craftIdx} && C.isDeleted = 'N';
   `;
   const [rows] = await connection.query(query);

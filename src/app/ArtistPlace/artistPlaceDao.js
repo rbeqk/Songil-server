@@ -25,20 +25,20 @@ async function getArtistInfo(connection, artistIdx){
 async function getArtistProfile(connection, artistIdx){
   const query = `
   SELECT content FROM ArtistProfile
-  WHERE isDeleted = 'N' && artistIdx = ${artistIdx};
+  WHERE artistIdx = ${artistIdx};
   `;
   const [rows] = await connection.query(query);
-  return rows;
+  return rows.map(item => item.content);
 }
 
 //작가 전시정보
 async function getArtistExhibition(connection, artistIdx){
   const query = `
   SELECT content FROM ArtistExhibition
-  WHERE isDeleted = 'N' && artistIdx = ${artistIdx};
+  WHERE artistIdx = ${artistIdx};
   `;
   const [rows] = await connection.query(query);
-  return rows;
+  return rows.map(item => item.content);
 }
 
 //작가 별 총 craft 개수 

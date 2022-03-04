@@ -57,7 +57,7 @@ async function getArticleContent(connection, articleIdx){
   const query = `
   SELECT contentIdx, content
   FROM ArticleContent
-  WHERE isDeleted = 'N' && articleIdx = ${articleIdx};
+  WHERE articleIdx = ${articleIdx};
   `;
   const [rows] = await connection.query(query);
   return rows;
@@ -68,7 +68,7 @@ async function getArticelDetailImage(connection, articleIdx){
   const query = `
   SELECT imageUrl, contentIdx
   FROM ArticleDetailImage
-  WHERE isDeleted = 'N' && articleIdx = ${articleIdx};
+  WHERE articleIdx = ${articleIdx};
   `;
   const [rows] = await connection.query(query);
   return rows;
@@ -82,7 +82,7 @@ async function getArticleReatedCraft(connection, articleIdx){
           JOIN Craft C on AC.craftIdx = C.craftIdx
           JOIN Artist A on C.artistIdx = A.artistIdx
           JOIN User U on A.userIdx = U.userIdx
-  WHERE AC.isDeleted = 'N' && AC.articleIdx = ${articleIdx};
+  WHERE AC.articleIdx = ${articleIdx};
   `;
   const [rows] = await connection.query(query);
   return rows;
