@@ -194,6 +194,17 @@ async function reportStory(connection, userIdx, storyIdx, withTypeIdx, reportedR
   return rows;
 }
 
+//유저의 스토리 전체 삭제
+async function deleteUserStory(connection, userIdx){
+  const query = `
+  UPDATE Story
+  SET isDeleted = 'Y'
+  WHERE userIdx = ${userIdx} && isDeleted = 'N';
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   isExistStoryIdx,
   getStoryDetail,
@@ -212,4 +223,5 @@ module.exports = {
   isAlreadyReportedStory,
   isUserStory,
   reportStory,
+  deleteUserStory,
 }

@@ -153,6 +153,17 @@ async function reportABTestComment(connection, abTestCommentIdx, userIdx, report
   return rows;
 }
 
+//유저의 abTest 댓글 전체 삭제
+async function deleteUserABTestComment(connection, userIdx){
+  const query = `
+  UPDATE ABTestComment
+  SET isDeleted = 'Y'
+  WHERE userIdx = ${userIdx} && isDeleted = 'N';
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   isExistABTestCommentParentIdx,
   createABTestComment,
@@ -164,4 +175,5 @@ module.exports = {
   isAlreadyReportedABTestCommentIdx,
   isUserABTestComment,
   reportABTestComment,
+  deleteUserABTestComment,
 }

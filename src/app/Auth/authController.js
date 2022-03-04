@@ -114,3 +114,15 @@ exports.getUserAuth = async (req, res) => {
   const getUserAuth = await authProvider.getUserAuth(userIdx);
   return res.send(getUserAuth);
 }
+
+/*
+  API No. 1.7
+  API Name: 회원 탈퇴 API
+  [DELETE] /users
+*/
+exports.deleteUser = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+
+  const deleteUser = await authService.deleteUser(userIdx);
+  return res.send(deleteUser);
+}

@@ -144,6 +144,17 @@ async function getArtistArticle(connection, articleList, sort, startItemIdx, pag
   return rows;
 }
 
+//작가 탈퇴
+async function deleteArtist(connection, artistIdx){
+  const query = `
+  UPDATE Artist
+  SET isDeleted = 'Y'
+  WHERE artistIdx = ${artistIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   isExistArtistIdx,
   getArtistInfo,
@@ -155,4 +166,5 @@ module.exports = {
   getArticleWithArtistTag,
   getArticleWithArtistCraft,
   getArtistArticle,
+  deleteArtist,
 }

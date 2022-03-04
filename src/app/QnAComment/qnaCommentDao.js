@@ -147,6 +147,17 @@ async function isUserQnAComment(connection, userIdx, qnaCommentIdx){
   return rows[0]['isExist'];
 }
 
+//유저의 qna 댓글 전체 삭제
+async function deleteUserQnAComment(connection, userIdx){
+  const query = `
+  UPDATE QnAComment
+  SET isDeleted = 'Y'
+  WHERE userIdx = ${userIdx} && isDeleted = 'N';
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   isExistQnACommentParentIdx,
   createQnAComment,
@@ -158,4 +169,5 @@ module.exports = {
   reportQnAComment,
   isAlreadyReportedQnACommentIdx,
   isUserQnAComment,
+  deleteUserQnAComment,
 }

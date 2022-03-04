@@ -187,6 +187,27 @@ async function deleteCraftComment(connection, craftCommentIdx){
   return rows;
 }
 
+//유저의 상품 댓글 전체 삭제
+async function deleteUserCraftComment(connection, userIdx){
+  const getUserCraftCommentQuery = `
+  SELECT CC.craftCommentIdx
+  FROM CraftComment CC
+          JOIN OrderCraft OC ON OC.orderCraftIdx = CC.orderCraftIdx
+          JOIN OrderT O ON O.orderIdx = OC.orderIdx
+  WHERE O.userIdx = ${userIdx} && CC.isDeleted = 'N';
+  `;
+  let [rows] = await connection.query(getUserCraftCommentQuery);
+  const userCraftCommentIdxArr = rows.length > 0 ? rows.map(item => item.craftCommentIdx) : [-1];
+
+  const deleteUserCraftCommentQuery = `
+  UPDATE CraftComment
+  SET isDeleted = 'Y'
+  WHERE craftCommentIdx IN (?)
+  `;
+  [rows] = await connection.query(deleteUserCraftCommentQuery, [userCraftCommentIdxArr]);
+  return rows;
+}
+
 module.exports = {
   getOnlyPhotoCommentCnt,
   getCommentCnt,
@@ -203,4 +224,5 @@ module.exports = {
   isAlreadyWrittenComment,
   isPossibleToWriteComment,
   deleteCraftComment,
+  deleteUserCraftComment,
 }

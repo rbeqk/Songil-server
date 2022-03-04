@@ -22,4 +22,7 @@ module.exports = function(app){
 
   //사용자 권한 판단 API
   app.get('/users/type', jwtMiddleware, authController.getUserAuth);
+
+  //회원 탈퇴 API
+  app.delete('/users', jwtMiddleware, authController.deleteUser);
 }

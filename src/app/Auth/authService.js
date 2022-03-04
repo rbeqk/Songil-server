@@ -1,4 +1,13 @@
 const authDao = require('./authDao');
+const storyDao = require('../Story/storyDao');
+const storyCommentDao = require('../StoryComment/storyCommentDao');
+const qnaDao = require('../QnA/qnaDao');
+const qnaCommentDao = require('../QnAComment/qnaCommentDao');
+const abTestDao = require('../ABTest/abTestDao');
+const abTestCommentDao = require('../ABTestComment/abTestCommentDao');
+const craftDao = require('../Craft/craftDao');
+const craftCommentDao = require('../CraftComment/craftCommentDao');
+const artistPlaceDao = require('../ArtistPlace/artistPlaceDao');
 const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
@@ -50,6 +59,46 @@ exports.createUser = async (email, password, nickname) => {
     }
   }catch(err){
     logger.error(`createUser DB Connection Error: ${err}`);
+    return errResponse(baseResponse.DB_ERROR);
+  }
+}
+
+//회원 탈퇴
+exports.deleteUser = async (userIdx) => {
+  try{
+    const connection = await pool.getConnection(async conn => conn);
+    try{
+      const artistIdx = await authDao.getArtistIdx(connection, userIdx);
+      await connection.beginTransaction();
+
+      await storyDao.deleteUserStory(connection, userIdx);
+      await storyCommentDao.deleteUserStoryComment(connection, userIdx);
+      await qnaDao.deleteUserQnA(connection, userIdx);
+      await qnaCommentDao.deleteUserQnAComment(connection, userIdx);
+      await abTestCommentDao.deleteUserABTestComment(connection, userIdx);
+      await craftCommentDao.deleteUserCraftComment(connection, userIdx);
+
+      if (artistIdx){
+        await artistPlaceDao.deleteArtist(connection, artistIdx);
+        await craftDao.deleteUserCraft(connection, artistIdx);
+        await abTestDao.deleteUserABTest(connection, artistIdx);
+      }
+
+      await authDao.deleteUser(connection, userIdx);
+
+      await connection.commit();
+
+      connection.release();
+      return response(baseResponse.SUCCESS);
+
+    }catch(err){
+      await connection.rollback();
+      connection.release();
+      logger.error(`deleteUser DB Query Error: ${err}`);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }catch(err){
+    logger.error(`deleteUser DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }

@@ -147,6 +147,17 @@ async function isUserStoryComment(connection, userIdx, storyCommentIdx){
   return rows[0]['isExist'];
 }
 
+//유저의 스토리 댓글 전체 삭제
+async function deleteUserStoryComment(connection, userIdx){
+  const query = `
+  UPDATE StoryComment
+  SET isDeleted = 'Y'
+  WHERE userIdx = ${userIdx} && isDeleted = 'N';
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   createStoryComment,
   isExistStoryCommentParentIdx,
@@ -158,4 +169,5 @@ module.exports = {
   reportStoryComment,
   isAlreadyReportedStoryCommentIdx,
   isUserStoryComment,
+  deleteUserStoryComment,
 }

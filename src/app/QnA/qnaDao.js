@@ -135,6 +135,17 @@ async function reportQnA(connection, userIdx, qnaIdx, withTypeIdx, reportedReaso
   return rows;
 }
 
+//유저의 qna 전체 삭제
+async function deleteUserQnA(connection, userIdx){
+  const query = `
+  UPDATE QnA
+  SET isDeleted = 'Y'
+  WHERE userIdx = ${userIdx} && isDeleted = 'N';
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   isExistQnaIdx,
   getQnADetail,
@@ -147,4 +158,5 @@ module.exports = {
   isAlreadyReportedQnA,
   isUserQnA,
   reportQnA,
+  deleteUserQnA,
 }

@@ -113,6 +113,17 @@ async function getUserLikeCraft(connection, userIdx, craftIdx){
   return rows[0]['isLike'];
 }
 
+//작가의 상품 전체 삭제
+async function deleteUserCraft(connection, artistIdx){
+  const query = `
+  UPDATE Craft
+  SET isDeleted = 'Y'
+  WHERE artistIdx = ${artistIdx} && isDeleted = 'N';
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   isExistCraftIdx,
   getCraftBasicInfo,
@@ -122,4 +133,5 @@ module.exports = {
   getCraftUsage,
   getCraftShippingFee,
   getUserLikeCraft,
+  deleteUserCraft,
 }

@@ -226,6 +226,17 @@ async function reportABTest(connection, userIdx, abTestIdx, withTypeIdx, reporte
   return rows;
 }
 
+//작가의 abTest 전체 삭제
+async function deleteUserABTest(connection, artistIdx){
+  const query = `
+  UPDATE ABTest
+  SET isDeleted = 'Y'
+  WHERE artistIdx = ${artistIdx} && isDeleted = 'N';
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   isExistABTestIdx,
   getABTestInfo,
@@ -247,4 +258,5 @@ module.exports = {
   deleteABTestComment,
   isAlreadyReportedABTest,
   reportABTest,
+  deleteUserABTest,
 }

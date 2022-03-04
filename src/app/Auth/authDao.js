@@ -56,6 +56,28 @@ async function isExistUser(connection, userIdx){
   return rows[0]['isExist'];
 }
 
+//작가 idx가져오기
+async function getArtistIdx(connection, userIdx){
+  const query = `
+  SELECT artistIdx
+  FROM Artist
+  WHERE userIdx = ${userIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows[0]?.artistIdx;
+}
+
+//유저 탈퇴
+async function deleteUser(connection, userIdx){
+  const query = `
+  UPDATE User
+  SET isDeleted = 'Y'
+  WHERE userIdx = ${userIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows;
+}
+
 module.exports = {
   isExistEmail,
   isExistNickname,
@@ -63,4 +85,6 @@ module.exports = {
   getPassword,
   getUserIdx,
   isExistUser,
+  getArtistIdx,
+  deleteUser,
 }
