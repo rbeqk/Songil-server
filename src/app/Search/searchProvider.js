@@ -7,6 +7,7 @@ const {getCorrespondIdxArr} = require('../../../modules/searchUtil');
 const {pageInfo, getTotalPage} = require('../../../modules/pageUtil');
 const {ITEMS_PER_PAGE, CATEGORY} = require('../../../modules/constants');
 
+//최근 검색어 및 인기 검색어 조회
 exports.getSearchKeywords = async (userIdx) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
@@ -17,7 +18,7 @@ exports.getSearchKeywords = async (userIdx) => {
       //최근검색어
       if (userIdx != -1){
         const recentlySearch = await searchDao.getRecentlySearch(connection, userIdx);
-        result.recentlySearch = recentlySearch ? recentlySearch.map(item => item.word) : [];
+        result.recentlySearch = recentlySearch;
       }
       else{
         result.recentlySearch = [];
@@ -25,7 +26,7 @@ exports.getSearchKeywords = async (userIdx) => {
 
       //인기검색어
       const popularSearch = await searchDao.getPopularSearch(connection);
-      result.popularSearch = popularSearch ? popularSearch.map(item => item.word) : [];
+      result.popularSearch = popularSearch;
 
       connection.release();
       return response(baseResponse.SUCCESS, result);

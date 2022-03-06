@@ -3,15 +3,14 @@ const {CATEGORY} = require('../../../modules/constants');
 //사용자 별 최근 검색어 가져오기(15개)
 async function getRecentlySearch(connection, userIdx){
   const query = `
-  SELECT S.searchIdx, S.word
-  FROM UserSearch US
-          JOIN Search S ON S.searchIdx = US.searchIdx
-  WHERE US.userIdx = ${userIdx} && US.isDeleted = 'N'
-  ORDER BY US.updatedAt DESC
-  LIMIT 15
+  SELECT DISTINCT word
+  FROM SearchRecord
+  WHERE userIdx = ${userIdx} && isDeleted = 'N'
+  ORDER BY searchRecordIdx
+  LIMIT 15;
   `;
   const [rows] = await connection.query(query);
-  return rows;
+  return rows.map(item => item.word);
 }
 
 //인기 검색어 가져오기(10개)
@@ -22,7 +21,7 @@ async function getPopularSearch(connection){
   LIMIT 10
   `;
   const [rows] = await connection.query(query);
-  return rows;
+  return rows.map(item => item.word);
 }
 
 //word의 searchIdx가져오기
