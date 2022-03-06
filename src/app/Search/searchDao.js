@@ -6,7 +6,7 @@ async function getRecentlySearch(connection, userIdx){
   SELECT DISTINCT word
   FROM SearchRecord
   WHERE userIdx = ${userIdx} && isDeleted = 'N'
-  ORDER BY searchRecordIdx
+  ORDER BY searchRecordIdx DESC
   LIMIT 15;
   `;
   const [rows] = await connection.query(query);
@@ -18,61 +18,51 @@ async function getPopularSearch(connection){
   const query = `
   SELECT searchIdx, word FROM Search
   ORDER BY count DESC
-  LIMIT 10
+  LIMIT 10;
   `;
   const [rows] = await connection.query(query);
   return rows.map(item => item.word);
 }
 
-//word의 searchIdx가져오기
-async function getSearchIdx(connection, word){
+//유효한 user의 search 항목인지
+async function isExistUserSearch(connection, userIdx, word){
   const query = `
-  SELECT searchIdx FROM Search
-  WHERE word = ?;
+  SELECT EXISTS(SELECT *
+    FROM SearchRecord
+    WHERE userIdx = ${userIdx} && word = ? && isDeleted = 'N') AS isExists;
   `;
   const [rows] = await connection.query(query, [word]);
-  return rows[0];
-}
-
-//유효한 user의 search 항목인지
-async function isExistUserSearchIdx(connection, userIdx, searchIdx){
-  const query = `
-  SELECT EXISTS(SELECT userSearchIdx
-    FROM UserSearch
-    WHERE userIdx = ${userIdx} && searchIdx = ${searchIdx} && isDeleted = 'N') as isExist
-  `;
-  const [rows] = await connection.query(query);
-  return rows[0]['isExist'];
+  return rows[0]['isExists'];
 }
 
 //사용자 최근검색어 삭제
-async function deleteUserRecentlySearch(connection, userIdx, searchIdx){
+async function deleteUserRecentlySearch(connection, userIdx, word){
   const query = `
-  UPDATE UserSearch
+  UPDATE SearchRecord
   SET isDeleted = 'Y'
-  WHERE userIdx = ${userIdx} && searchIdx = ${searchIdx};
+  WHERE userIdx = ${userIdx} && word = ?;
   `;
-  const [rows] = await connection.query(query);
+  const [rows] = await connection.query(query, [word]);
   return rows;
 }
 
 //user의 지울 검색어가 있는지
 async function isExistUserSearchs(connection, userIdx){
   const query = `
-  SELECT EXISTS(SELECT userSearchIdx
-    FROM UserSearch
-    WHERE userIdx = ${userIdx} && isDeleted = 'N') as isExist;
+  SELECT EXISTS(SELECT *
+    FROM SearchRecord
+    WHERE userIdx = ${userIdx} && isDeleted = 'N') AS isExists;
   `;
   const [rows] = await connection.query(query);
-  return rows[0]['isExist'];
+  return rows[0]['isExists'];
 }
 
 //user의 최근검색어 전체 삭제
 async function deleteAllUserRecentlySearch(connection, userIdx){
   const query = `
-  UPDATE UserSearch
+  UPDATE SearchRecord
   SET isDeleted = 'Y'
-  WHERE isDeleted = 'N' && userIdx = ${userIdx};
+  WHERE userIdx = ${userIdx};
   `;
   const [rows] = await connection.query(query);
   return rows;
@@ -419,7 +409,7 @@ async function isExistSearch(connection, keyword, clientIp){
     WHERE word = ?) AS isExists;
   `;
   const [rows] = await connection.query(query, [keyword, clientIp]);
-  return rows[0]['isExist'];
+  return rows[0]['isExists'];
 }
 
 //인기 검색어 cnt 증가
@@ -446,8 +436,7 @@ async function insertSearch(connection, keyword){
 module.exports = {
   getRecentlySearch,
   getPopularSearch,
-  getSearchIdx,
-  isExistUserSearchIdx,
+  isExistUserSearch,
   deleteUserRecentlySearch,
   isExistUserSearchs,
   deleteAllUserRecentlySearch,

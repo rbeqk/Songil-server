@@ -8,27 +8,18 @@ exports.deleteUserRecentlySearch = async (userIdx, word) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
-
-      //word의 searchIdx가져오기
-      const getSearchIdx = await searchDao.getSearchIdx(connection, word);
-      if (!getSearchIdx){
-        connection.release();
-        return errResponse(baseResponse.INVALID_USER_SEARCH_IDX);
-      }
-      
-      const searchIdx = getSearchIdx.searchIdx;
       
       //유효한 user의 word인지
-      const isExistUserSearchIdx = await searchDao.isExistUserSearchIdx(connection, userIdx, searchIdx);
-      if (!isExistUserSearchIdx){
+      const isExistUserSearch = await searchDao.isExistUserSearch(connection, userIdx, word);
+      if (!isExistUserSearch){
         connection.release();
-        return errResponse(baseResponse.INVALID_USER_SEARCH_IDX);
+        return errResponse(baseResponse.INVALID_USER_SEARCH);
       }
       
       await connection.beginTransaction();
 
       //최근검색어 삭제
-      await searchDao.deleteUserRecentlySearch(connection, userIdx, searchIdx);
+      await searchDao.deleteUserRecentlySearch(connection, userIdx, word);
       await connection.commit();
       
       connection.release();
