@@ -381,11 +381,11 @@ async function canReflectSearchCnt(connection, clientIp, keyword){
   const query = `
   SELECT NOT EXISTS(SELECT *
     FROM SearchCntRecord
-    WHERE ip = ? && word = ? && DATEDIFF(NOW(), createdAt) = 0) && NOT EXISTS(SELECT searchIdx, word
-                                                                              FROM Search
-                                                                              WHERE word = ?
-                                                                              ORDER BY count DESC
-                                                                              LIMIT 10) AS canReflect;
+    WHERE ip = ? && word = ? && DATEDIFF(NOW(), createdAt) = 0) && NOT EXISTS(SELECT *
+                                                                              FROM (SELECT word
+                                                                                    FROM Search
+                                                                                    LIMIT 10) R
+                                                                              WHERE word = ?) AS canReflect;
   `;
   const [rows] = await connection.query(query, [clientIp, keyword, keyword]);
   return rows[0]['canReflect'];

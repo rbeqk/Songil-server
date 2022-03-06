@@ -74,7 +74,8 @@ exports.getSearchPage = async (req, res) => {
   query: keyword, category, sort, page
 */
 exports.getSearch = async (req ,res) => {
-  const {keyword, category, sort, page} = req.query;
+  let {keyword} = req.query;
+  const {category, sort, page} = req.query;
   const token = req.headers['x-access-token'];
   const clientIp = req.clientIp;
 
@@ -88,6 +89,8 @@ exports.getSearch = async (req ,res) => {
   }
   if (page < 1) return res.send(baseResponse.INVALID_PAGE);
 
+  keyword = keyword.trim();
+  
   const userIdx = getUserIdx(token);
   if (userIdx === false) return res.send(errResponse(baseResponse.TOKEN_VERIFICATION_FAILURE));
 
