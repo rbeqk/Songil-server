@@ -367,6 +367,81 @@ async function getWithInfo(connection, userIdx, sort, storyIdxArr, qnaIdxArr, ab
   return rows;
 }
 
+//검색어 기록
+async function createSearchRecord(connection, userIdx, clientIp, keyword){
+  let query;
+  if (userIdx){
+    query = `
+    INSERT INTO SearchRecord (userIdx, ip, word)
+    VALUES (${userIdx}, ?, ?);
+    `;
+  }
+  else{
+    query = `
+    INSERT INTO SearchRecord (ip, word)
+    VALUES (?, ?);
+    `
+  }
+  const [rows] = await connection.query(query, [clientIp, keyword]);
+  return rows;
+}
+
+//검색어 순위에 반영 가능한지(한 ip는 하루에 한 번만 가능)
+async function canReflectSearchCnt(connection, clientIp, keyword){
+  const query = `
+  SELECT NOT EXISTS(SELECT *
+    FROM SearchCntRecord
+    WHERE ip = ? && word = ? && DATEDIFF(NOW(), createdAt) = 0) && NOT EXISTS(SELECT searchIdx, word
+                                                                              FROM Search
+                                                                              ORDER BY count DESC
+                                                                              LIMIT 10) AS canReflect;
+  `;
+  const [rows] = await connection.query(query, [clientIp, keyword]);
+  return rows[0]['canReflect'];
+}
+
+//검색어 횟수 기록
+async function updateSearchCntRecord(connection, clientIp, keyword){
+  const query = `
+  INSERT INTO SearchCntRecord (word, ip)
+  VALUES (?, ?);
+  `;
+  const [rows] = await connection.query(query, [keyword, clientIp]);
+  return rows;
+}
+
+//Search에 존재하는지
+async function isExistSearch(connection, keyword, clientIp){
+  const query = `
+  SELECT EXISTS(SELECT *
+    FROM Search
+    WHERE word = ?) AS isExists;
+  `;
+  const [rows] = await connection.query(query, [keyword, clientIp]);
+  return rows[0]['isExist'];
+}
+
+//인기 검색어 cnt 증가
+async function updateSearch(connection, keyword){
+  const query = `
+  UPDATE Search
+  SET count = count + 1
+  WHERE word = ?;
+  `;
+  const [rows] = await connection.query(query, [keyword]);
+  return rows;
+}
+
+//인기 검색어 추가
+async function insertSearch(connection, keyword){
+  const query = `
+  INSERT INTO Search (word)
+  VALUES (?);
+  `;
+  const [rows] = await connection.query(query, [keyword]);
+  return rows;
+}
+
 module.exports = {
   getRecentlySearch,
   getPopularSearch,
@@ -388,4 +463,10 @@ module.exports = {
   getCraftInfo,
   getArticleInfo,
   getWithInfo,
+  createSearchRecord,
+  canReflectSearchCnt,
+  updateSearchCntRecord,
+  isExistSearch,
+  updateSearch,
+  insertSearch,
 }

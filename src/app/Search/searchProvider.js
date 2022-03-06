@@ -70,7 +70,7 @@ exports.getSearchPage = async (keyword, category) => {
 }
 
 //검색
-exports.getSearch = async (userIdx, keyword, category, sort, page) => {
+exports.getSearch = async (userIdx, keyword, category, sort, page, clientIp) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
@@ -133,11 +133,29 @@ exports.getSearch = async (userIdx, keyword, category, sort, page) => {
 
         result.article = article.reverse();
       }
+
+      await connection.beginTransaction();
+      await searchDao.createSearchRecord(connection, userIdx, clientIp, keyword);
+      
+      const canReflectSearchCnt = await searchDao.canReflectSearchCnt(connection, clientIp, keyword);
+      if (canReflectSearchCnt){
+        await searchDao.updateSearchCntRecord(connection, clientIp, keyword);
+
+        const isExistSearch = await searchDao.isExistSearch(connection, keyword, clientIp);
+        if (isExistSearch){
+          await searchDao.updateSearch(connection, keyword);
+        }
+        else{
+          await searchDao.insertSearch(connection, keyword);
+        }
+      }
+      await connection.commit();
       
       connection.release();
       return response(baseResponse.SUCCESS, result);
       
     }catch(err){
+      await connection.rollback();
       connection.release();
       logger.error(`getSearch DB Query Error: ${err}`);
       return errResponse(baseResponse.DB_ERROR);

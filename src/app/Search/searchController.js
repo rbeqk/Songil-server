@@ -76,6 +76,7 @@ exports.getSearchPage = async (req, res) => {
 exports.getSearch = async (req ,res) => {
   const {keyword, category, sort, page} = req.query;
   const token = req.headers['x-access-token'];
+  const clientIp = req.clientIp;
 
   if (!(keyword && category && sort && page)) return res.send(errResponse(baseResponse.IS_EMPTY));
   if (!['shop', 'with', 'article'].includes(category)) return res.send(errResponse(baseResponse.INVALID_CATEGORY_NAME));
@@ -90,7 +91,7 @@ exports.getSearch = async (req ,res) => {
   const userIdx = getUserIdx(token);
   if (userIdx === false) return res.send(errResponse(baseResponse.TOKEN_VERIFICATION_FAILURE));
 
-  const getSearch = await searchProvider.getSearch(userIdx, keyword, category, sort, page);
+  const getSearch = await searchProvider.getSearch(userIdx, keyword, category, sort, page, clientIp);
 
   return res.send(getSearch);
 }

@@ -1,6 +1,7 @@
 module.exports = function (app){
   const jwtMiddleware = require('../../../config/jwtMiddleware');
   const searchController = require('./searchController');
+  const {ipMiddleware} = require('../../../config/ipMiddleware');
 
   //최근 검색어 및 인기 검색어 조회 API
   app.get('/search/keywords', searchController.getSearchKeywords);
@@ -15,5 +16,5 @@ module.exports = function (app){
   app.get('/search/page', searchController.getSearchPage);
 
   //검색 API
-  app.get('/search', searchController.getSearch);
+  app.get('/search', ipMiddleware, searchController.getSearch);
 }
