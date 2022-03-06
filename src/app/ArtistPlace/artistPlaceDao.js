@@ -113,7 +113,7 @@ async function getArticleWithArtistCraft(connection, artistIdx){
   FROM ArticleCraft AC
           JOIN Craft C on AC.craftIdx = C.craftIdx
           JOIN Artist A on C.artistIdx = A.artistIdx
-  WHERE AC.isDeleted = 'N' && A.artistIdx = ${artistIdx};
+  WHERE A.artistIdx = ${artistIdx};
   `;
   const [rows] = await connection.query(query);
   return rows;
