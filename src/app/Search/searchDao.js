@@ -370,7 +370,7 @@ async function getWithInfo(connection, userIdx, sort, storyIdxArr, qnaIdxArr, ab
 //검색어 기록
 async function createSearchRecord(connection, userIdx, clientIp, keyword){
   let query;
-  if (userIdx){
+  if (userIdx !== -1){
     query = `
     INSERT INTO SearchRecord (userIdx, ip, word)
     VALUES (${userIdx}, ?, ?);
@@ -393,10 +393,11 @@ async function canReflectSearchCnt(connection, clientIp, keyword){
     FROM SearchCntRecord
     WHERE ip = ? && word = ? && DATEDIFF(NOW(), createdAt) = 0) && NOT EXISTS(SELECT searchIdx, word
                                                                               FROM Search
+                                                                              WHERE word = ?
                                                                               ORDER BY count DESC
                                                                               LIMIT 10) AS canReflect;
   `;
-  const [rows] = await connection.query(query, [clientIp, keyword]);
+  const [rows] = await connection.query(query, [clientIp, keyword, keyword]);
   return rows[0]['canReflect'];
 }
 
