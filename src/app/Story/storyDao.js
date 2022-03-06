@@ -39,11 +39,12 @@ async function getStoryDetail(connection, storyIdx, userIdx){
 //storyIdx의 이미지
 async function getStoryImage(connection, storyIdx){
   const query = `
-  SELECT * FROM StoryImage
-  WHERE storyIdx = ${storyIdx} && isDeleted = 'N';
+  SELECT imageUrl
+  FROM StoryImage
+  WHERE storyIdx = ${storyIdx};
   `;
   const [rows] = await connection.query(query);
-  return rows;
+  return rows.map(item => item.imageUrl);
 }
 
 //storyIdx의 태그
@@ -53,7 +54,7 @@ async function getStoryTag(connection, storyIdx){
   WHERE storyIdx = ${storyIdx};
   `;
   const [rows] = await connection.query(query);
-  return rows;
+  return rows.map(item => item.tag);
 }
 
 //스토리 기본 정보 등록
@@ -132,8 +133,7 @@ async function deleteStoryTag(connection, storyIdx){
 //스토리 사진 삭제
 async function deleteStoryImage(connection, storyIdx){
   const query = `
-  UPDATE StoryImage
-  SET isDeleted = 'Y'
+  DELETE FROM StoryImage
   WHERE storyIdx = ${storyIdx};
   `;
   const [rows] = await connection.query(query);

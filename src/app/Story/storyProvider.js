@@ -18,14 +18,11 @@ exports.getStoryDetail = async (storyIdx, userIdx) => {
 
       const storyInfo = await storyDao.getStoryDetail(connection, storyIdx, userIdx);
       const storyImage = await storyDao.getStoryImage(connection, storyIdx);
-      const storyImageArr = storyImage.map(item => item.imageUrl);
-
       const storyTag = await storyDao.getStoryTag(connection, storyIdx);
-      const storyTagArr = storyTag.map(item => item.tag);
 
       const result = {
         'storyIdx': storyInfo.storyIdx,
-        'imageUrl': storyImageArr,
+        'imageUrl': storyImage,
         'title': storyInfo.title,
         'content': storyInfo.content,
         'userIdx': storyInfo.userIdx,
@@ -37,7 +34,7 @@ exports.getStoryDetail = async (storyIdx, userIdx) => {
         'totalLikeCnt': storyInfo.totalLikeCnt,
         'isLike': storyInfo.isLike,
         'totalCommentCnt': storyInfo.totalCommentCnt,
-        'tag': storyTagArr
+        'tag': storyTag
       };
 
       connection.release();

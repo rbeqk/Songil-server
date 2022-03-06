@@ -67,9 +67,6 @@ exports.deleteStory = async (userIdx, storyIdx) => {
       
       await connection.beginTransaction();
       await storyDao.deleteStory(connection, storyIdx);
-      await storyDao.deleteStoryTag(connection, storyIdx);
-      await storyDao.deleteStoryImage(connection, storyIdx);
-      await storyDao.deleteStoryLike(connection, storyIdx);
       await storyDao.deleteStoryComment(connection, storyIdx);
       await connection.commit();
       
@@ -132,7 +129,7 @@ exports.updateStory = async (storyIdx, userIdx, title, content, tag, imageArr) =
 
         //스토리 사진 삭제
         await storyDao.deleteStoryImage(connection, storyIdx);
-
+        
         //스토리 사진 등록
         imageArr.forEach(async item => {
           await storyDao.createStoryImage(connection, storyIdx, item);
