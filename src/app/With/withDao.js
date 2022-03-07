@@ -67,7 +67,7 @@ async function getStory(connection, userIdx, sort, startItemIdx, pageItemCnt){
   SELECT S.storyIdx,
         (SELECT SI.imageUrl
           FROM StoryImage SI
-          WHERE SI.isDeleted = 'N' && SI.storyIdx = S.storyIdx
+          WHERE SI.storyIdx = S.storyIdx
           LIMIT 1)                                                                            as mainImageUrl,
         S.title,
         S.userIdx,

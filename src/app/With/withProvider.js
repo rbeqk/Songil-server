@@ -185,11 +185,11 @@ exports.getWith = async (category, sort, page, userIdx) => {
       
     }catch(err){
       connection.release();
-      logger.error(`getTotalWithPage DB Query Error: ${err}`);
+      logger.error(`getWith DB Query Error: ${err}`);
       return errResponse(baseResponse.DB_ERROR);
     }
   }catch(err){
-    logger.error(`getTotalWithPage DB Connection Error: ${err}`);
+    logger.error(`getWith DB Connection Error: ${err}`);
     return errResponse(baseResponse.DB_ERROR);
   }
 }

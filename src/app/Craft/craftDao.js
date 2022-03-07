@@ -42,7 +42,7 @@ async function getCraftDetailImage(connection, craftIdx){
   const query = `
   SELECT CDI.imageUrl as detailImageUrl
   FROM Craft C
-          JOIN CraftDetailImage CDI ON CDI.craftIdx = C.craftIdx && CDI.isDeleted = 'N'
+          JOIN CraftDetailImage CDI ON CDI.craftIdx = C.craftIdx
   WHERE C.craftIdx = ${craftIdx} && C.isDeleted = 'N';
   `;
   const [rows] = await connection.query(query);
