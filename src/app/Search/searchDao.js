@@ -17,7 +17,7 @@ async function getRecentlySearch(connection, userIdx){
 async function getPopularSearch(connection){
   const query = `
   SELECT searchIdx, word FROM Search
-  ORDER BY count DESC
+  ORDER BY count DESC, searchIdx
   LIMIT 10;
   `;
   const [rows] = await connection.query(query);
