@@ -80,7 +80,7 @@ async function getHotStory(connection){
         COUNT(SL.userIdx) as totalLikeCnt,
         (SELECT SI.imageUrl
           FROM StoryImage SI
-          WHERE SI.storyIdx = SL.storyIdx && SI.isDeleted = 'N'
+          WHERE SI.storyIdx = SL.storyIdx
           LIMIT 1)         as mainImageUrl
   FROM StoryLike SL
           JOIN Story S ON S.storyIdx = SL.storyIdx && S.isDeleted = 'N'
