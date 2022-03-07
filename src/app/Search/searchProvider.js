@@ -4,7 +4,6 @@ const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 const {getCorrespondIdxArr} = require('../../../modules/searchUtil');
-const {pageInfo, getTotalPage} = require('../../../modules/pageUtil');
 const {ITEMS_PER_PAGE, CATEGORY} = require('../../../modules/constants');
 
 //최근 검색어 및 인기 검색어 조회
@@ -42,35 +41,8 @@ exports.getSearchKeywords = async (userIdx) => {
   }
 }
 
-//검색 페이지 개수 조회
-exports.getSearchPage = async (keyword, category) => {
-  try{
-    const connection = await pool.getConnection(async conn => conn);
-    try{
-
-      const correspondIdxArr = await getCorrespondIdxArr(connection, keyword, category);
-
-      const totalCnt = correspondIdxArr.length;
-      const totalPages = getTotalPage(totalCnt, ITEMS_PER_PAGE.SEARCH_PER_PAGE);
-
-      const result = new pageInfo(totalPages, ITEMS_PER_PAGE.SEARCH_PER_PAGE);
-
-      connection.release();
-      return response(baseResponse.SUCCESS, result);
-      
-    }catch(err){
-      connection.release();
-      logger.error(`getSearchPage DB Query Error: ${err}`);
-      return errResponse(baseResponse.DB_ERROR);
-    }
-  }catch(err){
-    logger.error(`getSearchPage DB Connection Error: ${err}`);
-    return errResponse(baseResponse.DB_ERROR);
-  }
-}
-
 //검색
-exports.getSearch = async (userIdx, keyword, category, sort, page, clientIp) => {
+exports.getSearch = async (userIdx, keyword, category, sort, page) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
@@ -133,29 +105,11 @@ exports.getSearch = async (userIdx, keyword, category, sort, page, clientIp) => 
 
         result.article = article.reverse();
       }
-
-      await connection.beginTransaction();
-      await searchDao.createSearchRecord(connection, userIdx, clientIp, keyword);
-      
-      const canReflectSearchCnt = await searchDao.canReflectSearchCnt(connection, clientIp, keyword);
-      if (canReflectSearchCnt){
-        await searchDao.updateSearchCntRecord(connection, clientIp, keyword);
-
-        const isExistSearch = await searchDao.isExistSearch(connection, keyword, clientIp);
-        if (isExistSearch){
-          await searchDao.updateSearch(connection, keyword);
-        }
-        else{
-          await searchDao.insertSearch(connection, keyword);
-        }
-      }
-      await connection.commit();
       
       connection.release();
       return response(baseResponse.SUCCESS, result);
       
     }catch(err){
-      await connection.rollback();
       connection.release();
       logger.error(`getSearch DB Query Error: ${err}`);
       return errResponse(baseResponse.DB_ERROR);

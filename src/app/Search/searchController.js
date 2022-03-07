@@ -58,12 +58,20 @@ exports.deleteAllUserRecentlySearch = async (req, res) => {
   query: keyword, category
 */
 exports.getSearchPage = async (req, res) => {
-  const {keyword, category} = req.query;
+  let {keyword} = req.query;
+  const {category} = req.query;
+  const token = req.headers['x-access-token'];
+  const clientIp = req.clientIp;
+
+  const userIdx = getUserIdx(token);
+  if (userIdx === false) return res.send(errResponse(baseResponse.TOKEN_VERIFICATION_FAILURE));
+
+  keyword = keyword.trim();
 
   if (!(keyword && category)) return res.send(errResponse(baseResponse.IS_EMPTY));
   if (!['shop', 'with', 'article'].includes(category)) return res.send(errResponse(baseResponse.INVALID_CATEGORY_NAME));
 
-  const getSearchPage = await searchProvider.getSearchPage(keyword, category);
+  const getSearchPage = await searchService.getSearchPage(keyword, category, userIdx, clientIp);
   return res.send(getSearchPage);
 }
 
@@ -77,7 +85,6 @@ exports.getSearch = async (req ,res) => {
   let {keyword} = req.query;
   const {category, sort, page} = req.query;
   const token = req.headers['x-access-token'];
-  const clientIp = req.clientIp;
 
   if (!(keyword && category && sort && page)) return res.send(errResponse(baseResponse.IS_EMPTY));
   if (!['shop', 'with', 'article'].includes(category)) return res.send(errResponse(baseResponse.INVALID_CATEGORY_NAME));
@@ -88,13 +95,11 @@ exports.getSearch = async (req ,res) => {
     if (!['popular', 'new', 'comment', 'price'].includes(sort)) return res.send(errResponse(baseResponse.INVALID_SORT_NAME));
   }
   if (page < 1) return res.send(baseResponse.INVALID_PAGE);
-
-  keyword = keyword.trim();
   
   const userIdx = getUserIdx(token);
   if (userIdx === false) return res.send(errResponse(baseResponse.TOKEN_VERIFICATION_FAILURE));
 
-  const getSearch = await searchProvider.getSearch(userIdx, keyword, category, sort, page, clientIp);
+  const getSearch = await searchProvider.getSearch(userIdx, keyword, category, sort, page);
 
   return res.send(getSearch);
 }

@@ -13,8 +13,8 @@ module.exports = function (app){
   app.delete('/search', jwtMiddleware, searchController.deleteUserRecentlySearch);
 
   //검색 페이지 개수 조회 API
-  app.get('/search/page', searchController.getSearchPage);
+  app.get('/search/page', ipMiddleware, searchController.getSearchPage);
 
   //검색 API
-  app.get('/search', ipMiddleware, searchController.getSearch);
+  app.get('/search', searchController.getSearch);
 }
