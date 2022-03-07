@@ -7,7 +7,7 @@ const moment = require('moment');
 /*
   API No. 10.7
   API Name: 발송정보 입력 API
-  [POST] /artist-page/ordrers/:orderDetailIdx/sending
+  [POST] /artist-page/orders/:orderDetailIdx/sending
   body: year, month, day, tCode, tInvoice
 */
 exports.createSendingInfo = async (req, res) => {
@@ -27,7 +27,7 @@ exports.createSendingInfo = async (req, res) => {
 /*
   API No. 10.8
   API Name: 발송정보 조회 API
-  [GET] /artist-page/ordrers/:orderDetailIdx/sending
+  [GET] /artist-page/orders/:orderDetailIdx/sending
 */
 exports.getSendingInfo = async (req, res) => {
   const {userIdx} = req.verifiedToken;
