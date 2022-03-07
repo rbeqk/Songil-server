@@ -288,7 +288,7 @@ async function getWithInfo(connection, userIdx, sort, storyIdxArr, qnaIdxArr, ab
                   ${CATEGORY.STORY}                                                                   as categoryIdx,
                   (SELECT imageUrl
                   FROM StoryImage SI
-                  WHERE SI.storyIdx = S.storyIdx && SI.isDeleted = 'N'
+                  WHERE SI.storyIdx = S.storyIdx
                   LIMIT 1)                                                                           as mainImageUrl,
                   S.title,
                   S.content,
