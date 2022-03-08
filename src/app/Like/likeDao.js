@@ -233,7 +233,7 @@ async function getLikedPost(connection, userIdx, startItemIdx, pageItemCnt){
         S.content,
         (SELECT imageUrl
           FROM StoryImage SI
-          WHERE SI.isDeleted = 'N' && SI.storyIdx = SL.storyIdx
+          WHERE SI.storyIdx = SL.storyIdx
           LIMIT 1)                                               as mainImageUrl,
         U.nickname                                              as name,
         DATE_FORMAT(S.createdAt, '%Y.%m.%d. %H:%i')                    as createdAt,
