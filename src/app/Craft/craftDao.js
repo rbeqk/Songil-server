@@ -1,4 +1,4 @@
-const {CRAFT_USAGE_CATEGORY} = require('../../../modules/constants');
+const {CRAFT_USAGE_ITEM} = require('../../../modules/constants');
 
 //유효한 craftIdx인지
 async function isExistCraftIdx(connection, craftIdx){
@@ -76,8 +76,8 @@ async function getCraftMaterial(connection, craftIdx){
 //상품 용도
 async function getCraftUsage(connection, craftIdx){
   const query = `
-  SELECT IF(CUI.craftUsageItemIdx IN (${CRAFT_USAGE_CATEGORY.TABLE_WARE_ETC}, ${CRAFT_USAGE_CATEGORY.HOME_DECO_ETC},
-    ${CRAFT_USAGE_CATEGORY.JEWELRY_ETC}, ${CRAFT_USAGE_CATEGORY.ETC_ETC}),
+  SELECT IF(CUI.craftUsageItemIdx IN (${CRAFT_USAGE_ITEM.TABLE_WARE_ETC}, ${CRAFT_USAGE_ITEM.HOME_DECO_ETC},
+    ${CRAFT_USAGE_ITEM.JEWELRY_ETC}, ${CRAFT_USAGE_ITEM.ETC_ETC}),
   CU.etcUsage,
   CUI.name) as 'usage'
   FROM Craft C
