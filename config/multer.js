@@ -22,9 +22,9 @@ const upload = (path) => multer({
 })
 
 const storyUpload = upload('/with/story');
-const ABTestUpload = upload('/with/abTest');
-const craftCommentUpload = upload('/with/craft/comment');
-const userProfileUpload = upload('/users');
+const ABTestUpload = upload('/with/ab-test');
+const craftCommentUpload = upload('/comment/craft');
+const userProfileUpload = upload('/user');
 
 module.exports = {
   storyUpload,

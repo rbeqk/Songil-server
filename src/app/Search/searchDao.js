@@ -16,7 +16,8 @@ async function getRecentlySearch(connection, userIdx){
 //인기 검색어 가져오기(10개)
 async function getPopularSearch(connection){
   const query = `
-  SELECT searchIdx, word FROM Search
+  SELECT DISTINCT word
+  FROM Search
   ORDER BY count DESC, searchIdx
   LIMIT 10;
   `;
@@ -433,18 +434,6 @@ async function insertSearch(connection, keyword){
   return rows;
 }
 
-//searchRecord에 기록했는지(중복 방지)
-async function isExistSearchRecord(connection, userIdx, clientIp, keyword){
-  const query = `
-  SELECT EXISTS(SELECT *
-    FROM SearchRecord
-    WHERE userIdx = IF(${userIdx} = -1, NULL, ${userIdx}) && ip = ? && word = ? &&
-          createdAt = NOW()) AS isExists;
-  `;
-  const [rows] = await connection.query(query, [clientIp, keyword]);
-  return rows[0]['isExists'];
-}
-
 module.exports = {
   getRecentlySearch,
   getPopularSearch,
@@ -471,5 +460,4 @@ module.exports = {
   isExistSearch,
   updateSearch,
   insertSearch,
-  isExistSearchRecord,
 }

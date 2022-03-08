@@ -20,13 +20,10 @@ exports.getSearchPage = async (keyword, category, userIdx, clientIp) => {
       const result = new pageInfo(totalPages, ITEMS_PER_PAGE.SEARCH_PER_PAGE);
 
       await connection.beginTransaction();
-      const isExistSearchRecord = await searchDao.isExistSearchRecord(connection, userIdx, clientIp, keyword);
-      if (!isExistSearchRecord){
-        await searchDao.createSearchRecord(connection, userIdx, clientIp, keyword);
-      }
+      await searchDao.createSearchRecord(connection, userIdx, clientIp, keyword);
       
       const canReflectSearchCnt = await searchDao.canReflectSearchCnt(connection, clientIp, keyword);
-      if (!isExistSearchRecord && canReflectSearchCnt){
+      if (canReflectSearchCnt){
         await searchDao.updateSearchCntRecord(connection, clientIp, keyword);
 
         const isExistSearch = await searchDao.isExistSearch(connection, keyword, clientIp);
