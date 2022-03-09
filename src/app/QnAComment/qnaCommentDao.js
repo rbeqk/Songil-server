@@ -77,7 +77,7 @@ async function getQnAParentComment(connection, qnaIdx, userIdx, pageItemCnt, sta
     FROM QnAComment QC
             JOIN User U ON U.userIdx = QC.userIdx && U.isDeleted = 'N'
             JOIN QnA Q ON Q.qnaIdx = QC.qnaIdx && Q.isDeleted = 'N'
-    WHERE QC.parentIdx IS NULL && QC.qnaIdx = ${qnaIdx}
+    WHERE QC.parentIdx IS NULL && QC.qnaIdx = ${qnaIdx} && QC.isDeleted = 'N'
     LIMIT ${startItemIdx}, ${pageItemCnt};
   `;
   const [rows] = await connection.query(query);
