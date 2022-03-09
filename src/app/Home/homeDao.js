@@ -55,18 +55,37 @@ async function getRecommend(connection){
 //1: QnA / 2: abTest
 async function getTalkWith(connection){
   const query = `
-  SELECT QL.qnaIdx as idx, COUNT(QL.userIdx) as totalLikeCnt, 1 as categoryIdx, Q.title as text
-  FROM QnALike QL
-          JOIN QnA Q ON Q.qnaIdx = QL.qnaIdx && Q.isDeleted = 'N'
-  GROUP BY QL.qnaIdx
-  UNION ALL
-  SELECT ABV.abTestIdx as idx, COUNT(ABV.userIdx) as totalLikeCnt, 2 as categoryIdx, U.nickname as text
-  FROM ABTestVote ABV
-          JOIN ABTest AB ON AB.abTestIdx = ABV.abTestIdx && AB.isDeleted = 'N'
-          JOIN Artist A ON A.artistIdx = AB.artistIdx && A.isDeleted = 'N'
-          JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
-  GROUP BY ABV.abTestIdx
-  ORDER BY totalLikeCnt DESC
+  SELECT R.idx, IFNULL(R.totalLikeCnt, 0) AS totalLikeCnt, R.categoryIdx, R.text, R.imageUrl, R.totalCommentCnt
+  FROM (
+          SELECT DISTINCT Q.qnaIdx                                              AS idx,
+                          QL.totalLikeCnt,
+                          1                                                     AS categoryIdx,
+                          Q.title                                               AS text,
+                          NULL                                                  as imageUrl,
+                          (SELECT COUNT(userIdx)
+                            FROM QnAComment QAC
+                            WHERE QAC.qnaIdx = QL.qnaIdx && QAC.isDeleted = 'N') as totalCommentCnt
+          FROM QnA Q
+                    LEFT JOIN (SELECT qnaIdx, COUNT(*) AS totalLikeCnt
+                              FROM QnALike
+                              GROUP BY qnaIdx) QL
+                              ON QL.qnaIdx = Q.qnaIdx
+          WHERE Q.isDeleted = 'N'
+          UNION ALL
+          SELECT DISTINCT AB.abTestIdx AS idx,
+                          ABV.totalLikeCnt,
+                          2            AS categoryIdx,
+                          U.nickname   AS text,
+                          U.imageUrl,
+                          NULL         AS totalCommentCnt
+          FROM ABTest AB
+                    LEFT JOIN (SELECT abTestIdx, COUNT(*) AS totalLikeCnt FROM ABTestVote) ABV
+                              ON ABV.abTestIdx = AB.abTestIdx
+                    JOIN Artist A ON A.artistIdx = AB.artistIdx && A.isDeleted = 'N'
+                    JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'
+          WHERE AB.isDeleted = 'N'
+      ) R
+  ORDER BY totalLikeCnt DESC, R.idx DESC
   LIMIT 15;
   `;
   const [rows] = await connection.query(query);
@@ -76,16 +95,13 @@ async function getTalkWith(connection){
 //hot Story (좋아요 순 6개)
 async function getHotStory(connection){
   const query = `
-  SELECT SL.storyIdx,
-        COUNT(SL.userIdx) as totalLikeCnt,
-        (SELECT SI.imageUrl
-          FROM StoryImage SI
-          WHERE SI.storyIdx = SL.storyIdx
-          LIMIT 1)         as mainImageUrl
-  FROM StoryLike SL
-          JOIN Story S ON S.storyIdx = SL.storyIdx && S.isDeleted = 'N'
-  GROUP BY SL.storyIdx
-  ORDER BY totalLikeCnt DESC
+  SELECT DISTINCT S.storyIdx,
+                  IFNULL(SL.totalLikeCnt, 0)                                                  AS totalLikeCnt,
+                  (SELECT imageUrl FROM StoryImage SI WHERE SI.storyIdx = S.storyIdx LIMIT 1) AS mainImageUrl
+  FROM Story S
+          LEFT JOIN (SELECT storyIdx, COUNT(*) AS totalLikeCnt FROM StoryLike) SL ON SL.storyIdx = S.storyIdx
+  WHERE S.isDeleted = 'N'
+  ORDER BY totalLikeCnt DESC, S.storyIdx DESC
   LIMIT 6;
   `;
   const [rows] = await connection.query(query);
