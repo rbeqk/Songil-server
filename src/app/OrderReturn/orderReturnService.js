@@ -58,7 +58,7 @@ async function orderCraftReturnRejection(connection, orderCraftIdx){
 
   await connection.beginTransaction();
   await orderReturnDao.resOrderCraftReturn(connection, orderCraftIdx, resStatusIdx);
-  await orderReturnDao.updateOrderCraftStatus(connection, orderCraftIdx, orderStatusIdx);
+  await orderReturnDao.updateOrderCraftStatus(connection, orderCraftIdx, orderStatusIdx, resStatusIdx);
   await connection.commit();
 }
 
