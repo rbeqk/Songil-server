@@ -1,3 +1,6 @@
+const {RANDOM_BASIS_HOUR} = require('../../../modules/constants');
+const {getRandomNum} = require('../../../modules/randomNumUtil');
+
 //상단 아티클 가져오기(최신순 4개)
 async function getArticleList(connection){
   const query = `
@@ -13,6 +16,7 @@ async function getArticleList(connection){
 
 //trendCraft 가져오기(랜덤 15개 - soldout 제외)
 async function getTrendCraft(connection){
+  const randomNum = getRandomNum(RANDOM_BASIS_HOUR.TREND_CRAFT);
   const query = `
   SELECT C.craftIdx,
         C.mainImageUrl,
@@ -24,7 +28,7 @@ async function getTrendCraft(connection){
           JOIN Artist A on C.artistIdx = A.artistIdx && A.isDeleted = 'N'
           JOIN User U on A.userIdx = U.userIdx && U.isDeleted = 'N'
   WHERE C.isDeleted = 'N' && C.isSoldOut = 'N'
-  ORDER BY RAND()
+  ORDER BY RAND(${randomNum} * DAY(NOW()))
   LIMIT 15;
   `;
   const [rows] = await connection.query(query);
@@ -33,6 +37,7 @@ async function getTrendCraft(connection){
 
 //recommend 가져오기 (랜덤 15개 - soldout 제외)
 async function getRecommend(connection){
+  const randomNum = getRandomNum(RANDOM_BASIS_HOUR.RECOMMEND_CRAFT);
   const query = `
   SELECT C.craftIdx,
         C.mainImageUrl,
@@ -44,7 +49,7 @@ async function getRecommend(connection){
           JOIN Artist A on C.artistIdx = A.artistIdx && A.isDeleted = 'N'
           JOIN User U on A.userIdx = U.userIdx && U.isDeleted = 'N'
   WHERE C.isDeleted = 'N' && C.isSoldOut = 'N'
-  ORDER BY RAND()
+  ORDER BY RAND(${randomNum} * DAY(NOW()) * 2)
   LIMIT 15;
   `;
   const [rows] = await connection.query(query);

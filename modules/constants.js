@@ -129,6 +129,12 @@ const REPORTED_REASON = {
   ETC: 7
 };
 
+const RANDOM_BASIS_HOUR = {
+  TODAY_ARTIST: 3,
+  TREND_CRAFT: 3,
+  RECOMMEND_CRAFT: 3,
+}
+
 module.exports = {
   ITEMS_PER_PAGE,
   CATEGORY,
@@ -143,4 +149,5 @@ module.exports = {
   COMMENT_BTN_STATUS,
   CRAFT_USAGE_ITEM,
   REPORTED_REASON,
+  RANDOM_BASIS_HOUR,
 }
