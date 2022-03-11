@@ -227,44 +227,46 @@ async function getTotalStoryLikeCnt(connection, storyIdx){
 //좋아요한 게시물
 async function getLikedPost(connection, userIdx, startItemIdx, pageItemCnt){
   const query = `
-  SELECT SL.storyIdx as idx,
-        1 as categoryIdx,
-        S.title,
-        S.content,
-        (SELECT imageUrl
-          FROM StoryImage SI
-          WHERE SI.storyIdx = SL.storyIdx
-          LIMIT 1)                                               as mainImageUrl,
-        U.nickname                                              as name,
-        DATE_FORMAT(S.createdAt, '%Y.%m.%d. %H:%i')                    as createdAt,
-        SL.createdAt                                            as originalCreatedAt,
-        (SELECT COUNT(*)
-          FROM StoryLike
-          WHERE StoryLike.storyIdx = SL.storyIdx)                as totalLikeCnt,
-        (SELECT COUNT(storyCommentIdx)
-          FROM StoryComment SC
-          WHERE SC.storyIdx = SL.storyIdx && SC.isDeleted = 'N') as totalCommentCnt
-  FROM StoryLike SL
-          JOIN Story S ON S.storyIdx = SL.storyIdx && S.isDeleted = 'N'
-          JOIN User U ON U.userIdx = S.userIdx && U.isDeleted = 'N'
-  WHERE SL.userIdx = ${userIdx}
-  UNION ALL
-  SELECT QL.qnaIdx as idx,
-        2 as categoryIdx,
-        Q.title,
-        Q.content,
-        NULL                                                            as mainImageUrl,
-        U.nickname                                                      as name,
-        DATE_FORMAT(Q.createdAt, '%Y.%m.%d. %H:%i')                            as createdAt,
-        QL.createdAt                                                    as originalCreatedAt,
-        (SELECT COUNT(*) FROM QnALike WHERE QnALike.qnaIdx = QL.qnaIdx) as totalLikeCnt,
-        (SELECT COUNT(qnaCommentIdx)
-          FROM QnAComment QC
-          WHERE QC.qnaIdx = QL.qnaIdx && QC.isDeleted = 'N')             as totalCommentCnt
-  FROM QnALike QL
-          JOIN QnA Q ON Q.qnaIdx = QL.qnaIdx && Q.isDeleted = 'N'
-          JOIN User U ON U.userIdx = Q.userIdx && U.isDeleted = 'N'
-  WHERE QL.userIdx = ${userIdx}
+  SELECT *
+  FROM (SELECT SL.storyIdx                                             as idx,
+              1                                                       as categoryIdx,
+              S.title,
+              S.content,
+              (SELECT imageUrl
+                FROM StoryImage SI
+                WHERE SI.storyIdx = SL.storyIdx
+                LIMIT 1)                                               as mainImageUrl,
+              U.nickname                                              as name,
+              DATE_FORMAT(S.createdAt, '%Y.%m.%d. %H:%i')             as createdAt,
+              SL.createdAt                                            as originalCreatedAt,
+              (SELECT COUNT(*)
+                FROM StoryLike
+                WHERE StoryLike.storyIdx = SL.storyIdx)                as totalLikeCnt,
+              (SELECT COUNT(storyCommentIdx)
+                FROM StoryComment SC
+                WHERE SC.storyIdx = SL.storyIdx && SC.isDeleted = 'N') as totalCommentCnt
+        FROM StoryLike SL
+                JOIN Story S ON S.storyIdx = SL.storyIdx && S.isDeleted = 'N'
+                JOIN User U ON U.userIdx = S.userIdx && U.isDeleted = 'N'
+        WHERE SL.userIdx = ${userIdx}
+        UNION ALL
+        SELECT QL.qnaIdx                                                       as idx,
+              2                                                               as categoryIdx,
+              Q.title,
+              Q.content,
+              NULL                                                            as mainImageUrl,
+              U.nickname                                                      as name,
+              DATE_FORMAT(Q.createdAt, '%Y.%m.%d. %H:%i')                     as createdAt,
+              QL.createdAt                                                    as originalCreatedAt,
+              (SELECT COUNT(*) FROM QnALike WHERE QnALike.qnaIdx = QL.qnaIdx) as totalLikeCnt,
+              (SELECT COUNT(qnaCommentIdx)
+                FROM QnAComment QC
+                WHERE QC.qnaIdx = QL.qnaIdx && QC.isDeleted = 'N')             as totalCommentCnt
+        FROM QnALike QL
+                JOIN QnA Q ON Q.qnaIdx = QL.qnaIdx && Q.isDeleted = 'N'
+                JOIN User U ON U.userIdx = Q.userIdx && U.isDeleted = 'N'
+        WHERE QL.userIdx = ${userIdx}
+      ) R
   ORDER BY originalCreatedAt DESC
   LIMIT ${startItemIdx}, ${pageItemCnt};
   `;

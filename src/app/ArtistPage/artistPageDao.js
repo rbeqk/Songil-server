@@ -143,45 +143,48 @@ async function getcancelOrReturnOrderCreatedAtArr(connection, artistIdx, startIt
 //작가관련 반품/취소 날짜 별 정보 가져오기
 async function getcancelOrReturnOrderInfo(connection, artistIdx, createdAt){
   const query = `
-  SELECT OCAN.orderCraftIdx                          AS orderDetailIdx,
-        IF(OCAN.resStatusIdx IS NULL, ${ORDER_CANCEL_RETURN_STATUS.REQUEST_CANCEL},
-            ${ORDER_CANCEL_RETURN_STATUS.COMPLETED}) AS status,
-        C.craftIdx,
-        C.mainImageUrl,
-        C.name,
-        O.userIdx,
-        U.nickname                                  AS userName,
-        IF(OCAN.orderCancelReasonIdx = ${ORDER_CANCEL_REASON.ETC_REASON}, OCAN.etcReason,
-            OCR.reason)                              AS reason,
-        IF(OCAN.resStatusIdx, 'N', 'Y')             AS canChangeStatus,
-        OCAN.reqCreatedAt                           AS compareCreatedAt
-  FROM OrderCancel OCAN
-          JOIN OrderCraft OC ON OC.orderCraftIdx = OCAN.orderCraftIdx
-          JOIN OrderT O ON O.orderIdx = OC.orderIdx
-          JOIN Craft C ON C.craftIdx = OC.craftIdx
-          JOIN User U ON U.userIdx = O.userIdx
-          JOIN OrderCancelReason OCR ON OCR.orderCancelReasonIdx = OCAN.orderCancelReasonIdx
-  WHERE C.artistIdx = ${artistIdx} && DATE(OCAN.reqCreatedAt) = ?
-  UNION ALL
-  SELECT ORE.orderCraftIdx                           AS orderDetailIdx,
-        IF(ORE.resStatusIdx IS NULL, ${ORDER_CANCEL_RETURN_STATUS.REQUEST_RETURN},
-            ${ORDER_CANCEL_RETURN_STATUS.COMPLETED}) AS status,
-        C.craftIdx,
-        C.mainImageUrl,
-        C.name,
-        O.userIdx,
-        U.nickname                                  AS userName,
-        IF(ORE.orderReturnReasonIdx = ${ORDER_RETURN_REASON.ETC_REASON}, ORE.etcReason,
-            ORR.reason)                              AS reason,
-        IF(ORE.resStatusIdx, 'N', 'Y')              AS canChangeStatus,
-        ORE.reqCreatedAt                            AS compareCreatedAt
-  FROM OrderReturn ORE
-          JOIN OrderCraft OC ON OC.orderCraftIdx = ORE.orderCraftIdx
-          JOIN OrderT O ON O.orderIdx = OC.orderIdx
-          JOIN Craft C ON C.craftIdx = OC.craftIdx
-          JOIN User U ON U.userIdx = O.userIdx
-          JOIN OrderReturnReason ORR on ORE.orderReturnReasonIdx = ORR.orderReturnReasonIdx
-  WHERE C.artistIdx = ${artistIdx} && DATE(ORE.reqCreatedAt) = ?
+  SELECT *
+  FROM (
+          SELECT OCAN.orderCraftIdx                          AS orderDetailIdx,
+                  IF(OCAN.resStatusIdx IS NULL, ${ORDER_CANCEL_RETURN_STATUS.REQUEST_CANCEL},
+                    ${ORDER_CANCEL_RETURN_STATUS.COMPLETED}) AS status,
+                  C.craftIdx,
+                  C.mainImageUrl,
+                  C.name,
+                  O.userIdx,
+                  U.nickname                                  AS userName,
+                  IF(OCAN.orderCancelReasonIdx = ${ORDER_CANCEL_REASON.ETC_REASON}, OCAN.etcReason,
+                    OCR.reason)                              AS reason,
+                  IF(OCAN.resStatusIdx, 'N', 'Y')             AS canChangeStatus,
+                  OCAN.reqCreatedAt                           AS compareCreatedAt
+          FROM OrderCancel OCAN
+                    JOIN OrderCraft OC ON OC.orderCraftIdx = OCAN.orderCraftIdx
+                    JOIN OrderT O ON O.orderIdx = OC.orderIdx
+                    JOIN Craft C ON C.craftIdx = OC.craftIdx
+                    JOIN User U ON U.userIdx = O.userIdx
+                    JOIN OrderCancelReason OCR ON OCR.orderCancelReasonIdx = OCAN.orderCancelReasonIdx
+          WHERE C.artistIdx = ${artistIdx} && DATE(OCAN.reqCreatedAt) = ?
+          UNION ALL
+          SELECT ORE.orderCraftIdx                           AS orderDetailIdx,
+                  IF(ORE.resStatusIdx IS NULL, ${ORDER_CANCEL_RETURN_STATUS.REQUEST_RETURN},
+                    ${ORDER_CANCEL_RETURN_STATUS.COMPLETED}) AS status,
+                  C.craftIdx,
+                  C.mainImageUrl,
+                  C.name,
+                  O.userIdx,
+                  U.nickname                                  AS userName,
+                  IF(ORE.orderReturnReasonIdx = ${ORDER_RETURN_REASON.ETC_REASON}, ORE.etcReason,
+                    ORR.reason)                              AS reason,
+                  IF(ORE.resStatusIdx, 'N', 'Y')              AS canChangeStatus,
+                  ORE.reqCreatedAt                            AS compareCreatedAt
+          FROM OrderReturn ORE
+                    JOIN OrderCraft OC ON OC.orderCraftIdx = ORE.orderCraftIdx
+                    JOIN OrderT O ON O.orderIdx = OC.orderIdx
+                    JOIN Craft C ON C.craftIdx = OC.craftIdx
+                    JOIN User U ON U.userIdx = O.userIdx
+                    JOIN OrderReturnReason ORR on ORE.orderReturnReasonIdx = ORR.orderReturnReasonIdx
+          WHERE C.artistIdx = ${artistIdx} && DATE(ORE.reqCreatedAt) = ?
+      ) R
   ORDER BY compareCreatedAt DESC;
   `;
   const [rows] = await connection.query(query, [createdAt, createdAt]);
