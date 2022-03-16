@@ -45,8 +45,8 @@ exports.createVerificationCode = async (email) => {
       const info = await transporter.sendMail({
         from: '손길',
         to: email,
-        subject: '손길 테스트 중입니다.',
-        html: `인증번호 테스트 중 입니다.<br/><b>${verificationCode}</b>`
+        subject: '[손길] 인증번호를 안내해드립니다.',
+        html: `인증번호: <b>${verificationCode}</b>`
       });
       
       connection.release();
