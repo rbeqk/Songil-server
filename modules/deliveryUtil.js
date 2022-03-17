@@ -74,7 +74,7 @@ const TrackingSchedule = schedule.scheduleJob('0 0-15/1 * * 1-6', async () => {
 
         const orderCraftDeliveryLen = await getOrderCraftDeliveryLen(connection, orderCraftIdx);
 
-        if (trackingDetails.length > orderCraftDeliveryLen){
+        if (trackingDetails?.length > orderCraftDeliveryLen){
           if (completeYN === 'Y'){
             const deliveryCompltedTime = trackingDetails[trackingDetails.length - 1].timsString;
             await updateOrderCraftDeliveryStatus(connection, orderCraftIdx, deliveryCompltedTime);

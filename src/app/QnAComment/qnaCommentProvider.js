@@ -62,6 +62,10 @@ exports.getQnAComment = async (qnaIdx, userIdx, page) => {
         });
       }
 
+      result = result.filter(item =>
+        item.isDeleted === 'N' || (item.isDeleted === 'Y' && item.reComment.length > 0)
+      );
+
       connection.release();
       return response(baseResponse.SUCCESS, result);
 
