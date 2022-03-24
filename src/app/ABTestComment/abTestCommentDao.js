@@ -70,8 +70,9 @@ async function getABTestParentComment(connection, abTestIdx, userIdx, startItemI
                 THEN CONCAT(TIMESTAMPDIFF(minute, AC.createdAt, NOW()), '분 전')
             WHEN TIMESTAMPDIFF(hour, AC.createdAt, NOW()) < 24
                 THEN CONCAT(TIMESTAMPDIFF(hour, AC.createdAt, NOW()), '시간 전')
-            WHEN TIMESTAMPDIFF(day, DATE_FORMAT(AC.createdAt, '%Y-%m-%d'), DATE_FORMAT(NOW(),'%Y-%m-%d')) <= 3
-                THEN CONCAT(TIMESTAMPDIFF(day, DATE_FORMAT(AC.createdAt, '%Y-%m-%d'), DATE_FORMAT(NOW(),'%Y-%m-%d')), '일 전')
+            WHEN TIMESTAMPDIFF(day, DATE_FORMAT(AC.createdAt, '%Y-%m-%d'), DATE_FORMAT(NOW(), '%Y-%m-%d')) <= 3
+                THEN CONCAT(TIMESTAMPDIFF(day, DATE_FORMAT(AC.createdAt, '%Y-%m-%d'), DATE_FORMAT(NOW(), '%Y-%m-%d')),
+                            '일 전')
             ELSE DATE_FORMAT(AC.createdAt, '%Y.%m.%d. %H:%i')
             END                                                     as createdAt,
         IF(AC.userIdx = ${userIdx}, 'Y', 'N')                       as isUserComment,
@@ -80,7 +81,13 @@ async function getABTestParentComment(connection, abTestIdx, userIdx, startItemI
   FROM ABTestComment AC
           JOIN User U ON U.userIdx = AC.userIdx && U.isDeleted = 'N'
           JOIN ABTest A on AC.abTestIdx = A.abTestIdx && A.isDeleted = 'N'
-  WHERE AC.parentIdx IS NULL && AC.abTestIdx = ${abTestIdx}
+          LEFT JOIN (SELECT parentIdx, COUNT(abTestCommentIdx) AS childCommentCnt
+                      FROM ABTestComment
+                      WHERE isDeleted = 'N' && parentIdx IS NOT NULL
+                      GROUP BY parentIdx) ACC
+                    ON ACC.parentIdx = AC.abTestCommentIdx
+  WHERE AC.parentIdx IS NULL && AC.abTestIdx = ${abTestIdx} &&
+        (AC.isDeleted = 'N' || (AC.isDeleted = 'Y' && childCommentCnt IS NOT NULL))
   LIMIT ${startItemIdx}, ${pageItemCnt};
   `;
   const [rows] = await connection.query(query);

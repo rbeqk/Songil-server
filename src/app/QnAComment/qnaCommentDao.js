@@ -55,30 +55,36 @@ async function deleteStoryComment(connection, qnaCommentIdx){
 async function getQnAParentComment(connection, qnaIdx, userIdx, pageItemCnt, startItemIdx){
   const query = `
   SELECT QC.qnaCommentIdx                      as commentIdx,
-          QC.userIdx,
-          U.imageUrl                            as userProfile,
-          U.nickname                            as userName,
-          IF(Q.userIdx = QC.userIdx, 'Y', 'N')  as isWriter,
-          QC.comment,
-          CASE
+        QC.userIdx,
+        U.imageUrl                            as userProfile,
+        U.nickname                            as userName,
+        IF(Q.userIdx = QC.userIdx, 'Y', 'N')  as isWriter,
+        QC.comment,
+        CASE
             WHEN TIMESTAMPDIFF(minute, QC.createdAt, NOW()) < 1
                 THEN '방금 전'
             WHEN TIMESTAMPDIFF(hour, QC.createdAt, NOW()) < 1
                 THEN CONCAT(TIMESTAMPDIFF(minute, QC.createdAt, NOW()), '분 전')
             WHEN TIMESTAMPDIFF(hour, QC.createdAt, NOW()) < 24
                 THEN CONCAT(TIMESTAMPDIFF(hour, QC.createdAt, NOW()), '시간 전')
-            WHEN TIMESTAMPDIFF(day, DATE_FORMAT(QC.createdAt, '%Y-%m-%d'), DATE_FORMAT(NOW(),'%Y-%m-%d')) <= 3
-                THEN CONCAT(TIMESTAMPDIFF(day, DATE_FORMAT(QC.createdAt, '%Y-%m-%d'), DATE_FORMAT(NOW(),'%Y-%m-%d')), '일 전')
+            WHEN TIMESTAMPDIFF(day, DATE_FORMAT(QC.createdAt, '%Y-%m-%d'), DATE_FORMAT(NOW(), '%Y-%m-%d')) <= 3
+                THEN CONCAT(TIMESTAMPDIFF(day, DATE_FORMAT(QC.createdAt, '%Y-%m-%d'), DATE_FORMAT(NOW(), '%Y-%m-%d')),
+                            '일 전')
             ELSE DATE_FORMAT(QC.createdAt, '%Y.%m.%d. %H:%i')
-            END                                                     as createdAt,
-          IF(QC.userIdx = ${userIdx}, 'Y', 'N') as isUserComment,
-          QC.isDeleted,
-          QC.isReported
-    FROM QnAComment QC
-            JOIN User U ON U.userIdx = QC.userIdx && U.isDeleted = 'N'
-            JOIN QnA Q ON Q.qnaIdx = QC.qnaIdx && Q.isDeleted = 'N'
-    WHERE QC.parentIdx IS NULL && QC.qnaIdx = ${qnaIdx}
-    LIMIT ${startItemIdx}, ${pageItemCnt};
+            END                               as createdAt,
+        IF(QC.userIdx = ${userIdx}, 'Y', 'N') as isUserComment,
+        QC.isDeleted,
+        QC.isReported
+  FROM QnAComment QC
+          JOIN User U ON U.userIdx = QC.userIdx && U.isDeleted = 'N'
+          JOIN QnA Q ON Q.qnaIdx = QC.qnaIdx && Q.isDeleted = 'N'
+          LEFT JOIN (SELECT parentIdx, COUNT(qnaCommentIdx) AS childCommentCnt
+                      FROM QnAComment
+                      WHERE isDeleted = 'N' && parentIdx IS NOT NULL
+                      GROUP BY parentIdx) QCC ON QCC.parentIdx = QC.qnaCommentIdx
+  WHERE QC.parentIdx IS NULL && QC.qnaIdx = ${qnaIdx} &&
+        (QC.isDeleted = 'N' || (QC.isDeleted = 'Y' && childCommentCnt IS NOT NULL))
+  LIMIT ${startItemIdx}, ${pageItemCnt};
   `;
   const [rows] = await connection.query(query);
   return rows;

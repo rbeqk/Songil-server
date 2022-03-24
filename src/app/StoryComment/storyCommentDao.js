@@ -54,31 +54,37 @@ async function deleteStoryComment(connection, storyCommentIdx){
 //스토리 부모 댓글 가져오기
 async function getStoryParentComment(connection, storyIdx, userIdx, startItemIdx, pageItemCnt){
   const query = `
-  SELECT SC.storyCommentIdx as commentIdx,
-          SC.userIdx,
-          U.imageUrl         as userProfile,
-          U.nickname         as userName,
-          IF(S.userIdx = SC.userIdx, 'Y', 'N') as isWriter,
-          SC.comment,
-          CASE
+  SELECT SC.storyCommentIdx                    as commentIdx,
+        SC.userIdx,
+        U.imageUrl                            as userProfile,
+        U.nickname                            as userName,
+        IF(S.userIdx = SC.userIdx, 'Y', 'N')  as isWriter,
+        SC.comment,
+        CASE
             WHEN TIMESTAMPDIFF(minute, SC.createdAt, NOW()) < 1
                 THEN '방금 전'
             WHEN TIMESTAMPDIFF(hour, SC.createdAt, NOW()) < 1
                 THEN CONCAT(TIMESTAMPDIFF(minute, SC.createdAt, NOW()), '분 전')
             WHEN TIMESTAMPDIFF(hour, SC.createdAt, NOW()) < 24
                 THEN CONCAT(TIMESTAMPDIFF(hour, SC.createdAt, NOW()), '시간 전')
-            WHEN TIMESTAMPDIFF(day, DATE_FORMAT(SC.createdAt, '%Y-%m-%d'), DATE_FORMAT(NOW(),'%Y-%m-%d')) <= 3
-                THEN CONCAT(TIMESTAMPDIFF(day, DATE_FORMAT(SC.createdAt, '%Y-%m-%d'), DATE_FORMAT(NOW(),'%Y-%m-%d')), '일 전')
+            WHEN TIMESTAMPDIFF(day, DATE_FORMAT(SC.createdAt, '%Y-%m-%d'), DATE_FORMAT(NOW(), '%Y-%m-%d')) <= 3
+                THEN CONCAT(TIMESTAMPDIFF(day, DATE_FORMAT(SC.createdAt, '%Y-%m-%d'), DATE_FORMAT(NOW(), '%Y-%m-%d')),
+                            '일 전')
             ELSE DATE_FORMAT(SC.createdAt, '%Y.%m.%d. %H:%i')
-            END                                                     as createdAt,
-          IF(SC.userIdx = ${userIdx}, 'Y', 'N') as isUserComment,
-          SC.isDeleted,
-          SC.isReported
-    FROM StoryComment SC
-            JOIN User U ON U.userIdx = SC.userIdx && U.isDeleted = 'N'
-            JOIN Story S ON S.storyIdx = SC.storyIdx && S.isDeleted = 'N'
-    WHERE SC.parentIdx IS NULL && SC.storyIdx = ${storyIdx}
-    LIMIT ${startItemIdx}, ${pageItemCnt};
+            END                               as createdAt,
+        IF(SC.userIdx = ${userIdx}, 'Y', 'N') as isUserComment,
+        SC.isDeleted,
+        SC.isReported
+  FROM StoryComment SC
+          JOIN User U ON U.userIdx = SC.userIdx && U.isDeleted = 'N'
+          JOIN Story S ON S.storyIdx = SC.storyIdx && S.isDeleted = 'N'
+          LEFT JOIN (SELECT parentIdx, COUNT(storyCommentIdx) AS childCommentCnt
+                      FROM StoryComment
+                      WHERE isDeleted = 'N' && parentIdx IS NOT NULL
+                      GROUP BY parentIdx) SCC ON SCC.parentIdx = SC.storyCommentIdx
+  WHERE SC.parentIdx IS NULL && SC.storyIdx = ${storyIdx} &&
+        (SC.isDeleted = 'N' || (SC.isDeleted = 'Y' && childCommentCnt IS NOT NULL))
+  LIMIT ${startItemIdx}, ${pageItemCnt};
   `;
   const [rows] = await connection.query(query);
   return rows;
