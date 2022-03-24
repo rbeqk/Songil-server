@@ -14,7 +14,7 @@ async function getBenefits(connection, userIdx){
         IF(B.discountPrice IS NOT NULL,
             (CONCAT(B.basisPrice, '원 이상 구매 시')),
             CONCAT(B.basisPrice, '원 이상 구매 시, 최대 ', B.maxDiscountPrice, '원 할인')) as detailInfo,
-        DATE_FORMAT(B.deadline, '%m.%d')                                   as deadline
+        DATE_FORMAT(B.deadline, '%m/%d')                                   as deadline
   FROM UserBenefit UB
           JOIN Benefit B ON B.benefitIdx = UB.benefitIdx && B.deadline > NOW() && B.isDeleted = 'N'
           LEFT JOIN Artist A ON A.artistIdx = B.artistIdx && A.isDeleted = 'N'
@@ -120,7 +120,7 @@ async function getCanUseBenefitInfo(connection, canUseBenefitIdxArr){
         IF(B.discountPrice IS NOT NULL,
             (CONCAT(B.basisPrice, '원 이상 구매 시')),
             CONCAT(B.basisPrice, '원 이상 구매시, 최대 ', B.maxDiscountPrice, '원 할인')) as detailInfo,
-        DATE_FORMAT(B.deadline, '%m.%d')                                      as deadline
+        DATE_FORMAT(B.deadline, '%m/%d')                                      as deadline
   FROM Benefit B
           LEFT JOIN Artist A ON A.artistIdx = B.artistIdx && A.isDeleted = 'N'
           LEFT JOIN User U ON U.userIdx = A.userIdx && U.isDeleted = 'N'

@@ -110,7 +110,6 @@ async function getABTestReComment(connection, abTestIdx, parentIdx, userIdx){
                 THEN CONCAT(TIMESTAMPDIFF(day, DATE_FORMAT(AC.createdAt, '%Y-%m-%d'), DATE_FORMAT(NOW(),'%Y-%m-%d')), '일 전')
             ELSE DATE_FORMAT(AC.createdAt, '%Y.%m.%d. %H:%i')
             END                                                     as createdAt,
-        DATE_FORMAT(AC.createdAt, '%Y.%m.%d')                       as createdAt,
         IF(AC.userIdx = ${userIdx}, 'Y', 'N')                       as isUserComment,
         AC.isReported
   FROM ABTestComment AC
