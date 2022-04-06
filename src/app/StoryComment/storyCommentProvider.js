@@ -1,10 +1,12 @@
 const storyDao = require('../Story/storyDao');
+const withDao = require('../With/withDao');
 const storyCommentDao = require('./storyCommentDao');
 const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 const {ITEMS_PER_PAGE} = require("../../../modules/constants");
+const {isBlockedComment} = require("../../../modules/commentUtil");
 
 //스토리 댓글 조회
 exports.getStoryComment = async (storyIdx, userIdx, page) => {
@@ -20,6 +22,7 @@ exports.getStoryComment = async (storyIdx, userIdx, page) => {
       }
 
       const startItemIdx = (page - 1) * ITEMS_PER_PAGE.STORY_COMMENT_PER_PAGE;
+      const blockUsers = await withDao.getBlockUsers(connection, userIdx);
 
       //부모 댓글 가져오기
       const parentComment = await storyCommentDao.getStoryParentComment(
@@ -40,6 +43,7 @@ exports.getStoryComment = async (storyIdx, userIdx, page) => {
           'isUserComment': item.isUserComment,
           'isDeleted': item.isDeleted,
           'isReported': item.isReported,
+          'isBlocked': isBlockedComment(item.userIdx, blockUsers),
           'reComment': []
         });
       });
@@ -58,7 +62,8 @@ exports.getStoryComment = async (storyIdx, userIdx, page) => {
             'comment': item.comment,
             'createdAt': item.createdAt,
             'isUserComment': item.isUserComment,
-            'isReported': item.isReported
+            'isReported': item.isReported,
+            'isBlocked': isBlockedComment(item.userIdx, blockUsers),
           });
         });
       }

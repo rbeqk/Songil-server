@@ -10,4 +10,7 @@ module.exports = function (app){
 
   //카테고리 별 WITH 조회 API
   app.get('/with', withController.getWith);
+
+  //WITH 쪽 유저 차단 API
+  app.post('/with/users/:userIdx/block', jwtMiddleware, withController.blockUser);
 }

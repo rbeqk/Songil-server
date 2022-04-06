@@ -1,10 +1,12 @@
 const qnaCommentDao = require('./qnaCommentDao');
 const qnaDao = require('../QnA/qnaDao');
+const withDao = require('../With/withDao');
 const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 const {ITEMS_PER_PAGE} = require("../../../modules/constants");
+const {isBlockedComment} = require("../../../modules/commentUtil");
 
 exports.getQnAComment = async (qnaIdx, userIdx, page) => {
   try{
@@ -19,6 +21,7 @@ exports.getQnAComment = async (qnaIdx, userIdx, page) => {
       }
 
       const startItemIdx = (page - 1) * ITEMS_PER_PAGE.QNA_COMMENT_PER_PAGE;
+      const blockUsers = await withDao.getBlockUsers(connection, userIdx);
 
       //부모 댓글 가져오기
       const parentComment = await qnaCommentDao.getQnAParentComment(
@@ -39,6 +42,7 @@ exports.getQnAComment = async (qnaIdx, userIdx, page) => {
           'isUserComment': item.isUserComment,
           'isDeleted': item.isDeleted,
           'isReported': item.isReported,
+          'isBlocked': isBlockedComment(item.userIdx, blockUsers),
           'reComment': []
         })
       });
@@ -57,7 +61,8 @@ exports.getQnAComment = async (qnaIdx, userIdx, page) => {
             'comment': item.comment,
             'createdAt': item.createdAt,
             'isUserComment': item.isUserComment,
-            'isReported': item.isReported
+            'isReported': item.isReported,
+            'isBlocked': isBlockedComment(item.userIdx, blockUsers),
           });
         });
       }

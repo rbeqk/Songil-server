@@ -1,6 +1,7 @@
 const baseResponseStatus = require('../../../config/baseResponseStatus');
 const { errResponse } = require('../../../config/response');
 const withProvider = require("./withProvider");
+const withService = require("./withService");
 const {getUserIdx} = require('../../../modules/userUtil');
 
 /*
@@ -22,10 +23,13 @@ exports.getHotTalk = async (req, res) => {
 */
 exports.getTotalWithPage = async (req, res) => {
   const {category} = req.query;
+  const token = req.headers['x-access-token'];
+  const userIdx = getUserIdx(token);
+  if (userIdx === false) return res.send(errResponse(baseResponseStatus.TOKEN_VERIFICATION_FAILURE));
   
   if (!category) return res.send(errResponse(baseResponseStatus.IS_EMPTY));
   if (!['story', 'qna', 'ab-test'].includes(category)) return res.send(errResponse(baseResponseStatus.INVALID_CATEGORY_NAME));
-  const getTotalWithPage = await withProvider.getTotalWithPage(category);
+  const getTotalWithPage = await withProvider.getTotalWithPage(userIdx, category);
 
   return res.send(getTotalWithPage);
 }
@@ -53,4 +57,22 @@ exports.getWith = async (req, res) => {
   const getWith = await withProvider.getWith(category, sort, page, userIdx);
 
   return res.send(getWith);
+}
+
+/*
+  API No. 5.0
+  API Name: WITH 쪽 유저 차단 API
+  [POST] /with/users/:userIdx/block
+*/
+exports.blockUser = async (req, res) => {
+  const {userIdx} = req.verifiedToken;
+  const {userIdx: blockUserIdx} = req.params;
+
+  if (userIdx == blockUserIdx){
+    return res.send(errResponse(baseResponseStatus.CAN_NOT_BLOCK_SELF));
+  }
+
+  const blockUser = await withService.blockUser(userIdx, blockUserIdx);
+
+  return res.send(blockUser);
 }

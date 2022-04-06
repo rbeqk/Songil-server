@@ -48,6 +48,7 @@ module.exports = {
   INVALID_POINT: {"isSuccess": false, "code": 2329, "message": "사용할 수 없는 포인트 값입니다"},
   INVALID_ORDER_CRAFT_IDX: {"isSuccess": false, "code": 2340, "message": "존재하지 않는 orderDetailIdx입니다"},
   INVALID_REASON_IDX: {"isSuccess": false, "code": 2341, "message": "존재하지 않는 reasonIdx입니다"},
+  INVALID_USER_IDX: {"isSuccess": false, "code": 2342, "message": "존재하지 않는 userIdx입니다"},
 
   EXCEED_ASK_CONTENT: {"isSuccess": false, "code": 2350, "message": "content는 300자 이하로 입력해주세요"},
   EXCEED_REPORTED_REASON: {"isSuccess": false, "code": 2351, "message": "etcReason은 150자 이하로 입력해주세요"},
@@ -76,6 +77,7 @@ module.exports = {
   IS_ALREADY_ANSWER_ASK_IDX: {"isSuccess": false, "code": 2402, "message": "이미 답변한 문의입니다"},
   CAN_NOT_COMMENT_TO_DELETED_CRAFT: {"isSuccess": false, "code": 2403, "message": "삭제된 상품의 문의에 대해서는 답변할 수 없습니다"},
   CAN_NOT_USE_BENEFIT_IDX: {"isSuccess": false, "code": 2404, "message": "사용할 수 없는 benefitIdx입니다"},
+  CAN_NOT_BLOCK_SELF: {"isSuccess": false, "code": 2405, "message": "자기 자신은 차단할 수 없습니다"},
 
   //Response
   INVALD_VERIFICATIONCODE: {"isSuccess": false, "code": 3100, "message": "올바르지 않은 인증번호입니다"},
@@ -89,6 +91,7 @@ module.exports = {
   ALREADY_VOTE_ABTEST_IDX: {"isSuccess": false, "code": 3204, "message": "이미 투표 완료한 abTest입니다"},
   ALREADY_PAYMENT_ORDER_IDX: {"isSuccess": false, "code": 3205, "message": "이미 결제한 orderIdx입니다"},
   ALREADY_WRITTEN_COMMENT: {"isSuccess": false, "code": 3206, "message": "이미 댓글을 작성한 orderDetailIdx입니다"},
+  ALREADY_BLOCKED_USER_IDX: {"isSuccess": false, "code": 3207, "message": "이미 차단한 userIdx입니다"},
 
   EMPTY_USER_SEARCH: {"isSuccess": false, "code": 3300, "message": "사용자의 최근 검색어가 없습니다"},
   NO_VOTE_DATA: {"isSuccess": false, "code": 3301, "message": "투표 이력이 없습니다"},

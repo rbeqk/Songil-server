@@ -41,21 +41,21 @@ exports.getHotTalk = async () => {
 }
 
 //카테고리 별 WITH 페이지 개수 조회
-exports.getTotalWithPage = async (category) => {
+exports.getTotalWithPage = async (userIdx, category) => {
   try{
     const connection = await pool.getConnection(async conn => conn);
     try{
-
+      const blockUsers = await withDao.getBlockUsers(connection, userIdx);
       let totalCnt;
 
       if (category === 'story'){
-        totalCnt = await withDao.getStoryTotalCnt(connection);
+        totalCnt = await withDao.getStoryTotalCnt(connection, blockUsers);
       }
       else if (category === 'qna'){
-        totalCnt = await withDao.getQnaTotalCnt(connection);
+        totalCnt = await withDao.getQnaTotalCnt(connection, blockUsers);
       }
       else if (category === 'ab-test'){
-        totalCnt = await withDao.getABTestTotalCnt(connection);
+        totalCnt = await withDao.getABTestTotalCnt(connection, blockUsers);
       }
 
       const totalPages = getTotalPage(totalCnt, ITEMS_PER_PAGE.WITH_BY_CATEGORY_PER_PAGE);
@@ -83,14 +83,15 @@ exports.getWith = async (category, sort, page, userIdx) => {
 
       let result;
       const startItemIdx = (page - 1) * ITEMS_PER_PAGE.WITH_BY_CATEGORY_PER_PAGE;
+      const blockUsers = await withDao.getBlockUsers(connection, userIdx);
 
       if (category === 'story'){
         result = {};
-        result.totalCnt = await withDao.getStoryTotalCnt(connection);
+        result.totalCnt = await withDao.getStoryTotalCnt(connection, blockUsers);
         
         result.story = [];
         const story = await withDao.getStory(
-          connection, userIdx, sort, startItemIdx, ITEMS_PER_PAGE.WITH_BY_CATEGORY_PER_PAGE
+          connection, userIdx, blockUsers, sort, startItemIdx, ITEMS_PER_PAGE.WITH_BY_CATEGORY_PER_PAGE
         );
 
         story.forEach(item => {
@@ -111,7 +112,7 @@ exports.getWith = async (category, sort, page, userIdx) => {
         result = [];
 
         const qna = await withDao.getQnA(
-          connection, userIdx, sort, startItemIdx, ITEMS_PER_PAGE.WITH_BY_CATEGORY_PER_PAGE
+          connection, userIdx, blockUsers, sort, startItemIdx, ITEMS_PER_PAGE.WITH_BY_CATEGORY_PER_PAGE
         );
 
         qna.forEach(item => {
@@ -136,7 +137,7 @@ exports.getWith = async (category, sort, page, userIdx) => {
       else if (category === 'ab-test'){
         result = [];
         const abTest = await withDao.getABTest(
-          connection, startItemIdx, ITEMS_PER_PAGE.WITH_BY_CATEGORY_PER_PAGE
+          connection, blockUsers, startItemIdx, ITEMS_PER_PAGE.WITH_BY_CATEGORY_PER_PAGE
         );
 
         for (let item of abTest){

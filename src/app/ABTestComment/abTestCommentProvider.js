@@ -1,10 +1,12 @@
 const abTestDao = require('../ABTest/abTestDao');
 const abTestCommentDao = require('./abTestCommentDao');
+const withDao = require('../With/withDao');
 const {pool} = require('../../../config/database');
 const {logger} = require('../../../config/winston');
 const {response, errResponse} = require('../../../config/response');
 const baseResponse = require('../../../config/baseResponseStatus');
 const {ITEMS_PER_PAGE} = require("../../../modules/constants");
+const {isBlockedComment} = require("../../../modules/commentUtil");
 
 exports.getABTestComment = async (abTestIdx, userIdx, page) => {
   try{
@@ -19,6 +21,7 @@ exports.getABTestComment = async (abTestIdx, userIdx, page) => {
       }
 
       const startItemIdx = (page - 1) * ITEMS_PER_PAGE.AB_TEST_COMMENT_PER_PAGE;
+      const blockUsers = await withDao.getBlockUsers(connection, userIdx);
 
       //부모 댓글 가져오기
       const parentComment = await abTestCommentDao.getABTestParentComment(connection, abTestIdx, userIdx, startItemIdx, ITEMS_PER_PAGE.AB_TEST_COMMENT_PER_PAGE);
@@ -37,6 +40,7 @@ exports.getABTestComment = async (abTestIdx, userIdx, page) => {
           'isUserComment': item.isUserComment,
           'isDeleted': item.isDeleted,
           'isReported': item.isReported,
+          'isBlocked': isBlockedComment(item.userIdx, blockUsers),
           'reComment': []
         });
       });
@@ -55,7 +59,8 @@ exports.getABTestComment = async (abTestIdx, userIdx, page) => {
             'comment': item.comment,
             'createdAt': item.createdAt,
             'isUserComment': item.isUserComment,
-            'isReported': item.isReported
+            'isReported': item.isReported,
+            'isBlocked': isBlockedComment(item.userIdx, blockUsers),
           });
         });
       }
