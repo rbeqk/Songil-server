@@ -13,6 +13,7 @@ async function isExistABTestIdx(connection, abTestIdx){
 async function getABTestInfo(connection, abTestIdx, userIdx){
   const query = `
   SELECT AB.abTestIdx,
+        U.userIdx,
         AB.artistIdx,
         U.imageUrl                                                  as artistImageUrl,
         U.nickname                                                  as artistName,

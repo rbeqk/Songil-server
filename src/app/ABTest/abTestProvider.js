@@ -22,6 +22,7 @@ exports.getABTestDetail = async (abTestIdx, userIdx) => {
 
       let result = {
         'abTestIdx': abTestInfo.abTestIdx,
+        'userIdx': abTestInfo.userIdx,
         'artistIdx': abTestInfo.artistIdx,
         'artistImageUrl': abTestInfo.artistImageUrl,
         'artistName': abTestInfo.artistName,
