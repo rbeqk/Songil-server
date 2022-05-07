@@ -124,6 +124,26 @@ async function deleteUserCraft(connection, artistIdx){
   return rows;
 }
 
+//교환/환불/취소 안내
+async function getCraftRefundInfo(connection, craftIdx){
+  const query = `
+  SELECT info FROM CraftRefundInfo
+  WHERE craftIdx = ${craftIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows.map(item => item.info);
+}
+
+//배송기간 안내
+async function getDeliveryPeriodInfo(connection, craftIdx){
+  const query = `
+  SELECT info FROM CraftDeliveryPeriodInfo
+  WHERE craftIdx = ${craftIdx};
+  `;
+  const [rows] = await connection.query(query);
+  return rows.map(item => item.info);
+}
+
 module.exports = {
   isExistCraftIdx,
   getCraftBasicInfo,
@@ -134,4 +154,6 @@ module.exports = {
   getCraftShippingFee,
   getUserLikeCraft,
   deleteUserCraft,
+  getCraftRefundInfo,
+  getDeliveryPeriodInfo,
 }
