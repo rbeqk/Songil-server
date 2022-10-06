@@ -32,10 +32,11 @@ exports.createVerificationCode = async (email) => {
       Cache.put(email, verificationCode, 1000*60*3);
   
       const transporter = nodemailer.createTransport({
-        service: 'gmail',
+        service: 'GMail',
         host: 'smtp.gmail.com',
         port: 587,
-        secure: false,
+        secure: true,
+        requireTLS: true,
         auth: {
           user: process.env.NODEMAILER_USER,
           pass: process.env.NODEMAILER_PASSWORD,
